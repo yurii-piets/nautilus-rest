@@ -1,0 +1,2 @@
+include ':nautilus-common'
+project(':nautilus-common').projectDir = new File(settingsDir, '../nautilus-common')
