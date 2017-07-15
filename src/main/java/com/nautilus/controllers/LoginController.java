@@ -14,7 +14,7 @@ public class LoginController {
 
     @RequestMapping(method = RequestMethod.POST)
     public LoginStatusDTO login(@RequestBody LoginDTO loginDTO){
-        System.out.println(loginDTO.getUserName() + ": " + loginDTO.getPassword());
-        return new LoginStatusDTO(LoginStatus.Accepted.toString());
+        System.out.println(loginDTO.getUserEmail() + ": " + loginDTO.getPassword());
+        return new LoginStatusDTO(LoginStatus.Accepted);
     }
 }
