@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/registerUser")
-public class RegisterController {
+@RequestMapping(value = "/updateUser")
+public class UpdateUserController {
 
     @RequestMapping(method = RequestMethod.POST)
-    public Status register(@RequestBody RegisterUserDTO registerDTO) {
+    public Status update(@RequestBody RegisterUserDTO updateDto) {
 
         return Status.ACCEPTED;
     }

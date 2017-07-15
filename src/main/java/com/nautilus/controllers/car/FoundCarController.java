@@ -1,7 +1,7 @@
 package com.nautilus.controllers.car;
 
 import com.nautilus.constants.CarStatus;
-import com.nautilus.dto.car.CarDTO;
+import com.nautilus.dto.car.CarStatusDTO;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FoundCarController {
 
     @RequestMapping(method = RequestMethod.POST)
-    public CarStatus found(@RequestBody CarDTO carDTO) {
+    public CarStatus found(@RequestBody CarStatusDTO carDTO) {
 
         return CarStatus.OK;
     }
