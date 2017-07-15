@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/found")
 public class FoundCarController {
@@ -17,7 +19,7 @@ public class FoundCarController {
     private CarService service;
 
     @RequestMapping(method = RequestMethod.POST)
-    public CarStatus found(@RequestBody CarStatusDTO carDTO) {
+    public CarStatus found(@RequestBody @Valid CarStatusDTO carDTO) {
         CarStatus status = service.checkStatusByCarId(carDTO.getId());
         return status;
     }

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/updateUser")
 public class UpdateUserController {
@@ -16,7 +18,7 @@ public class UpdateUserController {
     private UserService service;
 
     @RequestMapping(method = RequestMethod.POST)
-    public Status update(@RequestBody RegisterUserDTO updateDto) {
+    public Status update(@RequestBody @Valid RegisterUserDTO updateDto) {
         Status status = service.updateUser(updateDto);
         return status;
     }

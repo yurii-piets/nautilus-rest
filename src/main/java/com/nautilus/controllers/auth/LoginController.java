@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.nautilus.dto.user.login.LoginDTO;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/login")
 public class LoginController {
@@ -17,7 +19,7 @@ public class LoginController {
     private UserService service;
 
     @RequestMapping(method = RequestMethod.POST)
-    public Status login(@RequestBody LoginDTO loginDTO) {
+    public Status login(@RequestBody @Valid LoginDTO loginDTO) {
         Status status = service.checkCredential(loginDTO);
 
         return status;
