@@ -1,7 +1,6 @@
 package com.nautilus.controllers.car;
 
 import com.nautilus.constants.Status;
-import com.nautilus.database.def.CarService;
 import com.nautilus.dto.car.CarRegisterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,12 +14,9 @@ import javax.validation.Valid;
 @RequestMapping(value = "/updateCar")
 public class UpdateCarController {
 
-    @Autowired
-    private CarService service;
-
     @RequestMapping(method = RequestMethod.POST)
     public Status update(@RequestBody @Valid CarRegisterDTO updateDto) {
-        Status status = service.updateCar(updateDto);
+        Status status = Status.ACCEPTED;
         return status;
     }
 }

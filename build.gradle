@@ -29,4 +29,17 @@ dependencies {
 
     compile project(':nautilus-common')
 
+    compile "org.hibernate:hibernate-core:5.2.10.Final"
+    compile "org.hibernate:hibernate-envers:5.2.10.Final"
+    compile "org.hibernate:hibernate-validator:5.4.1.Final"
+    compile "javax.validation:validation-api:1.0.0.GA"
+    compile "mysql:mysql-connector-java:5.1.13"
+
+    compile group: 'org.springframework', name: 'spring-jdbc', version: "4.3.7.RELEASE"
+    compile group: 'org.springframework', name: 'spring-context', version: "4.3.7.RELEASE"
+    compile group: 'org.springframework', name: 'spring-orm', version: "4.3.7.RELEASE"
+    compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.1.1'
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.9.Final'
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '1.11.1.RELEASE'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.0.0'
 }
