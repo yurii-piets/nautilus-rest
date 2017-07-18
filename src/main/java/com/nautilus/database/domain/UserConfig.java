@@ -4,21 +4,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Data
 @NoArgsConstructor
-public class User {
+public class UserConfig {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
     private String name;
     private String surname;
     private String email;
     private String password;
 
     @OneToMany
-    private Car cars;
-
+    private Set<Car> cars;
 }

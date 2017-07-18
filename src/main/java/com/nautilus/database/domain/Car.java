@@ -4,10 +4,7 @@ import com.nautilus.constants.CarStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 @Data
@@ -16,6 +13,7 @@ public class Car {
 
     @Id
     private String beaconId;
+
     private String registerNumber;
     private String mark;
     private String model;
@@ -25,7 +23,7 @@ public class Car {
     private String description;
 
     @ManyToOne
-    private User owner;
+    private UserConfig owner;
 
     private CarStatus status;
 
