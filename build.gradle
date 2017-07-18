@@ -42,4 +42,5 @@ dependencies {
     compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '1.11.1.RELEASE'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.0.0'
     // End Spring Data JPA
+
 }

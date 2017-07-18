@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 @PropertySource("classpath:database_application.properties")
 public class DataSourceConfig {
 
-    static final String PACKAGE_TO_SCAN_REPOSITORIES = "com.nautilus.database.config";
+    static final String PACKAGE_TO_SCAN_REPOSITORIES = "com.nautilus.database.repository";
     private static final String PACKAGE_TO_SCAN_ENTITIES = "com.nautilus.database.domain";
 
     private static final String PROPERTY_DATASOURCE_DRIVER_CLASS_NAME = "datasource.driver-class-name";
