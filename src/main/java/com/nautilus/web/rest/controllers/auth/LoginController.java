@@ -1,4 +1,4 @@
-package com.nautilus.controllers.auth;
+package com.nautilus.web.rest.controllers.auth;
 
 import com.nautilus.constants.Status;
 import com.nautilus.dto.user.LoginDTO;

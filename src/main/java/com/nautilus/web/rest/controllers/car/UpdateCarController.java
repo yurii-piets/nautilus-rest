@@ -1,4 +1,4 @@
-package com.nautilus.controllers.car;
+package com.nautilus.web.rest.controllers.car;
 
 import com.nautilus.constants.Status;
 import com.nautilus.dto.car.CarRegisterDTO;
@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/registerCar")
-public class RegisterCarController {
+@RequestMapping(value = "/updateCar")
+public class UpdateCarController {
 
     @RequestMapping(method = RequestMethod.POST)
-    public Status register(@RequestBody @Valid CarRegisterDTO registerDTO) {
+    public Status update(@RequestBody @Valid CarRegisterDTO updateDto) {
         Status status = Status.ACCEPTED;
         return status;
     }

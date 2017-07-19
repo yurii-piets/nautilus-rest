@@ -44,5 +44,7 @@ dependencies {
     // End Spring Data JPA
 
     compile 'org.aspectj:aspectjweaver:1.7.4'
+    compile "org.springframework.boot:spring-boot-starter-actuator"
 
+    compile 'org.springframework.boot:spring-boot-devtools'
 }

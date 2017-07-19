@@ -1,8 +1,7 @@
-package com.nautilus.controllers.car;
+package com.nautilus.web.rest.controllers.car;
 
-import com.nautilus.constants.CarStatus;
-import com.nautilus.dto.car.CarStatusDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.nautilus.constants.Status;
+import com.nautilus.dto.car.CarRegisterDTO;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/found")
-public class FoundCarController {
+@RequestMapping(value = "/registerCar")
+public class RegisterCarController {
 
     @RequestMapping(method = RequestMethod.POST)
-    public CarStatus found(@RequestBody @Valid CarStatusDTO carDTO) {
-        CarStatus status = CarStatus.STOLEN;
+    public Status register(@RequestBody @Valid CarRegisterDTO registerDTO) {
+        Status status = Status.ACCEPTED;
         return status;
     }
 }
