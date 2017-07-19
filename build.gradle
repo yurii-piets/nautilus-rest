@@ -43,4 +43,6 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '42.0.0'
     // End Spring Data JPA
 
+    compile 'org.aspectj:aspectjweaver:1.7.4'
+
 }

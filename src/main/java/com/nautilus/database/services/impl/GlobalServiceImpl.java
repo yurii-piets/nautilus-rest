@@ -1,6 +1,6 @@
 package com.nautilus.database.services.impl;
 
-import com.nautilus.database.domain.Car;
+import com.nautilus.database.domain.UserConfig;
 import com.nautilus.database.repository.CarRepository;
 import com.nautilus.database.repository.UserRepository;
 import com.nautilus.database.services.def.GlobalService;
@@ -19,7 +19,7 @@ public class GlobalServiceImpl implements GlobalService {
     private CarRepository carRepository;
 
 //    @Override
-//    public void saveCar(Car car) {
+//    public void save(Car car) {
 //        carRepository.save(car);
 //    }
 
@@ -33,10 +33,10 @@ public class GlobalServiceImpl implements GlobalService {
 //        return carRepository.findCarStatusByBeaconId(beaconId);
 //    }
 //
-//    @Override
-//    public void saveUser(UserConfig user) {
-//        userRepository.save(user);
-//    }
+    @Override
+    public void save(UserConfig user) {
+        userRepository.save(user);
+    }
 //
 //    @Override
 //    public void updateUser(UserConfig user) {
