@@ -1,6 +1,6 @@
-out
+out/
 .gradle/
 gradle/
 build/
+.idea/
 *.iml
-.idea
