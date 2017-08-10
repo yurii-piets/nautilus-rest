@@ -1,9 +1,12 @@
 plugins {
     id 'org.springframework.boot' version '1.5.4.RELEASE'
+    id "com.bmuschko.cargo" version "2.2.3"
+    id 'nu.studer.credentials' version '1.0.1'
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'war'
 
 group = 'com.nautilus'
 version = '0.0.1-SNAPSHOT'
@@ -21,7 +24,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.springframework.boot:spring-boot-devtools'
-    compile 'org.springframework.boot:spring-boot-starter-security:1.0.0.RELEASE'
+//    compile 'org.springframework.boot:spring-boot-starter-security:1.0.0.RELEASE'
 
     // Begin Spring Data JPA
     compile 'org.springframework:spring-jdbc:4.3.7.RELEASE'
@@ -35,4 +38,24 @@ dependencies {
     // End Spring Data JPA
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
+}
+
+war{
+    baseName = 'nautilus-app'
+    version =  '0.0.1'
+}
+
+cargo {
+    containerId = 'tomcat8x'
+    port = 8080
+
+    deployable {
+        context = '/nautilus-app-dev'
+    }
+
+    remote {
+        hostname = 'localhost'
+        username = project.credentials.("manager.username")
+        password = project.credentials.("manager.password")
+    }
 }
