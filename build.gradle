@@ -1,7 +1,5 @@
 plugins {
     id 'org.springframework.boot' version '1.5.4.RELEASE'
-    id "com.bmuschko.cargo" version "2.2.3"
-    id 'nu.studer.credentials' version '1.0.1'
 }
 
 apply plugin: 'java'
@@ -11,6 +9,10 @@ apply plugin: 'war'
 group = 'com.nautilus'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
+
+ext {
+    applicationName = 'nautilus-app'
+}
 
 repositories {
     mavenLocal()
@@ -37,25 +39,28 @@ dependencies {
     compile 'org.aspectj:aspectjweaver:1.7.4'
     // End Spring Data JPA
 
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 
-war{
+war {
     baseName = 'nautilus-app'
-    version =  '0.0.1'
+    version = '0.0.1'
 }
 
-cargo {
-    containerId = 'tomcat8x'
-    port = 8080
+task deployLocal(dependsOn: war, type: Copy) {
+    from("build/libs")
+    into "${System.env.CATALINA_HOME}/webapps"
+    include "${war.baseName}-${war.version}.war"
+    rename("${war.baseName}-${war.version}.war", "${applicationName}.war")
+}
 
-    deployable {
-        context = '/nautilus-app-dev'
+task unDeployLocal(type: Delete){
+    delete fileTree("${System.env.CATALINA_HOME}/webapps"){
+        include "**/${applicationName}.war"
     }
 
-    remote {
-        hostname = 'localhost'
-        username = project.credentials.("manager.username")
-        password = project.credentials.("manager.password")
-    }
+    delete "${System.env.CATALINA_HOME}/webapps/${applicationName}/"
+
 }
