@@ -1,0 +1,26 @@
+apply plugin: 'war'
+
+war {
+    baseName = 'nautilus-app'
+    version = '0.0.1'
+}
+
+task deployLocal(dependsOn: war, type: Copy) {
+    from("build/libs")
+    into "${System.env.CATALINA_HOME}/webapps"
+    include "${war.baseName}-${war.version}.war"
+    rename("${war.baseName}-${war.version}.war", "${applicationName}.war")
+}
+
+task unDeployLocal(type: Delete){
+    delete fileTree("${System.env.CATALINA_HOME}/webapps"){
+        include "**/${applicationName}.war"
+    }
+
+    delete "${System.env.CATALINA_HOME}/webapps/${applicationName}/"
+
+}
+
+dependencies {
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+}

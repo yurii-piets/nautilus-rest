@@ -4,7 +4,6 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'idea'
-apply plugin: 'war'
 
 group = 'com.nautilus'
 version = '0.0.1-SNAPSHOT'
@@ -39,28 +38,19 @@ dependencies {
     compile 'org.aspectj:aspectjweaver:1.7.4'
     // End Spring Data JPA
 
-    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 
-war {
-    baseName = 'nautilus-app'
-    version = '0.0.1'
+ext {
+    profiles=['deployLocal']
 }
 
-task deployLocal(dependsOn: war, type: Copy) {
-    from("build/libs")
-    into "${System.env.CATALINA_HOME}/webapps"
-    include "${war.baseName}-${war.version}.war"
-    rename("${war.baseName}-${war.version}.war", "${applicationName}.war")
-}
-
-task unDeployLocal(type: Delete){
-    delete fileTree("${System.env.CATALINA_HOME}/webapps"){
-        include "**/${applicationName}.war"
+if(hasProperty('p')){
+    p.split(",").each {profile ->
+        if(ext.profiles.contains(profile)){
+            apply from: "gradle-profiles/profile-${profile}.gradle"
+        } else {
+            println "No such profile"
+        }
     }
-
-    delete "${System.env.CATALINA_HOME}/webapps/${applicationName}/"
-
 }
