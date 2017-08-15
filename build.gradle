@@ -4,6 +4,7 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'war'
 
 group = 'com.nautilus'
 version = '0.0.1-SNAPSHOT'
