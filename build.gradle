@@ -23,21 +23,6 @@ subprojects {
         compile 'com.nautilus:nautilus-common:0.0.1-SNAPSHOT'
         compile 'org.projectlombok:lombok:1.16.16'
 
-        compile 'org.springframework.boot:spring-boot-starter-web:1.5.4.RELEASE'
-        compile 'org.springframework.boot:spring-boot-starter-actuator:1.5.4.RELEASE'
-        compile 'org.springframework.boot:spring-boot-devtools:1.5.4.RELEASE'
-
-        // Begin Spring Data JPA
-        compile 'org.springframework:spring-jdbc:4.3.7.RELEASE'
-        compile 'org.springframework:spring-context:4.3.7.RELEASE'
-        compile 'org.springframework:spring-orm:4.3.7.RELEASE'
-        compile 'org.apache.commons:commons-dbcp2:2.1.1'
         compile 'org.hibernate:hibernate-core:5.2.9.Final'
-        compile 'org.springframework.data:spring-data-jpa:1.11.1.RELEASE'
-        compile 'org.postgresql:postgresql:42.0.0'
-        compile 'org.aspectj:aspectjweaver:1.7.4'
-        // End Spring Data JPA
-
-        testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.4.RELEASE'
     }
 }

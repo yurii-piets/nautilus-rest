@@ -1,2 +1,9 @@
 dependencies {
+    compile 'org.springframework:spring-jdbc:4.3.7.RELEASE'
+    compile 'org.springframework:spring-context:4.3.7.RELEASE'
+    compile 'org.springframework:spring-orm:4.3.7.RELEASE'
+    compile 'org.apache.commons:commons-dbcp2:2.1.1'
+    compile 'org.springframework.data:spring-data-jpa:1.11.1.RELEASE'
+    compile 'org.postgresql:postgresql:42.0.0'
+    compile 'org.aspectj:aspectjweaver:1.7.4'
 }
