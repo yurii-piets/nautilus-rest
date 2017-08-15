@@ -15,7 +15,7 @@ public class UpdateUserController {
 
     @RequestMapping(method = RequestMethod.POST)
     public Status update(@RequestBody @Valid RegisterUserDTO updateDto) {
-        Status status = Status.ACCEPTED;
+        Status status = Status.REJECTED;
         return status;
     }
 }

@@ -1,4 +1,4 @@
-package com.nautilus.controllers.auth;
+package com.nautilus.rest.controllers.auth;
 
 import com.nautilus.constants.Status;
 import com.nautilus.domain.UserConfig;
@@ -21,20 +21,7 @@ public class RegisterController {
 
     @RequestMapping(method = RequestMethod.POST)
     public Status register(@RequestBody @Valid RegisterUserDTO registerDTO) {
-        Status status = Status.ACCEPTED;
-        UserConfig user = buildUser(registerDTO);
-        service.save(user);
+        Status status = Status.REJECTED;
         return status;
-    }
-
-    private UserConfig buildUser(RegisterUserDTO dto) {
-        UserConfig user = new UserConfig();
-
-        user.setName(dto.getUserName());
-        user.setSurname(dto.getUserName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-
-        return user;
     }
 }

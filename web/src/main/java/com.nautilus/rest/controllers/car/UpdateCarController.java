@@ -15,7 +15,7 @@ public class UpdateCarController {
 
     @RequestMapping(method = RequestMethod.POST)
     public Status update(@RequestBody @Valid CarRegisterDTO updateDto) {
-        Status status = Status.ACCEPTED;
+        Status status = Status.REJECTED;
         return status;
     }
 }

@@ -15,7 +15,7 @@ public class RegisterCarController {
 
     @RequestMapping(method = RequestMethod.POST)
     public Status register(@RequestBody @Valid CarRegisterDTO registerDTO) {
-        Status status = Status.ACCEPTED;
+        Status status = Status.REJECTED;
         return status;
     }
 }

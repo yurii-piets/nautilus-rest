@@ -15,8 +15,7 @@ public class LoginController {
 
     @RequestMapping(method = RequestMethod.POST)
     public Status login(@RequestBody @Valid LoginDTO loginDTO) {
-        Status status = Status.ACCEPTED;
-
+        Status status = Status.REJECTED;
         return status;
     }
 }
