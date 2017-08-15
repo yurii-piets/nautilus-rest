@@ -1,0 +1,23 @@
+plugins {
+    id 'org.springframework.boot' version '1.5.4.RELEASE'
+}
+
+apply plugin: 'war'
+
+ext {
+    profiles = ['deployLocal']
+}
+
+if (hasProperty('p')) {
+    p.split(",").each { profile ->
+        if (ext.profiles.contains(profile)) {
+            apply from: "gradle-profiles/profile-${profile}.gradle"
+        } else {
+            println "No such profile"
+        }
+    }
+}
+
+dependencies {
+    compile project(':database')
+}

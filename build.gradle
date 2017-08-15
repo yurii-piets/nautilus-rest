@@ -1,57 +1,43 @@
-plugins {
-    id 'org.springframework.boot' version '1.5.4.RELEASE'
+allprojects {
+    group = 'com.nautilus'
+    version = '0.0.1-SNAPSHOT'
+
+    ext {
+        applicationName = 'nautilus-app'
+    }
 }
 
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'war'
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
 
-group = 'com.nautilus'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
+    sourceCompatibility = 1.8
 
-ext {
-    applicationName = 'nautilus-app'
-}
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
 
-repositories {
-    mavenLocal()
-    jcenter()
-}
 
-dependencies {
-    compile 'com.nautilus:nautilus-common:0.0.1-SNAPSHOT'
+    dependencies {
+        compile 'com.nautilus:nautilus-common:0.0.1-SNAPSHOT'
+        compile 'org.projectlombok:lombok:1.16.16'
 
-    compile 'org.projectlombok:lombok:1.16.16'
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'org.springframework.boot:spring-boot-starter-actuator'
-    compile 'org.springframework.boot:spring-boot-devtools'
-//    compile 'org.springframework.boot:spring-boot-starter-security:1.0.0.RELEASE'
+        compile 'org.springframework.boot:spring-boot-starter-web:1.5.4.RELEASE'
+        compile 'org.springframework.boot:spring-boot-starter-actuator:1.5.4.RELEASE'
+        compile 'org.springframework.boot:spring-boot-devtools:1.5.4.RELEASE'
 
-    // Begin Spring Data JPA
-    compile 'org.springframework:spring-jdbc:4.3.7.RELEASE'
-    compile 'org.springframework:spring-context:4.3.7.RELEASE'
-    compile 'org.springframework:spring-orm:4.3.7.RELEASE'
-    compile 'org.apache.commons:commons-dbcp2:2.1.1'
-    compile 'org.hibernate:hibernate-core:5.2.9.Final'
-    compile 'org.springframework.data:spring-data-jpa:1.11.1.RELEASE'
-    compile 'org.postgresql:postgresql:42.0.0'
-    compile 'org.aspectj:aspectjweaver:1.7.4'
-    // End Spring Data JPA
+        // Begin Spring Data JPA
+        compile 'org.springframework:spring-jdbc:4.3.7.RELEASE'
+        compile 'org.springframework:spring-context:4.3.7.RELEASE'
+        compile 'org.springframework:spring-orm:4.3.7.RELEASE'
+        compile 'org.apache.commons:commons-dbcp2:2.1.1'
+        compile 'org.hibernate:hibernate-core:5.2.9.Final'
+        compile 'org.springframework.data:spring-data-jpa:1.11.1.RELEASE'
+        compile 'org.postgresql:postgresql:42.0.0'
+        compile 'org.aspectj:aspectjweaver:1.7.4'
+        // End Spring Data JPA
 
-    testCompile 'org.springframework.boot:spring-boot-starter-test'
-}
-
-ext {
-    profiles=['deployLocal']
-}
-
-if(hasProperty('p')){
-    p.split(",").each {profile ->
-        if(ext.profiles.contains(profile)){
-            apply from: "gradle-profiles/profile-${profile}.gradle"
-        } else {
-            println "No such profile"
-        }
+        testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.4.RELEASE'
     }
 }
