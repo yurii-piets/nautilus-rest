@@ -1,4 +1,4 @@
-package com.nautilus.conf;
+package com.nautilus.config;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
