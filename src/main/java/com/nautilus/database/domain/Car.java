@@ -19,7 +19,7 @@ public class Car {
     private String model;
     private String color;
     private String yearOfProduction;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", length = 1000)
     private String description;
 
     @ManyToOne
