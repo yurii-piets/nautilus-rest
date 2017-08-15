@@ -18,11 +18,11 @@ subprojects {
         jcenter()
     }
 
-
     dependencies {
         compile 'com.nautilus:nautilus-common:0.0.1-SNAPSHOT'
         compile 'org.projectlombok:lombok:1.16.16'
-
         compile 'org.hibernate:hibernate-core:5.2.9.Final'
+
+        compile 'org.springframework.boot:spring-boot-starter-web:1.5.4.RELEASE'
     }
 }
