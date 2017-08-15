@@ -22,8 +22,8 @@ public class RegisterController {
     @RequestMapping(method = RequestMethod.POST)
     public Status register(@RequestBody @Valid RegisterUserDTO registerDTO) {
         Status status = Status.ACCEPTED;
-        //UserConfig user = buildUser(registerDTO);
-        //service.save(user);
+        UserConfig user = buildUser(registerDTO);
+        service.save(user);
         return status;
     }
 

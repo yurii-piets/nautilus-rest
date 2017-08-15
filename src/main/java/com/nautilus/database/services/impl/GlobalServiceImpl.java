@@ -37,17 +37,19 @@ public class GlobalServiceImpl implements GlobalService {
     public void save(UserConfig user) {
         userRepository.save(user);
     }
-//
-//    @Override
-//    public void updateUser(UserConfig user) {
-//        userRepository.update(user);
-//    }
-//
+
+    @Override
+    public UserConfig update(UserConfig user) {
+        UserConfig userConfig = userRepository.findUserConfigByEmail(user.getEmail());
+        user.setUserId(userConfig.getUserId());
+        return userRepository.save(user);
+    }
+
 //    @Override
 //    public boolean checkEmail(String email) {
 //        return userRepository.findUserByEmail(email) == null;
 //    }
-//
+
 //    @Override
 //    public boolean checkUser(UserConfig user) {
 //        String password = userRepository.findPasswordByEmail(user.getEmail());

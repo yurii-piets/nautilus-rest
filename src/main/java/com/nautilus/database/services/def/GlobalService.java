@@ -8,7 +8,7 @@ public interface GlobalService {
 //    CarStatus checkCarStatus(String beaconId);
 //
     void save(UserConfig user);
-//    void updateUser(UserConfig user);
+    UserConfig update(UserConfig user);
 //    boolean checkEmail(String email);
 //    boolean checkUser(UserConfig user);
 }
