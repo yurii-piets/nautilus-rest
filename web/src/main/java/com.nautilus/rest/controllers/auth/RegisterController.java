@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/registerUser")
+@RequestMapping(value = "${user.register}")
 public class RegisterController {
 
     @Autowired

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/found")
+@RequestMapping(value = "${car.found}")
 public class FoundCarController {
 
     @RequestMapping(method = RequestMethod.POST)

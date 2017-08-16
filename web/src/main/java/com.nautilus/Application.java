@@ -3,10 +3,13 @@ package com.nautilus;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.PropertySource;
 
+@EnableConfigurationProperties
 @SpringBootApplication
-public class  Application extends SpringBootServletInitializer {
+public class Application extends SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
