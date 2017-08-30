@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = "{user.login}")
+@RequestMapping(value = "${user.login}")
 public class LoginController {
 
     @RequestMapping(method = RequestMethod.POST)

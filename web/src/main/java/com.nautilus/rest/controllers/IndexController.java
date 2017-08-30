@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/index")
+@RequestMapping(value = "${test.index}")
 public class IndexController {
 
     @RequestMapping(method = RequestMethod.GET)
