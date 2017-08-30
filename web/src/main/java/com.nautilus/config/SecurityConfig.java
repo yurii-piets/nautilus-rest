@@ -18,11 +18,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         String indexMapping = properties.getIndex();
         String loginMapping = properties.getLogin();
+        String registerUser = properties.getRegisterUser();
 
         http
             .authorizeRequests()
-                .antMatchers(indexMapping, loginMapping).permitAll()
+                .antMatchers(indexMapping, loginMapping, registerUser).permitAll()
                 .anyRequest().authenticated()
-                .and().csrf().disable();
+            .and().csrf().disable();
     }
 }

@@ -16,7 +16,11 @@ public class MappingProperties {
     @Value("${user.login}")
     private String login;
 
+    @Value("${user.register}")
+    private String registerUser;
+
     @Value("${test.index}")
     private String index;
+
 }
 
