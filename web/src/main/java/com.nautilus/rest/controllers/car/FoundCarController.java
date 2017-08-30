@@ -15,7 +15,6 @@ public class FoundCarController {
 
     @RequestMapping(method = RequestMethod.POST)
     public CarStatus found(@RequestBody @Valid CarStatusDTO carDTO) {
-        CarStatus status = CarStatus.STOLEN;
-        return status;
+        return CarStatus.OK;
     }
 }
