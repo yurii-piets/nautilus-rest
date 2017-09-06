@@ -17,8 +17,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         String indexMapping = properties.getIndex();
-        String loginMapping = properties.getLogin();
-        String registerUser = properties.getRegisterUser();
+        String loginMapping = properties.getUserLogin();
+        String registerUser = properties.getUserRegister();
 
         http
             .authorizeRequests()
