@@ -4,11 +4,13 @@ import com.nautilus.domain.UserConfig;
 
 public interface GlobalService {
     void save(UserConfig user);
-//
-//    CarStatus checkCarStatus(String beaconId);
-//    void updateCar(Car car);
-//    void save(Car car);
+    boolean checkEmailIsFree(String email);
+    boolean checkPhoneNumberIsFree(String phoneNumber);
+
 //    UserConfig update(UserConfig user);
-//    boolean checkEmail(String email);
+//    void save(Car car);
+//    void updateCar(Car car);
+//    CarStatus checkCarStatus(String beaconId);
+//
 //    boolean checkUser(UserConfig user);
 }

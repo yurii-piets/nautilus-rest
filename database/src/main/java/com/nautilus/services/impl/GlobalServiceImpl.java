@@ -23,27 +23,32 @@ public class GlobalServiceImpl implements GlobalService {
         userRepository.save(user);
     }
 
+    @Override
+    public boolean checkEmailIsFree(String email) {
+        return userRepository.findUserConfigByEmail(email) == null;
+    }
 
-//        carRepository.save(car);
+    @Override
+    public boolean checkPhoneNumberIsFree(String phoneNumber) {
+        return userRepository.findUserConfigByPhoneNumber(phoneNumber) == null;
+    }
+
 //    public void save(Car car) {
-//    @Override
+//        carRepository.save(car);
 
-//    }
-//
-//    }
-//        return carRepository.findCarStatusByBeaconId(beaconId);
-//    public CarStatus checkCarStatus(String beaconId) {
 //    @Override
-//
-//    }
-//        carRepository.update(car);
 //    public void updateCar(Car car) {
+//        carRepository.update(car);
+//    }
+//
 //    @Override
+//    public CarStatus checkCarStatus(String beaconId) {
+//        return carRepository.findCarStatusByBeaconId(beaconId);
+//    }
+//
+//    }
 
 //    @Override
-//    public boolean checkEmail(String email) {
-//        return userRepository.findUserByEmail(email) == null;
-//    }
 
 //    @Override
 //    public boolean checkUser(UserConfig user) {
