@@ -1,6 +1,5 @@
 package com.nautilus.rest.controllers;
 
-import com.nautilus.dto.user.LoginDTO;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.rest.mapping.MappingProperties;
 import org.junit.Test;
@@ -42,16 +41,6 @@ public class ControllersTest {
     @Test
     public void index() throws Exception {
         mockMvc.perform(get(properties.getIndex())).andExpect(status().isOk());
-    }
-
-    @Test
-    public void userLogin() throws Exception {
-        String loginJson = json(new LoginDTO("yurii@mail.com", "password"));
-
-        mockMvc.perform(post(properties.getUserLogin())
-                .contentType(contentType)
-                .content(loginJson))
-                .andExpect(status().isOk());
     }
 
     @Test

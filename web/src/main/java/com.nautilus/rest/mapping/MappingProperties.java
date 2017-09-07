@@ -12,9 +12,6 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("classpath:mapping.properties")
 public class MappingProperties {
 
-    @Value("${user.login}")
-    private String userLogin;
-
     @Value("${user.register}")
     private String userRegister;
 

@@ -16,11 +16,6 @@ public class MappingPropertiesTest {
     private MappingProperties properties;
 
     @Test
-    public void getLogin() throws Exception {
-        assertEquals("/login", properties.getUserLogin());
-    }
-
-    @Test
     public void getUserRegister() throws Exception {
         assertEquals("/registerUser", properties.getUserRegister());
     }
