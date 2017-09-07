@@ -3,7 +3,7 @@ package com.nautilus.services.impl;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.repository.CarRepository;
 import com.nautilus.repository.UserRepository;
-import com.nautilus.services.GlobalService;
+import com.nautilus.services.def.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,32 +18,27 @@ public class GlobalServiceImpl implements GlobalService {
     @Autowired
     private CarRepository carRepository;
 
-//    @Override
-//    public void save(Car car) {
-//        carRepository.save(car);
-//    }
-
-//    @Override
-//    public void updateCar(Car car) {
-//        carRepository.update(car);
-//    }
-//
-//    @Override
-//    public CarStatus checkCarStatus(String beaconId) {
-//        return carRepository.findCarStatusByBeaconId(beaconId);
-//    }
-//
     @Override
     public void save(UserConfig user) {
         userRepository.save(user);
     }
 
-    @Override
-    public UserConfig update(UserConfig user) {
-        UserConfig userConfig = userRepository.findUserConfigByEmail(user.getEmail());
-        user.setUserId(userConfig.getUserId());
-        return userRepository.save(user);
-    }
+
+//        carRepository.save(car);
+//    public void save(Car car) {
+//    @Override
+
+//    }
+//
+//    }
+//        return carRepository.findCarStatusByBeaconId(beaconId);
+//    public CarStatus checkCarStatus(String beaconId) {
+//    @Override
+//
+//    }
+//        carRepository.update(car);
+//    public void updateCar(Car car) {
+//    @Override
 
 //    @Override
 //    public boolean checkEmail(String email) {
