@@ -1,6 +1,7 @@
 package com.nautilus.domain;
 
 import com.nautilus.domain.Car;
+import com.nautilus.dto.user.RegisterUserDTO;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,18 +28,12 @@ public class UserConfig {
     @OneToMany
     private Set<Car> cars;
 
-    @Builder
-    public UserConfig(
-            String name,
-            String surname,
-            String phoneNumber,
-            String email,
-            String password) {
-        this.name = name;
-        this.surname = surname;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.password = password;
+    public UserConfig(RegisterUserDTO registerDTO) {
+        this.name = registerDTO.getUserName();
+        this.surname = registerDTO.getUserSurname();
+        this.phoneNumber = registerDTO.getPhoneNumber();
+        this.email = registerDTO.getEmail();
+        this.password = registerDTO.getPassword();
     }
 }
 

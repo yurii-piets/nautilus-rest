@@ -1,13 +1,12 @@
 package com.nautilus.domain;
 
 import com.nautilus.constants.CarStatus;
+import com.nautilus.dto.car.CarRegisterDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -28,6 +27,18 @@ public class Car {
     @ManyToOne
     private UserConfig owner;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<CarStatusSnapshot> statusSnapshots;
+
     private CarStatus status;
 
+    public Car(CarRegisterDTO carRegisterDTO){
+        this.beaconId = carRegisterDTO.getBeaconId();
+        this.registerNumber = carRegisterDTO.getRegisterNumber();
+        this.mark = carRegisterDTO.getMark();
+        this.model = carRegisterDTO.getModel();
+        this.color = carRegisterDTO.getColor();
+        this.yearOfProduction = carRegisterDTO.getYearOfProduction();
+        this.description = carRegisterDTO.getDescription();
+    }
 }

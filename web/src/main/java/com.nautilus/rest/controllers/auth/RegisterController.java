@@ -35,21 +35,11 @@ public class RegisterController {
         }
 
         if (statuses.isEmpty()) {
-            UserConfig user = buildNewUserFromRegisterDto(registerDTO);
+            UserConfig user = new UserConfig(registerDTO);
             service.save(user);
             statuses.add(RegisterStatus.REGISTERED);
         }
 
         return statuses;
-    }
-
-    private UserConfig buildNewUserFromRegisterDto(RegisterUserDTO registerDTO) {
-        return UserConfig.builder()
-                .name(registerDTO.getUserName())
-                .surname(registerDTO.getUserSurname())
-                .phoneNumber(registerDTO.getPhoneNumber())
-                .email(registerDTO.getEmail())
-                .password(new MD5().encode(registerDTO.getPassword()))
-                .build();
     }
 }

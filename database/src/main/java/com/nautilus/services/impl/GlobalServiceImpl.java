@@ -1,12 +1,20 @@
 package com.nautilus.services.impl;
 
+import com.nautilus.constants.CarStatus;
+import com.nautilus.domain.Car;
+import com.nautilus.domain.CarLocation;
+import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.repository.CarRepository;
+import com.nautilus.repository.CarStatusSnapshotRepository;
 import com.nautilus.repository.UserRepository;
 import com.nautilus.services.def.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Timestamp;
+import java.util.Date;
 
 @Service
 @Transactional
@@ -17,6 +25,9 @@ public class GlobalServiceImpl implements GlobalService {
 
     @Autowired
     private CarRepository carRepository;
+
+    @Autowired
+    private CarStatusSnapshotRepository statusSnapshotRepository;
 
     @Override
     public void save(UserConfig user) {
@@ -31,6 +42,38 @@ public class GlobalServiceImpl implements GlobalService {
     @Override
     public boolean checkPhoneNumberIsFree(String phoneNumber) {
         return userRepository.findUserConfigByPhoneNumber(phoneNumber) == null;
+    }
+
+    @Override
+    public UserConfig findUserByPhoneNumber(String phoneNumber) {
+        return userRepository.findUserConfigByPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public CarStatus getCarStatusByCarBeaconId(String beaconId) {
+        Car car = carRepository.findCarByBeaconId(beaconId);
+        return car.getStatus();
+    }
+
+    @Override
+    public void save(Car car) {
+        carRepository.save(car);
+    }
+
+    @Override
+    public void saveCarLastLocation(String carBeaconId, CarLocation carLocation) {
+        Car car = carRepository.findCarByBeaconId(carBeaconId);
+        CarStatusSnapshot statusSnapshot = new CarStatusSnapshot();
+        statusSnapshot.setCar(car);
+        statusSnapshot.setCarLocation(carLocation);
+        statusSnapshot.setTimestamp(new Timestamp(new Date().getTime()));
+
+        statusSnapshotRepository.save(statusSnapshot);
+    }
+
+    @Override
+    public Car findCarByBeaconId(String beaconId) {
+        return carRepository.findCarByBeaconId(beaconId);
     }
 
 //    public void save(Car car) {

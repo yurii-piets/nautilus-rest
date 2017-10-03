@@ -6,15 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserConfig, Long> {
-
     UserConfig findUserConfigByEmail(String email);
     UserConfig findUserConfigByPhoneNumber(String phoneNumber);
-
-//    void update(UserConfig user);
-
-//    @Query
-//    Object findUserByEmail(String email);
-//
-//    @Query
-//    String findPasswordByEmail(String email);
 }
