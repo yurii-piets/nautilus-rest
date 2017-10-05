@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.Year;
 import java.util.List;
 
 @Entity
@@ -20,7 +21,7 @@ public class Car {
     private String mark;
     private String model;
     private String color;
-    private String yearOfProduction;
+    private Year yearOfProduction;
     @Column(columnDefinition = "TEXT", length = 1000)
     private String description;
 
