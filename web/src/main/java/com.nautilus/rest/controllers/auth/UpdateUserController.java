@@ -1,6 +1,6 @@
 package com.nautilus.rest.controllers.auth;
 
-import com.nautilus.dto.user.RegisterUserDTO;
+import com.nautilus.dto.user.UpdateUserDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +14,7 @@ import javax.validation.Valid;
 public class UpdateUserController {
 
     @RequestMapping(method = RequestMethod.POST)
-    public HttpStatus update(@RequestBody @Valid RegisterUserDTO updateDto) {
+    public HttpStatus update(@RequestBody @Valid UpdateUserDTO updateDTO) {
         return HttpStatus.OK;
     }
 }
