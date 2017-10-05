@@ -5,6 +5,7 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.CarLocation;
 import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.domain.UserConfig;
+import com.nautilus.exceptions.WrongCarBeaconIdException;
 import com.nautilus.repository.CarRepository;
 import com.nautilus.repository.CarStatusSnapshotRepository;
 import com.nautilus.repository.UserRepository;
@@ -50,8 +51,13 @@ public class GlobalServiceImpl implements GlobalService {
     }
 
     @Override
-    public CarStatus getCarStatusByCarBeaconId(String beaconId) {
+    public CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException {
         Car car = carRepository.findCarByBeaconId(beaconId);
+
+        if(car == null){
+            throw new WrongCarBeaconIdException("No such car with beacon id: " + beaconId);
+        }
+
         return car.getStatus();
     }
 

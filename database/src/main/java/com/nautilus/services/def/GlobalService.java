@@ -4,6 +4,7 @@ import com.nautilus.constants.CarStatus;
 import com.nautilus.domain.Car;
 import com.nautilus.domain.CarLocation;
 import com.nautilus.domain.UserConfig;
+import com.nautilus.exceptions.WrongCarBeaconIdException;
 
 public interface GlobalService {
     void save(UserConfig user);
@@ -11,7 +12,7 @@ public interface GlobalService {
     boolean checkPhoneNumberIsFree(String phoneNumber);
     UserConfig findUserByPhoneNumber(String phoneNumber);
 
-    CarStatus getCarStatusByCarBeaconId(String beaconId);
+    CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException;
 
     void saveCarLastLocation(String carBeaconId, CarLocation carLocation);
     void save(Car car);
