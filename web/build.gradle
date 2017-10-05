@@ -19,6 +19,7 @@ if (hasProperty('p')) {
 }
 
 dependencies {
+    compile project(':common')
     compile project(':database')
 
     compile 'org.springframework.boot:spring-boot-starter-actuator:1.5.4.RELEASE'

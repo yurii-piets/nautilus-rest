@@ -1,4 +1,5 @@
 dependencies {
+    compile project(':common')
     compile 'org.springframework:spring-jdbc:4.3.7.RELEASE'
     compile 'org.springframework:spring-context:4.3.7.RELEASE'
     compile 'org.springframework:spring-orm:4.3.7.RELEASE'
