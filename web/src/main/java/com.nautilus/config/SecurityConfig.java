@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
@@ -14,6 +15,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private MappingProperties properties;
+
+    private String[] authenticatedMappings;
+
+    private String[] permitAllMappings;
+
+    private void initMappings() {
+        initAuthenticatedMethods();
+        initPermitAllMappings();
+    }
+
+    private void initAuthenticatedMethods() {
+        authenticatedMappings = new String[]{
+                properties.getUserUpdate(),
+                properties.getCarFound(),
+                properties.getCarRegister(),
+                properties.getCarUpdate()
+        };
+    }
+
+    private void initPermitAllMappings() {
+        permitAllMappings = new String[]{
+                properties.getIndex(),
+                properties.getUserRegister()
+        };
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth)
@@ -27,18 +53,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        String indexMapping = properties.getIndex();
-        String registerUserMapping = properties.getUserRegister();
-        String updateUserMapping = properties.getUserUpdate();
-        String carFoundMapping = properties.getCarFound();
+        initMappings();
 
         http
                 .authorizeRequests()
-                .antMatchers(carFoundMapping).authenticated()
-                .antMatchers(indexMapping, registerUserMapping, updateUserMapping).permitAll()
+                .antMatchers(authenticatedMappings).authenticated()
+                .antMatchers(permitAllMappings).permitAll()
                 .anyRequest().permitAll()
             .and()
                 .httpBasic()
+            .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .csrf().disable();
     }
