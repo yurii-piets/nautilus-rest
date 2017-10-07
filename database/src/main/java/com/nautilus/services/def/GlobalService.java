@@ -10,7 +10,7 @@ public interface GlobalService {
     void save(UserConfig user);
     boolean checkEmailIsFree(String email);
     boolean checkPhoneNumberIsFree(String phoneNumber);
-    UserConfig findUserByPhoneNumber(String phoneNumber);
+    UserConfig findUserConfigByPhoneNumber(String phoneNumber);
 
     CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException;
 

@@ -22,20 +22,15 @@ public class RegisterCarController {
     private GlobalService service;
 
     @RequestMapping(method = RequestMethod.POST)
-    public HttpStatus register(@RequestBody @Valid CarRegisterDTO registerDTO) {
-        Car car = buildNewCarFromDTO(registerDTO);
+    public HttpStatus register(@RequestBody @Valid CarRegisterDTO carRegisterDTO) {
+        Car car = new Car(carRegisterDTO);
+
+        UserConfig user = service.findUserConfigByPhoneNumber(carRegisterDTO.getUserPhoneNumber());
+        car.setOwner(user);
+        car.setStatus(CarStatus.TESTING);
+        car.setStatus(CarStatus.OK);
 
         service.save(car);
         return HttpStatus.OK;
-    }
-
-    private Car buildNewCarFromDTO(@RequestBody @Valid CarRegisterDTO carRegisterDTO) {
-        Car car = new Car(carRegisterDTO);
-
-        UserConfig user = service.findUserByPhoneNumber(carRegisterDTO.getUserPhoneNumber());
-        car.setOwner(user);
-        car.setStatus(CarStatus.TESTING);
-
-        return car;
     }
 }

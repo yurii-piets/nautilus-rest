@@ -1,11 +1,9 @@
 package com.nautilus.domain;
 
-import com.nautilus.domain.Car;
+import com.nautilus.algorithm.MD5;
 import com.nautilus.dto.user.RegisterUserDTO;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Singular;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -33,7 +31,7 @@ public class UserConfig {
         this.surname = registerDTO.getUserSurname();
         this.phoneNumber = registerDTO.getPhoneNumber();
         this.email = registerDTO.getEmail();
-        this.password = registerDTO.getPassword();
+        this.password = new MD5().encode(registerDTO.getPassword());
     }
 }
 

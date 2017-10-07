@@ -46,7 +46,7 @@ public class GlobalServiceImpl implements GlobalService {
     }
 
     @Override
-    public UserConfig findUserByPhoneNumber(String phoneNumber) {
+    public UserConfig findUserConfigByPhoneNumber(String phoneNumber) {
         return userRepository.findUserConfigByPhoneNumber(phoneNumber);
     }
 

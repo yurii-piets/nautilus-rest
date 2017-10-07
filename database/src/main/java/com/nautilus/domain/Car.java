@@ -5,8 +5,12 @@ import com.nautilus.dto.car.CarRegisterDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.time.Year;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Id;
 import java.util.List;
 
 @Entity
@@ -21,7 +25,7 @@ public class Car {
     private String mark;
     private String model;
     private String color;
-    private Year yearOfProduction;
+    private String yearOfProduction;
     @Column(columnDefinition = "TEXT", length = 1000)
     private String description;
 
