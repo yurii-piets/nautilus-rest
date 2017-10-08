@@ -29,6 +29,7 @@ public class FoundCarController {
             status = service.getCarStatusByCarBeaconId(carStatusDTO.getBeaconId());
         } catch (WrongCarBeaconIdException e) {
             status = CarStatus.TESTING;
+            e.printStackTrace();
         }
 
         if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {
