@@ -31,8 +31,7 @@ public class FoundCarController {
             status = CarStatus.TESTING;
         }
 
-//        if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {
-        if (true) {
+        if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {
             CarLocation carLocation = new CarLocation(carStatusDTO);
             Car car = service.findCarByBeaconId(carStatusDTO.getBeaconId());
             carLocation.setCar(car);
@@ -40,6 +39,6 @@ public class FoundCarController {
             service.saveCarLastLocation(carStatusDTO.getBeaconId(), carLocation);
         }
 
-        return CarStatus.TESTING;
+        return status;
     }
 }
