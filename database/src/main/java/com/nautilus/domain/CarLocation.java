@@ -17,8 +17,8 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 public class CarLocation {
-    private static final int MIN_LONGTITUDE = -180;
-    private static final int MAX_LONGTITUDE = 180;
+    private static final int MIN_LONGITUDE = -180;
+    private static final int MAX_LONGITUDE = 180;
 
     private static final int MIN_LATITUDE = -90;
     private static final int MAX_LATITUDE = 90;
@@ -28,8 +28,8 @@ public class CarLocation {
     private String locationId;
 
     @NotNull
-    @Min(value = MIN_LONGTITUDE)
-    @Max(value = MAX_LONGTITUDE)
+    @Min(value = MIN_LONGITUDE)
+    @Max(value = MAX_LONGITUDE)
     private Double longitude;
 
     @NotNull
