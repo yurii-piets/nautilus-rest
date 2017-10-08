@@ -18,6 +18,8 @@ public interface GlobalService {
     void save(Car car);
     Car findCarByBeaconId(String beaconId);
 
+    void save(CarLocation carLocation);
+
 //    UserConfig update(UserConfig user);
 //    void updateCar(Car car);
 //    CarStatus checkCarStatus(String beaconId);

@@ -1,6 +1,7 @@
 package com.nautilus.rest.controllers.car;
 
 import com.nautilus.constants.CarStatus;
+import com.nautilus.domain.Car;
 import com.nautilus.domain.CarLocation;
 import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.exceptions.WrongCarBeaconIdException;
@@ -30,12 +31,13 @@ public class FoundCarController {
             status = CarStatus.TESTING;
         }
 
-        if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {
-            CarLocation carLocation = new CarLocation();
-            carLocation.setCar(service.findCarByBeaconId(carStatusDTO.getBeaconId()));
-            carLocation.setLatitude(carStatusDTO.getLocation().getLatitude());
-            carLocation.setLongitude(carStatusDTO.getLocation().getLongitude());
-//            service.saveCarLastLocation(carStatusDTO.getBeaconId(), carLocation);
+//        if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {
+        if (true) {
+            CarLocation carLocation = new CarLocation(carStatusDTO);
+            Car car = service.findCarByBeaconId(carStatusDTO.getBeaconId());
+            carLocation.setCar(car);
+            service.save(carLocation);
+            service.saveCarLastLocation(carStatusDTO.getBeaconId(), carLocation);
         }
 
         return CarStatus.TESTING;

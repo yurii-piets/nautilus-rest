@@ -6,6 +6,7 @@ import com.nautilus.domain.CarLocation;
 import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.exceptions.WrongCarBeaconIdException;
+import com.nautilus.repository.CarLocationRepository;
 import com.nautilus.repository.CarRepository;
 import com.nautilus.repository.CarStatusSnapshotRepository;
 import com.nautilus.repository.UserRepository;
@@ -29,6 +30,9 @@ public class GlobalServiceImpl implements GlobalService {
 
     @Autowired
     private CarStatusSnapshotRepository statusSnapshotRepository;
+
+    @Autowired
+    private CarLocationRepository carLocationRepository;
 
     @Override
     public void save(UserConfig user) {
@@ -82,7 +86,12 @@ public class GlobalServiceImpl implements GlobalService {
         return carRepository.findCarByBeaconId(beaconId);
     }
 
-//    public void save(Car car) {
+    @Override
+    public void save(CarLocation carLocation) {
+        carLocationRepository.save(carLocation);
+    }
+
+    //    public void save(Car car) {
 //        carRepository.save(car);
 
 //    @Override

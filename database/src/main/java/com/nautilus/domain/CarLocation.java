@@ -1,9 +1,14 @@
 package com.nautilus.domain;
 
+import com.nautilus.dto.car.CarStatusDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -34,4 +39,9 @@ public class CarLocation {
 
     @OneToOne
     private Car car;
+
+    public CarLocation(CarStatusDTO carStatusDTO) {
+        this.longitude = carStatusDTO.getLocation().getLongitude();
+        this.latitude = carStatusDTO.getLocation().getLatitude();
+    }
 }

@@ -1,5 +1,6 @@
 package com.nautilus.domain;
 
+
 import com.nautilus.constants.CarStatus;
 import com.nautilus.dto.car.CarRegisterDTO;
 import lombok.Data;
@@ -8,9 +9,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Id;
 import java.util.List;
 
 @Entity
@@ -37,7 +38,7 @@ public class Car {
 
     private CarStatus status;
 
-    public Car(CarRegisterDTO carRegisterDTO){
+    public Car(CarRegisterDTO carRegisterDTO) {
         this.beaconId = carRegisterDTO.getBeaconId();
         this.registerNumber = carRegisterDTO.getRegisterNumber();
         this.mark = carRegisterDTO.getMark();
