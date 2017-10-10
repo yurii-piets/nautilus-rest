@@ -33,55 +33,10 @@ public class UpdateUserController {
         }
 
         if (user != null) {
-            UserConfig updatedUser = buildUpdatedUser(user, updateDTO);
+            UserConfig updatedUser = UserConfig.mergeWithUpdateDto(user, updateDTO);
             service.save(updatedUser);
         }
 
         return HttpStatus.OK;
-    }
-
-    private UserConfig buildUpdatedUser(UserConfig user, UpdateUserDTO updateDTO) {
-        UserConfig updateUser = new UserConfig();
-
-        String name = updateDTO.getUserName();
-        String surname = updateDTO.getUserSurname();
-        String phoneNumber = updateDTO.getPhoneNumber();
-        String email = updateDTO.getEmail();
-        String password = updateDTO.getPassword();
-
-        if (name != null) {
-            updateUser.setName(name);
-        } else {
-            updateUser.setName(user.getName());
-        }
-
-        if(surname != null){
-            updateUser.setSurname(surname);
-        } else {
-            updateUser.setSurname(user.getSurname());
-        }
-
-        if(phoneNumber != null){
-            updateUser.setPhoneNumber(phoneNumber);
-        } else {
-            updateUser.setPhoneNumber(user.getPhoneNumber());
-        }
-
-        if(email != null){
-            updateUser.setEmail(email);
-        } else {
-            updateUser.setPhoneNumber(user.getPhoneNumber());
-        }
-
-        if(password != null){
-            updateUser.setPassword(new MD5().encode(password));
-        } else {
-            updateUser.setPassword(user.getPassword());
-        }
-
-        Long id = user.getUserId();
-        updateUser.setUserId(id);
-
-        return updateUser;
     }
 }

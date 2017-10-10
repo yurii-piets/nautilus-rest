@@ -2,6 +2,7 @@ package com.nautilus.domain;
 
 import com.nautilus.algorithm.MD5;
 import com.nautilus.dto.user.RegisterUserDTO;
+import com.nautilus.dto.user.UpdateUserDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -32,6 +33,51 @@ public class UserConfig {
         this.phoneNumber = registerDTO.getPhoneNumber();
         this.email = registerDTO.getEmail();
         this.password = new MD5().encode(registerDTO.getPassword());
+    }
+
+    public static UserConfig mergeWithUpdateDto(UserConfig user, UpdateUserDTO updateDTO) {
+        UserConfig updateUser = new UserConfig();
+
+        String name = updateDTO.getUserName();
+        String surname = updateDTO.getUserSurname();
+        String phoneNumber = updateDTO.getPhoneNumber();
+        String email = updateDTO.getEmail();
+        String password = updateDTO.getPassword();
+
+        if (name != null) {
+            updateUser.setName(name);
+        } else {
+            updateUser.setName(user.getName());
+        }
+
+        if(surname != null){
+            updateUser.setSurname(surname);
+        } else {
+            updateUser.setSurname(user.getSurname());
+        }
+
+        if(phoneNumber != null){
+            updateUser.setPhoneNumber(phoneNumber);
+        } else {
+            updateUser.setPhoneNumber(user.getPhoneNumber());
+        }
+
+        if(email != null){
+            updateUser.setEmail(email);
+        } else {
+            updateUser.setPhoneNumber(user.getPhoneNumber());
+        }
+
+        if(password != null){
+            updateUser.setPassword(new MD5().encode(password));
+        } else {
+            updateUser.setPassword(user.getPassword());
+        }
+
+        Long id = user.getUserId();
+        updateUser.setUserId(id);
+
+        return updateUser;
     }
 }
 
