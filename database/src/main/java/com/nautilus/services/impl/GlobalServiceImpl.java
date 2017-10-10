@@ -55,6 +55,11 @@ public class GlobalServiceImpl implements GlobalService {
     }
 
     @Override
+    public UserConfig findUserConfigByEmail(String email) {
+        return userRepository.findUserConfigByEmail(email);
+    }
+
+    @Override
     public CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException {
         Car car = carRepository.findCarByBeaconId(beaconId);
 

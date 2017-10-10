@@ -11,6 +11,7 @@ public interface GlobalService {
     boolean checkEmailIsFree(String email);
     boolean checkPhoneNumberIsFree(String phoneNumber);
     UserConfig findUserConfigByPhoneNumber(String phoneNumber);
+    UserConfig findUserConfigByEmail(String email);
 
     CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException;
 
