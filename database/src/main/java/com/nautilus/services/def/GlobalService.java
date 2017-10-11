@@ -6,6 +6,8 @@ import com.nautilus.domain.CarLocation;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.exceptions.WrongCarBeaconIdException;
 
+import java.util.Set;
+
 public interface GlobalService {
     void save(UserConfig user);
     boolean checkEmailIsFree(String email);
@@ -20,6 +22,8 @@ public interface GlobalService {
     Car findCarByBeaconId(String beaconId);
 
     void save(CarLocation carLocation);
+
+    void save(Set<UserConfig> userConfigs);
 
 //    UserConfig update(UserConfig user);
 //    void updateCar(Car car);

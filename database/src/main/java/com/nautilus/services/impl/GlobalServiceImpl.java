@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -96,26 +97,8 @@ public class GlobalServiceImpl implements GlobalService {
         carLocationRepository.save(carLocation);
     }
 
-    //    public void save(Car car) {
-//        carRepository.save(car);
-
-//    @Override
-//    public void updateCar(Car car) {
-//        carRepository.update(car);
-//    }
-//
-//    @Override
-//    public CarStatus checkCarStatus(String beaconId) {
-//        return carRepository.findCarStatusByBeaconId(beaconId);
-//    }
-//
-//    }
-
-//    @Override
-
-//    @Override
-//    public boolean checkUser(UserConfig user) {
-//        String password = userRepository.findPasswordByEmail(user.getEmail());
-//        return password != null && password.equals(user.getPassword());
-//    }
+    @Override
+    public void save(Set<UserConfig> userConfigs) {
+        userRepository.save(userConfigs);
+    }
 }

@@ -25,7 +25,7 @@ public class CarLocation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String locationId;
+    private Long locationId;
 
     @NotNull
     @Min(value = MIN_LONGITUDE)

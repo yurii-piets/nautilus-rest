@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "${car.register}")
@@ -30,7 +33,13 @@ public class RegisterCarController {
         car.setStatus(CarStatus.TESTING);
         car.setStatus(CarStatus.OK);
 
+        user.getCars().add(car);
+
         service.save(car);
+
+        service.save(new HashSet<UserConfig>(){{
+            add(user);
+        }});
         return HttpStatus.OK;
     }
 }

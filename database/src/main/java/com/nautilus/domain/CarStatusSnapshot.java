@@ -17,7 +17,7 @@ public class CarStatusSnapshot {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String snapshotId;
+    private Long snapshotId;
 
     @OneToOne
     private CarLocation carLocation;

@@ -5,12 +5,14 @@ import com.nautilus.constants.CarStatus;
 import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.dto.car.CarUpdateDTO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.List;
@@ -100,5 +102,15 @@ public class Car {
         updatedCar.setStatusSnapshots(car.getStatusSnapshots());
 
         return updatedCar;
+    }
+
+    @Override
+    public  String toString(){
+        return "Zopa_car";
+    }
+
+    @Override
+    public int hashCode(){
+        return 2;
     }
 }

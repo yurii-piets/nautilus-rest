@@ -3,7 +3,9 @@ package com.nautilus.domain;
 import com.nautilus.algorithm.MD5;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.dto.user.UpdateUserDTO;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -23,6 +25,7 @@ public class UserConfig {
     private String phoneNumber;
     private String email;
     private String password;
+    private Boolean enabled;
 
     @OneToMany
     private Set<Car> cars;
@@ -33,6 +36,7 @@ public class UserConfig {
         this.phoneNumber = registerDTO.getPhoneNumber();
         this.email = registerDTO.getEmail();
         this.password = new MD5().encode(registerDTO.getPassword());
+        this.enabled = true;
     }
 
     public static UserConfig mergeWithUpdateDto(UserConfig user, UpdateUserDTO updateDTO) {
@@ -43,6 +47,7 @@ public class UserConfig {
         String phoneNumber = updateDTO.getPhoneNumber();
         String email = updateDTO.getEmail();
         String password = updateDTO.getPassword();
+        Boolean enabled = updateDTO.getEnabled();
 
         if (name != null) {
             updateUser.setName(name);
@@ -74,10 +79,26 @@ public class UserConfig {
             updateUser.setPassword(user.getPassword());
         }
 
+        if(enabled != null){
+            updateUser.setEnabled(enabled);
+        } else {
+            updateUser.setEnabled(user.getEnabled());
+        }
+
         Long id = user.getUserId();
         updateUser.setUserId(id);
 
         return updateUser;
+    }
+
+    @Override
+    public String toString(){
+        return  "zopa_userConfig";
+    }
+
+    @Override
+    public int hashCode(){
+        return 1;
     }
 }
 
