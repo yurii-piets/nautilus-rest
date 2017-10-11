@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -105,12 +106,17 @@ public class Car {
     }
 
     @Override
-    public  String toString(){
-        return "Zopa_car";
-    }
-
-    @Override
     public int hashCode(){
-        return 2;
+        int hashCode = 1;
+        hashCode = 31 * hashCode + (beaconId == null ? 0 : beaconId.hashCode());
+        hashCode = 31 * hashCode + (registerNumber == null ? 0 : registerNumber.hashCode());
+        hashCode = 31 * hashCode + (mark == null ? 0 : mark.hashCode());
+        hashCode = 31 * hashCode + (model == null ? 0 : model.hashCode());
+        hashCode = 31 * hashCode + (color == null ? 0 : color.hashCode());
+        hashCode = 31 * hashCode + (yearOfProduction == null ? 0 : yearOfProduction.hashCode());
+        hashCode = 31 * hashCode + (description == null ? 0 : description.hashCode());
+        hashCode = 31 * hashCode + (status == null ? 0 : status.hashCode());
+        hashCode = 31 * hashCode + (owner == null ? 0 : owner.hashCode());
+        return hashCode;
     }
 }
