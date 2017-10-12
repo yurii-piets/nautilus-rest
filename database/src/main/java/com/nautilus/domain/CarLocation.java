@@ -8,7 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -37,11 +36,17 @@ public class CarLocation {
     @Max(value = MAX_LATITUDE)
     private Double latitude;
 
-    @OneToOne
-    private Car car;
-
     public CarLocation(CarStatusDTO carStatusDTO) {
         this.longitude = carStatusDTO.getLocation().getLongitude();
         this.latitude = carStatusDTO.getLocation().getLatitude();
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = 31 * hashCode + (locationId == null ? 0 : locationId.hashCode());
+        hashCode = 31 * hashCode + (longitude == null ? 0 : longitude.hashCode());
+        hashCode = 31 * hashCode + (latitude == null ? 0 : latitude.hashCode());
+        return hashCode;
     }
 }

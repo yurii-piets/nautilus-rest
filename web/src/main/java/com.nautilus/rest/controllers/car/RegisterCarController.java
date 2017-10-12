@@ -31,7 +31,6 @@ public class RegisterCarController {
         UserConfig user = service.findUserConfigByPhoneNumber(carRegisterDTO.getUserPhoneNumber());
         car.setOwner(user);
         car.setStatus(CarStatus.TESTING);
-        car.setStatus(CarStatus.OK);
 
         user.getCars().add(car);
 
@@ -40,6 +39,7 @@ public class RegisterCarController {
         service.save(new HashSet<UserConfig>(){{
             add(user);
         }});
+
         return HttpStatus.OK;
     }
 }

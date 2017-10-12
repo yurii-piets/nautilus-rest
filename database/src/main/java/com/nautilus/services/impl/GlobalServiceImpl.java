@@ -30,7 +30,7 @@ public class GlobalServiceImpl implements GlobalService {
     private CarRepository carRepository;
 
     @Autowired
-    private CarStatusSnapshotRepository statusSnapshotRepository;
+    private CarStatusSnapshotRepository carStatusSnapshotRepository;
 
     @Autowired
     private CarLocationRepository carLocationRepository;
@@ -38,6 +38,26 @@ public class GlobalServiceImpl implements GlobalService {
     @Override
     public void save(UserConfig user) {
         userRepository.save(user);
+    }
+
+    @Override
+    public void save(Car car) {
+        carRepository.save(car);
+    }
+
+    @Override
+    public void save(CarLocation carLocation) {
+        carLocationRepository.save(carLocation);
+    }
+
+    @Override
+    public void save(CarStatusSnapshot carStatusSnapshot) {
+        carStatusSnapshotRepository.save(carStatusSnapshot);
+    }
+
+    @Override
+    public void save(Set<UserConfig> userConfigs) {
+        userRepository.save(userConfigs);
     }
 
     @Override
@@ -61,6 +81,11 @@ public class GlobalServiceImpl implements GlobalService {
     }
 
     @Override
+    public Car findCarByBeaconId(String beaconId) {
+        return carRepository.findCarByBeaconId(beaconId);
+    }
+
+    @Override
     public CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException {
         Car car = carRepository.findCarByBeaconId(beaconId);
 
@@ -71,34 +96,4 @@ public class GlobalServiceImpl implements GlobalService {
         return car.getStatus();
     }
 
-    @Override
-    public void save(Car car) {
-        carRepository.save(car);
-    }
-
-    @Override
-    public void saveCarLastLocation(String carBeaconId, CarLocation carLocation) {
-        Car car = carRepository.findCarByBeaconId(carBeaconId);
-        CarStatusSnapshot statusSnapshot = new CarStatusSnapshot();
-        statusSnapshot.setCar(car);
-        statusSnapshot.setCarLocation(carLocation);
-        statusSnapshot.setTimestamp(new Timestamp(new Date().getTime()));
-
-        statusSnapshotRepository.save(statusSnapshot);
-    }
-
-    @Override
-    public Car findCarByBeaconId(String beaconId) {
-        return carRepository.findCarByBeaconId(beaconId);
-    }
-
-    @Override
-    public void save(CarLocation carLocation) {
-        carLocationRepository.save(carLocation);
-    }
-
-    @Override
-    public void save(Set<UserConfig> userConfigs) {
-        userRepository.save(userConfigs);
-    }
 }

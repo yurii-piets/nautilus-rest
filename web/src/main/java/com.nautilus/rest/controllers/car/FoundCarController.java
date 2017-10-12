@@ -3,6 +3,7 @@ package com.nautilus.rest.controllers.car;
 import com.nautilus.constants.CarStatus;
 import com.nautilus.domain.Car;
 import com.nautilus.domain.CarLocation;
+import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.exceptions.WrongCarBeaconIdException;
 import com.nautilus.services.def.GlobalService;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.sql.Timestamp;
+import java.util.Date;
 
 @RestController
 @RequestMapping(value = "${car.found}")
@@ -34,10 +37,17 @@ public class FoundCarController {
 
         if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {
             CarLocation carLocation = new CarLocation(carStatusDTO);
-            Car car = service.findCarByBeaconId(carStatusDTO.getBeaconId());
-            carLocation.setCar(car);
             service.save(carLocation);
-            service.saveCarLastLocation(carStatusDTO.getBeaconId(), carLocation);
+
+            Car car = service.findCarByBeaconId(carStatusDTO.getBeaconId());
+            CarStatusSnapshot carStatusSnapshot = new CarStatusSnapshot();
+            carStatusSnapshot.setCarLocation(carLocation);
+            carStatusSnapshot.setCar(car);
+            carStatusSnapshot.setTimestamp(new Timestamp(new Date().getTime()));
+            service.save(carStatusSnapshot);
+
+            car.getStatusSnapshots().add(carStatusSnapshot);
+            service.save(car);
         }
 
         return status;
