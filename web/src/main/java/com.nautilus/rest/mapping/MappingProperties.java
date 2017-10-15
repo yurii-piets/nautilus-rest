@@ -33,6 +33,18 @@ public class MappingProperties {
     @Value("${car.update-photos}")
     private String carUpdatePhotos;
 
+    @Value("${user.get.info}")
+    private String userInfo;
+
+    @Value("${user.get.Car}")
+    private String userCars;
+
+    @Value("${car.get.info}")
+    private String carInfo;
+
+    @Value("${car.get.photos}")
+    private String carPhotos;
+
     //delete this om production
     @Value("${test.index}")
     private String index;
