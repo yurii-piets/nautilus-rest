@@ -5,6 +5,7 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.services.def.GlobalService;
+import com.nautilus.utilities.FileSaveUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -29,11 +30,11 @@ import java.util.Set;
 @RestController
 public class RegisterCarController {
 
-    @Value("${upload.path}")
-    private String UPLOAD_FOLDER;
-
     @Autowired
     private GlobalService service;
+
+    @Autowired
+    private FileSaveUtility fileSaveUtility;
 
     @RequestMapping(value = "${car.register}", method = RequestMethod.POST)
     public HttpStatus register(@RequestBody @Valid CarRegisterDTO carRegisterDTO) {
@@ -61,40 +62,12 @@ public class RegisterCarController {
             return HttpStatus.NOT_ACCEPTABLE;
         }
 
-        Long userID = service.getUserIdConfigByCarBeaconId(carId);
-
-        int fileCount = 0;
-        for (MultipartFile file : files) {
-            if (file == null || file.isEmpty()) {
-                System.out.println("File is empty!");
-                return HttpStatus.NOT_ACCEPTABLE;
-            }
-
-            try {
-                byte[] bytes = file.getBytes();
-                String folderPath = UPLOAD_FOLDER + userID + "/";
-                String[] splited = file.getOriginalFilename().split("\\.");
-                String type = splited.length != 0 ? splited[splited.length - 1] : file.getOriginalFilename();
-                createPath(folderPath);
-                Path path = Paths.get(folderPath + fileCount + "." + type);
-                Files.write(path, bytes);
-                System.out.println("File has been written!");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            fileCount++;
+        if (files == null || files.isEmpty()) {
+            return HttpStatus.NOT_ACCEPTABLE;
         }
+
+        fileSaveUtility.saveCarPhotos(carId, files);
 
         return HttpStatus.ACCEPTED;
-    }
-
-    private void createPath(String path) {
-        File file = new File(path);
-        if (!file.exists() || !file.isDirectory()) {
-            file.mkdirs();
-        }
-        if (file.canWrite()) {
-            file.setWritable(true);
-        }
     }
 }
