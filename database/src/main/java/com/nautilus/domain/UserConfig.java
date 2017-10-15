@@ -1,6 +1,7 @@
 package com.nautilus.domain;
 
 import com.nautilus.algorithm.MD5;
+import com.nautilus.constants.Authorities;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.dto.user.UpdateUserDTO;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -33,6 +35,8 @@ public class UserConfig {
     private String email;
     private String password;
     private Boolean enabled;
+
+    private Authorities authorities;
 
     @OneToMany
     private Set<Car> cars;

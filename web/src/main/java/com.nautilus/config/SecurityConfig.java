@@ -12,6 +12,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 import javax.sql.DataSource;
 
+import static org.hibernate.criterion.Restrictions.and;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -32,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     + "where email = ?";
 
     private static final String DEF_AUTHORITIES_BY_USERNAME_QUERY =
-            "select email, USER "
+            "select email, authorities "
                     + "from userconfig "
                     + "where email = ?";
 
@@ -43,7 +45,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .dataSource(dataSource)
                 .usersByUsernameQuery(DEF_USERS_BY_EMAIL_QUERY)
                 .authoritiesByUsernameQuery(DEF_AUTHORITIES_BY_USERNAME_QUERY)
-                .passwordEncoder(new MD5());
+                .passwordEncoder(new MD5())
+            .and()
+                .inMemoryAuthentication()
+                .withUser("actuator").password("actuator").roles("ACTUATOR");
     }
 
     @Override

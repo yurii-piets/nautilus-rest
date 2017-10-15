@@ -1,5 +1,6 @@
 package com.nautilus.rest.controllers.user;
 
+import com.nautilus.constants.Authorities;
 import com.nautilus.constants.RegisterStatus;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.RegisterUserDTO;
@@ -35,6 +36,7 @@ public class RegisterController {
 
         if (statuses.isEmpty()) {
             UserConfig user = new UserConfig(registerDTO);
+            user.setAuthorities(Authorities.USER);
             service.save(user);
             statuses.add(RegisterStatus.REGISTERED);
         }
