@@ -23,4 +23,6 @@ public interface GlobalService {
     UserConfig findUserConfigByEmail(String email);
     Car findCarByBeaconId(String beaconId);
     CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException;
+
+    Long getUserIdConfigByCarBeaconId(String carId);
 }

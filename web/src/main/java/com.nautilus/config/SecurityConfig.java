@@ -74,7 +74,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 properties.getUserUpdate(),
                 properties.getCarFound(),
                 properties.getCarRegister(),
-                properties.getCarUpdate()
+                properties.getCarUpdate(),
+                properties.getRegisterCarPhotos()
         };
     }
 

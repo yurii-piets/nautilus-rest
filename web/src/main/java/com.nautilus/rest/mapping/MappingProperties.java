@@ -24,6 +24,9 @@ public class MappingProperties {
     @Value("${car.register}")
     private String carRegister;
 
+    @Value("${car.register-car-photos}")
+    private String registerCarPhotos;
+
     @Value("${car.update}")
     private String carUpdate;
 
