@@ -13,10 +13,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Component
-public class FileSaveUtility {
+public class FileAccessUtility {
     @Value("${upload.path}")
     private String UPLOAD_FOLDER;
 
@@ -80,5 +83,26 @@ public class FileSaveUtility {
         if (file.canWrite()) {
             file.setWritable(true);
         }
+    }
+
+    public List<File> getCarPhotos(Long userId, String carId) {
+        String path = UPLOAD_FOLDER + "/" + userId + "/" + carId;
+        File dir = new File(path);
+
+        if(!dir.exists() || !dir.isDirectory()){
+            return Collections.emptyList();
+        }
+
+        if(!dir.canRead()){
+            dir.setReadable(true);
+        }
+
+        File[] files = dir.listFiles();
+
+        if(files == null){
+            return Collections.emptyList();
+        }
+
+        return Arrays.asList(files);
     }
 }

@@ -36,7 +36,7 @@ public class MappingProperties {
     @Value("${user.get.info}")
     private String userInfo;
 
-    @Value("${user.get.Car}")
+    @Value("${user.get.cars}")
     private String userCars;
 
     @Value("${car.get.info}")

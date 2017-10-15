@@ -3,7 +3,7 @@ package com.nautilus.rest.controllers.car;
 import com.nautilus.domain.Car;
 import com.nautilus.dto.car.CarUpdateDTO;
 import com.nautilus.services.def.GlobalService;
-import com.nautilus.utilities.FileSaveUtility;
+import com.nautilus.utilities.FileAccessUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +23,7 @@ public class UpdateCarController {
     private GlobalService service;
 
     @Autowired
-    private FileSaveUtility fileSaveUtility;
+    private FileAccessUtility fileSaveUtility;
 
     @RequestMapping(value = "${car.update}", method = RequestMethod.POST)
     public HttpStatus update(@RequestBody @Valid CarUpdateDTO updateDto) {

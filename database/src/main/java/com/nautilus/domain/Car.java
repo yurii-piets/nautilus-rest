@@ -1,11 +1,15 @@
 package com.nautilus.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nautilus.constants.CarStatus;
 import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.dto.car.CarUpdateDTO;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,8 +20,11 @@ import javax.persistence.OneToMany;
 import java.util.Set;
 
 @Entity
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@RequiredArgsConstructor
+@EqualsAndHashCode(exclude="statusSnapshots")
+@ToString(exclude="statusSnapshots")
 public class Car {
 
     @Id
@@ -32,9 +39,11 @@ public class Car {
     private String description;
 
     @ManyToOne
+    @JsonIgnore
     private UserConfig owner;
 
     @OneToMany(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<CarStatusSnapshot> statusSnapshots;
 
     private CarStatus status;
@@ -100,20 +109,5 @@ public class Car {
         updatedCar.setStatusSnapshots(car.getStatusSnapshots());
 
         return updatedCar;
-    }
-
-    @Override
-    public int hashCode(){
-        int hashCode = 1;
-        hashCode = 31 * hashCode + (beaconId == null ? 0 : beaconId.hashCode());
-        hashCode = 31 * hashCode + (registerNumber == null ? 0 : registerNumber.hashCode());
-        hashCode = 31 * hashCode + (mark == null ? 0 : mark.hashCode());
-        hashCode = 31 * hashCode + (model == null ? 0 : model.hashCode());
-        hashCode = 31 * hashCode + (color == null ? 0 : color.hashCode());
-        hashCode = 31 * hashCode + (yearOfProduction == null ? 0 : yearOfProduction.hashCode());
-        hashCode = 31 * hashCode + (description == null ? 0 : description.hashCode());
-        hashCode = 31 * hashCode + (status == null ? 0 : status.hashCode());
-        hashCode = 31 * hashCode + (owner == null ? 0 : owner.hashCode());
-        return hashCode;
     }
 }

@@ -1,14 +1,24 @@
 package com.nautilus.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+import javax.jws.HandlerChain;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Data
-@NoArgsConstructor
+@Setter
+@Getter
+@RequiredArgsConstructor
+@EqualsAndHashCode(exclude = "carLocation")
+@ToString(exclude = "carLocation")
 public class CarStatusSnapshot {
 
     @Id
@@ -16,19 +26,11 @@ public class CarStatusSnapshot {
     private Long snapshotId;
 
     @OneToOne
+    @JsonIgnore
     private CarLocation carLocation;
 
     @ManyToOne
     private Car car;
 
     private Timestamp timestamp;
-
-    @Override
-    public int hashCode() {
-        int hashCode = 1;
-        hashCode = 31 * hashCode + (snapshotId == null ? 0 : snapshotId.hashCode());
-        hashCode = 31 * hashCode + (car == null ? 0 : car.hashCode());
-        hashCode = 31 * hashCode + (timestamp == null ? 0 : timestamp.hashCode());
-        return hashCode;
-    }
 }

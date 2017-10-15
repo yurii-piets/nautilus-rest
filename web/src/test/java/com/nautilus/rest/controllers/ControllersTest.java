@@ -5,6 +5,7 @@ import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.rest.mapping.MappingProperties;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@Ignore
 public class ControllersTest {
 
     @Autowired
@@ -87,7 +89,7 @@ public class ControllersTest {
         carRegisterDTO.setMark("Alfa romeo");
         carRegisterDTO.setModel("146");
         carRegisterDTO.setColor("red");
-        carRegisterDTO.setYearOfProduction(Year.of(1999));
+        carRegisterDTO.setYearOfProduction("1999");
         carRegisterDTO.setDescription("My car is very nice. I love my car");
         String registerJson = json(carRegisterDTO);
 

@@ -5,9 +5,8 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.services.def.GlobalService;
-import com.nautilus.utilities.FileSaveUtility;
+import com.nautilus.utilities.FileAccessUtility;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,15 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 public class RegisterCarController {
@@ -34,7 +26,7 @@ public class RegisterCarController {
     private GlobalService service;
 
     @Autowired
-    private FileSaveUtility fileSaveUtility;
+    private FileAccessUtility fileSaveUtility;
 
     @RequestMapping(value = "${car.register}", method = RequestMethod.POST)
     public HttpStatus register(@RequestBody @Valid CarRegisterDTO carRegisterDTO) {
