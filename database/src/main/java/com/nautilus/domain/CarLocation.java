@@ -41,12 +41,4 @@ public class CarLocation {
         this.latitude = carStatusDTO.getLocation().getLatitude();
     }
 
-    @Override
-    public int hashCode() {
-        int hashCode = 1;
-        hashCode = 31 * hashCode + (locationId == null ? 0 : locationId.hashCode());
-        hashCode = 31 * hashCode + (longitude == null ? 0 : longitude.hashCode());
-        hashCode = 31 * hashCode + (latitude == null ? 0 : latitude.hashCode());
-        return hashCode;
-    }
 }

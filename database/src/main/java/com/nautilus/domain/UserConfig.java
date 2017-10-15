@@ -98,18 +98,6 @@ public class UserConfig {
         return updateUser;
     }
 
-    @Override
-    public int hashCode(){
-        int hashCode = 1;
-        hashCode = 31 * hashCode + (userId == null ? 0 : userId.hashCode());
-        hashCode = 31 * hashCode + (name == null ? 0 : name.hashCode());
-        hashCode = 31 * hashCode + (surname == null ? 0 : surname.hashCode());
-        hashCode = 31 * hashCode + (phoneNumber == null ? 0 : phoneNumber.hashCode());
-        hashCode = 31 * hashCode + (email == null ? 0 : email.hashCode());
-        hashCode = 31 * hashCode + (password == null ? 0 : password.hashCode());
-        hashCode = 31 * hashCode + (enabled == null ? 0 : enabled.hashCode());
-        return hashCode;
-    }
 }
 
 
