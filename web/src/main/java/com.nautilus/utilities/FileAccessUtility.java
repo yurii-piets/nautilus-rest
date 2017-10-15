@@ -62,7 +62,7 @@ public class FileAccessUtility {
     private void clearDir(String folderPath) {
         File dir = new File(folderPath);
 
-        if(dir.exists() || !dir.isDirectory()){
+        if(!dir.exists() || !dir.isDirectory()){
             return;
         }
 
