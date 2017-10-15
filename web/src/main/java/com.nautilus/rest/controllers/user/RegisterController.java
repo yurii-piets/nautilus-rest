@@ -1,6 +1,5 @@
-package com.nautilus.rest.controllers.auth;
+package com.nautilus.rest.controllers.user;
 
-import com.nautilus.algorithm.MD5;
 import com.nautilus.constants.RegisterStatus;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.RegisterUserDTO;

@@ -1,7 +1,5 @@
-package com.nautilus.rest.controllers.auth;
+package com.nautilus.rest.controllers.user;
 
-import com.nautilus.algorithm.MD5;
-import com.nautilus.constants.CarStatus;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.UpdateUserDTO;
 import com.nautilus.services.def.GlobalService;
