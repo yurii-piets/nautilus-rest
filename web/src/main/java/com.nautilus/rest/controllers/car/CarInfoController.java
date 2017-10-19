@@ -5,23 +5,19 @@ import com.nautilus.domain.UserConfig;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping(method = RequestMethod.GET)
@@ -32,6 +28,15 @@ public class CarInfoController {
 
     @Autowired
     private FileAccessUtility fileAccessUtility;
+
+    @Value("${server.protocol}")
+    private String protocol;
+
+    @Value("${server.host}")
+    private String host;
+
+    @Value("${server.port}")
+    private int port;
 
     @RequestMapping(value = "${car.get.info}")
     public ResponseEntity<Car> car(@RequestParam String carId) {
@@ -44,46 +49,51 @@ public class CarInfoController {
         return new ResponseEntity<>(car, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "${car.get.photos}/{userId}/{beaconId}/{index}")
+    public ResponseEntity<MultipartFile> photo(){
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-    // TODO: 19/10/2017 replace returing list with list of url to resources
-    @RequestMapping(value = "${car.get.photos}")
-    @ResponseBody
-    public ResponseEntity<List<byte[]>> photos(@RequestParam String carId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
+    @RequestMapping(value="${car.get.photos}" )
+    public ResponseEntity<Set<URL>> photos(@RequestParam String beaconId){
 
-        Car car = service.findCarByBeaconId(carId);
-        if (car == null) {
-            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.BAD_REQUEST);
+        // TODO: 19/10/2017 create method in service to checj if car with current beaconid exists
+        Car car = service.findCarByBeaconId(beaconId);
+        if(car == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         UserConfig owner = car.getOwner();
-
-        if (owner == null) {
-            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.NOT_ACCEPTABLE);
+        if(owner == null){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
-        List<File> files = fileAccessUtility.getCarPhotos(owner.getUserId(), carId);
+        Long userId = owner.getUserId();
+        if(userId == null){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
 
-        List<byte[]> result = files.stream()
-                .map(file -> {
-                    byte[] b = new byte[(int) file.length()];
-                    FileInputStream fileInputStream = null;
-                    try {
-                        fileInputStream = new FileInputStream(file);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        fileInputStream.read(b);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return b;
-                })
-                .collect(Collectors.toList());
+        Set<URL> urls = new HashSet<>();
+        int size = fileAccessUtility.countOfPhotos(userId, beaconId);
 
-        return ResponseEntity.ok(result);
+        for(int i = 0; i < size; ++i){
+            urls.add(buildUrl(beaconId, userId, i));
+        }
+
+        return new ResponseEntity<>(urls, HttpStatus.OK);
     }
 
+    private URL buildUrl(@RequestParam String beaconId, Long userId, int i) {
+        StringBuilder pathBuilder = new StringBuilder();
+        pathBuilder.append("/"); pathBuilder.append(beaconId);
+        pathBuilder.append("/"); pathBuilder.append(userId);
+        pathBuilder.append("/"); pathBuilder.append(i);
+        URL url = null;
+        try {
+            url = new URL(protocol, host, port, pathBuilder.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
 }

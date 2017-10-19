@@ -1,10 +1,8 @@
 package com.nautilus.utilities;
 
-import com.nautilus.domain.Car;
 import com.nautilus.services.def.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -104,5 +101,24 @@ public class FileAccessUtility {
         }
 
         return Arrays.asList(files);
+    }
+
+    public int countOfPhotos(Long userId, String carId){
+        String path = UPLOAD_FOLDER + "/" + userId + "/" + carId;
+        File dir = new File(path);
+
+        if(!dir.exists() || !dir.isDirectory()){
+            return -1;
+        }
+
+        if(!dir.canRead()){
+            dir.setReadable(true);
+        }
+
+        File[] files = dir.listFiles();
+
+        int size = files != null ? files.length : 0;
+
+        return size;
     }
 }
