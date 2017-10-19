@@ -8,6 +8,8 @@ import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.exceptions.WrongCarBeaconIdException;
 import com.nautilus.services.def.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,7 +27,7 @@ public class FoundCarController {
     private GlobalService service;
 
     @RequestMapping(method = RequestMethod.POST)
-    public CarStatus found(@RequestBody @Valid CarStatusDTO carStatusDTO) {
+    public ResponseEntity<CarStatus> found(@RequestBody @Valid CarStatusDTO carStatusDTO) {
 
         CarStatus status;
         try {
@@ -50,6 +52,6 @@ public class FoundCarController {
             service.save(car);
         }
 
-        return status;
+        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 }

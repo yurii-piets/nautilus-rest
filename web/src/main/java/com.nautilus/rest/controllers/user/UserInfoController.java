@@ -5,12 +5,13 @@ import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.UserInfo;
 import com.nautilus.services.def.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Set;
 
 
@@ -22,7 +23,7 @@ public class UserInfoController {
     private GlobalService service;
 
     @RequestMapping(value="${user.get.info}")
-    public UserInfo userInfo(@RequestParam String userPhone){
+    public ResponseEntity<UserInfo> userInfo(@RequestParam String userPhone){
         UserConfig userConfig = service.findUserConfigByPhoneNumber(userPhone);
 
         UserInfo userInfo = new UserInfo();
@@ -31,13 +32,18 @@ public class UserInfoController {
         userInfo.setUserName(userConfig.getName());
         userInfo.setUserSurname(userConfig.getSurname());
 
-        return userInfo;
+        return new ResponseEntity<>(userInfo, HttpStatus.OK);
     }
 
     @RequestMapping(value="${user.get.cars}")
-    public Set<Car> userCars(@RequestParam String userPhone){
+    public ResponseEntity<Set<Car>> userCars(@RequestParam String userPhone){
         UserConfig config = service.findUserConfigByPhoneNumber(userPhone);
+
+        if(userPhone == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         Set<Car> cars = config.getCars();
-        return cars;
+        return new ResponseEntity<>(cars, HttpStatus.OK);
     }
 }

@@ -6,6 +6,8 @@ import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.services.def.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,7 +25,7 @@ public class RegisterController {
     private GlobalService service;
 
     @RequestMapping(method = RequestMethod.POST)
-    public Set<RegisterStatus> register(@RequestBody @Valid RegisterUserDTO registerDTO) {
+    public ResponseEntity<Set<RegisterStatus>> register(@RequestBody @Valid RegisterUserDTO registerDTO) {
         Set<RegisterStatus> statuses = new HashSet<>();
 
         if (!service.checkEmailIsFree(registerDTO.getEmail())) {
@@ -34,13 +36,15 @@ public class RegisterController {
             statuses.add(RegisterStatus.PHONE_NUMBER_NOT_FREE);
         }
 
-        if (statuses.isEmpty()) {
-            UserConfig user = new UserConfig(registerDTO);
-            user.setAuthorities(Authorities.USER);
-            service.save(user);
-            statuses.add(RegisterStatus.REGISTERED);
+        if (!statuses.isEmpty()) {
+            return new ResponseEntity<>(statuses, HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return statuses;
+        UserConfig user = new UserConfig(registerDTO);
+        user.setAuthorities(Authorities.USER);
+        service.save(user);
+        statuses.add(RegisterStatus.REGISTERED);
+
+        return new ResponseEntity<>(statuses, HttpStatus.OK);
     }
 }

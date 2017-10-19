@@ -4,33 +4,23 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.support.ServletContextResource;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @RestController
@@ -44,11 +34,18 @@ public class CarInfoController {
     private FileAccessUtility fileAccessUtility;
 
     @RequestMapping(value = "${car.get.info}")
-    public Car car(@RequestParam String carId) {
+    public ResponseEntity<Car> car(@RequestParam String carId) {
         Car car = service.findCarByBeaconId(carId);
-        return car;
+
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(car, HttpStatus.OK);
     }
 
+
+    // TODO: 19/10/2017 replace returing list with list of url to resources
     @RequestMapping(value = "${car.get.photos}")
     @ResponseBody
     public ResponseEntity<List<byte[]>> photos(@RequestParam String carId) {
@@ -88,4 +85,5 @@ public class CarInfoController {
 
         return ResponseEntity.ok(result);
     }
+
 }

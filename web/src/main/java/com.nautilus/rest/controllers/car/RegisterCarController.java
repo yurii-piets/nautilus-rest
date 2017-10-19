@@ -54,18 +54,18 @@ public class RegisterCarController {
     }
 
     @RequestMapping(value = "${car.register-car-photos}", method = RequestMethod.PUT)
-    public HttpStatus registerCarPhotos(@RequestParam String carId,
+    public ResponseEntity registerCarPhotos(@RequestParam String carId,
                                         @RequestParam("file") List<MultipartFile> files) {
         if (carId == null || carId.isEmpty()) {
-            return HttpStatus.NOT_ACCEPTABLE;
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
         if (files == null || files.isEmpty()) {
-            return HttpStatus.NOT_ACCEPTABLE;
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
         fileSaveUtility.saveCarPhotos(carId, files);
 
-        return HttpStatus.ACCEPTED;
+        return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 }

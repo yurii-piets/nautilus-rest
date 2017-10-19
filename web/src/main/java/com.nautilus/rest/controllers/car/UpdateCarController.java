@@ -59,19 +59,19 @@ public class UpdateCarController {
     }
 
     @RequestMapping(value = "${car.update-photos}", method = RequestMethod.PUT)
-    public HttpStatus updatePhotos(@RequestParam String carId,
+    public ResponseEntity updatePhotos(@RequestParam String carId,
                                    @RequestParam("file") List<MultipartFile> files) {
         if (carId == null || carId.isEmpty()) {
-            return HttpStatus.NOT_ACCEPTABLE;
+            new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
         if(files == null || files.isEmpty()){
-            return HttpStatus.NOT_ACCEPTABLE;
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
         fileSaveUtility.deleteAndSaveCarPhotos(carId, files);
 
-        return HttpStatus.ACCEPTED;
+        return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
 }
