@@ -1,13 +1,10 @@
 package com.nautilus.rest.controllers.car;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.nautilus.domain.Car;
-import com.nautilus.dto.car.CarUpdateDTO;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
+import com.nautilus.utilities.JsonPatchUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class UpdateCarController {
@@ -33,7 +28,7 @@ public class UpdateCarController {
     private FileAccessUtility fileSaveUtility;
 
     @Autowired
-    private ObjectMapper mapper;
+    private JsonPatchUtility patchUtility;
 
     /*
     * @param Car beaconId
@@ -49,10 +44,9 @@ public class UpdateCarController {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
-        JsonNode patchedNode;
         try {
-            final JsonPatch patch = mapper.readValue(updateBody, JsonPatch.class);
-            patchedNode = patch.apply(mapper.convertValue(car, JsonNode.class));
+            Car mergedCar = (Car) patchUtility.patch(beaconId, car).get();
+            service.save(mergedCar);
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -60,9 +54,7 @@ public class UpdateCarController {
             e.printStackTrace();
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        Car mergedCar = mapper.convertValue(patchedNode, car.getClass());
 
-        service.save(mergedCar);
         return new ResponseEntity(HttpStatus.OK);
     }
 
