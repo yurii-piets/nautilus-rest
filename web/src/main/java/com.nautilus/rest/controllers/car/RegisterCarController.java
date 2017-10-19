@@ -8,6 +8,7 @@ import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,10 +30,15 @@ public class RegisterCarController {
     private FileAccessUtility fileSaveUtility;
 
     @RequestMapping(value = "${car.register}", method = RequestMethod.POST)
-    public HttpStatus register(@RequestBody @Valid CarRegisterDTO carRegisterDTO) {
+    public ResponseEntity register(@RequestBody @Valid CarRegisterDTO carRegisterDTO) {
         Car car = new Car(carRegisterDTO);
 
         UserConfig user = service.findUserConfigByPhoneNumber(carRegisterDTO.getUserPhoneNumber());
+
+        if(user == null){
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
         car.setOwner(user);
         car.setStatus(CarStatus.TESTING);
 
@@ -44,7 +50,7 @@ public class RegisterCarController {
             add(user);
         }});
 
-        return HttpStatus.OK;
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(value = "${car.register-car-photos}", method = RequestMethod.PUT)

@@ -19,22 +19,22 @@ public class UpdateUserController {
     @Autowired
     private GlobalService service;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public HttpStatus update(@RequestBody @Valid UpdateUserDTO updateDTO) {
-        UserConfig user = null;
-        if (updateDTO.getPhoneNumber() != null) {
-            user = service.findUserConfigByPhoneNumber(updateDTO.getPhoneNumber());
-        }
-
-        if (user == null && updateDTO.getEmail() != null) {
-            user = service.findUserConfigByEmail(updateDTO.getEmail());
-        }
-
-        if (user != null) {
-            UserConfig updatedUser = UserConfig.mergeWithUpdateDto(user, updateDTO);
-            service.save(updatedUser);
-        }
-
-        return HttpStatus.OK;
-    }
+//    @RequestMapping(method = RequestMethod.POST)
+//    public HttpStatus update(@RequestBody @Valid UpdateUserDTO updateDTO) {
+//        UserConfig user = null;
+//        if (updateDTO.getPhoneNumber() != null) {
+//            user = service.findUserConfigByPhoneNumber(updateDTO.getPhoneNumber());
+//        }
+//
+//        if (user == null && updateDTO.getEmail() != null) {
+//            user = service.findUserConfigByEmail(updateDTO.getEmail());
+//        }
+//
+//        if (user != null) {
+//            UserConfig updatedUser = UserConfig.mergeWithUpdateDto(user, updateDTO);
+//            service.save(updatedUser);
+//        }
+//
+//        return HttpStatus.OK;
+//    }
 }
