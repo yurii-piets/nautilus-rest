@@ -1,6 +1,7 @@
 package com.nautilus.utilities;
 
 import com.nautilus.services.def.GlobalService;
+import org.apache.tools.ant.DirectoryScanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,8 +12,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -59,15 +58,15 @@ public class FileAccessUtility {
     private void clearDir(String folderPath) {
         File dir = new File(folderPath);
 
-        if(!dir.exists() || !dir.isDirectory()){
+        if (!dir.exists() || !dir.isDirectory()) {
             return;
         }
 
-        if(!dir.canWrite()){
+        if (!dir.canWrite()) {
             dir.setWritable(true);
         }
 
-        for(File file : dir.listFiles()){
+        for (File file : dir.listFiles()) {
             file.delete();
         }
     }
@@ -82,36 +81,35 @@ public class FileAccessUtility {
         }
     }
 
-    public List<File> getCarPhotos(Long userId, String carId) {
-        String path = UPLOAD_FOLDER + "/" + userId + "/" + carId;
-        File dir = new File(path);
+    public File getCarPhotos(Long userId, String carId, String index) {
+        String path = UPLOAD_FOLDER + userId + "/" + carId;
+        String wildcardFileName = index + ".**";
 
-        if(!dir.exists() || !dir.isDirectory()){
-            return Collections.emptyList();
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setIncludes(new String[]{wildcardFileName});
+        scanner.setBasedir(path);
+        scanner.setCaseSensitive(false);
+        scanner.scan();
+        String[] files = scanner.getIncludedFiles();
+
+        if (files == null || files.length != 1) {
+            return null;
         }
 
-        if(!dir.canRead()){
-            dir.setReadable(true);
-        }
+        File file = new File(path + "/" + files[0]);
 
-        File[] files = dir.listFiles();
-
-        if(files == null){
-            return Collections.emptyList();
-        }
-
-        return Arrays.asList(files);
+        return file;
     }
 
-    public int countOfPhotos(Long userId, String carId){
+    public int countOfPhotos(Long userId, String carId) {
         String path = UPLOAD_FOLDER + "/" + userId + "/" + carId;
         File dir = new File(path);
 
-        if(!dir.exists() || !dir.isDirectory()){
+        if (!dir.exists() || !dir.isDirectory()) {
             return -1;
         }
 
-        if(!dir.canRead()){
+        if (!dir.canRead()) {
             dir.setReadable(true);
         }
 

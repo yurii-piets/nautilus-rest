@@ -23,7 +23,7 @@ subprojects {
         compile 'org.projectlombok:lombok:1.16.16'
         compile 'org.hibernate:hibernate-core:5.2.9.Final'
         compile 'com.github.fge:json-patch:1.9'
-        compile 'com.github.fge:json-patch:1.9'
+        compile group: 'org.apache.ant', name: 'ant', version: '1.8.2'
 
         compile 'org.springframework.boot:spring-boot-starter-web:1.5.4.RELEASE'
     }
