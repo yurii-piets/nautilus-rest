@@ -12,8 +12,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 import javax.sql.DataSource;
 
-import static org.hibernate.criterion.Restrictions.and;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -85,7 +83,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 properties.getUserInfo(),
                 properties.getUserCars(),
                 properties.getCarInfo(),
-                properties.getCarPhotos()
+                properties.getCarPhotos(),
+                properties.getCarPhotos() + "/**"
         };
     }
 
