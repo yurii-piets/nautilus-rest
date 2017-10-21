@@ -7,6 +7,8 @@ import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.exceptions.WrongCarBeaconIdException;
 import com.nautilus.services.def.GlobalService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,8 @@ public class FoundCarController {
     @Autowired
     private GlobalService service;
 
+    private final Logger logger = LogManager.getLogger(this.getClass());
+
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<CarStatus> found(@RequestBody @Valid CarStatusDTO carStatusDTO) {
 
@@ -34,7 +38,7 @@ public class FoundCarController {
             status = service.getCarStatusByCarBeaconId(carStatusDTO.getBeaconId());
         } catch (WrongCarBeaconIdException e) {
             status = CarStatus.TESTING;
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {

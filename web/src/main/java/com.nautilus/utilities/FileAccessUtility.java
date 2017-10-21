@@ -1,6 +1,8 @@
 package com.nautilus.utilities;
 
 import com.nautilus.services.def.GlobalService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.DirectoryScanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,8 @@ public class FileAccessUtility {
     @Value("${upload.path}")
     private String UPLOAD_FOLDER;
 
+    private final Logger logger = LogManager.getLogger(this.getClass());
+
     @Autowired
     private GlobalService service;
 
@@ -28,7 +32,7 @@ public class FileAccessUtility {
         int fileCount = 0;
         for (MultipartFile file : files) {
             if (file == null || file.isEmpty()) {
-                System.out.println("File is empty!");
+                logger.warn("File is empty!");
             }
 
             try {
@@ -39,9 +43,9 @@ public class FileAccessUtility {
                 createPath(folderPath);
                 Path path = Paths.get(folderPath + fileCount + "." + type);
                 Files.write(path, bytes);
-                System.out.println("File has been written!");
+                logger.warn("File has been written!");
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
             fileCount++;
         }

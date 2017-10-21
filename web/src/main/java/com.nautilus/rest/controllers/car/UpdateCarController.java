@@ -5,6 +5,8 @@ import com.nautilus.domain.Car;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
 import com.nautilus.utilities.JsonPatchUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +32,13 @@ public class UpdateCarController {
     @Autowired
     private JsonPatchUtility patchUtility;
 
+    private final Logger logger = LogManager.getLogger(this.getClass());
+
     /*
     * @param Car beaconId
     * @param update entity, matches pattern : [{"op": "/replace", "path": "/registerNumber", "value": "WW121"}]
     * @return ResponseEntity with HttpStatus
     */
-
     @RequestMapping(value = "${car.update}", method = RequestMethod.PATCH)
     public ResponseEntity update(@RequestParam String beaconId, @RequestBody String updateBody) {
         Car car = service.findCarByBeaconId(beaconId);
@@ -48,10 +51,10 @@ public class UpdateCarController {
             Car mergedCar = (Car) patchUtility.patch(beaconId, car).get();
             service.save(mergedCar);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (JsonPatchException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 

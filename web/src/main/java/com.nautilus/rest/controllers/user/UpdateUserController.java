@@ -4,6 +4,8 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,8 @@ public class UpdateUserController {
     @Autowired
     private JsonPatchUtility patchUtility;
 
+    private final Logger logger = LogManager.getLogger(this.getClass());
+
     @RequestMapping(method = RequestMethod.PATCH)
     public ResponseEntity update(@RequestParam String userPhone, @RequestBody String updateBody) {
         UserConfig user = service.findUserConfigByPhoneNumber(userPhone);
@@ -37,10 +41,10 @@ public class UpdateUserController {
             UserConfig mergedUser = (UserConfig) patchUtility.patch(updateBody, user).get();
             service.save(mergedUser);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (JsonPatchException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 

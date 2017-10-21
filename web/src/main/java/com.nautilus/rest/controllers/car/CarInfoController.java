@@ -5,6 +5,8 @@ import com.nautilus.domain.UserConfig;
 import com.nautilus.rest.mapping.MappingProperties;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -48,6 +50,8 @@ public class CarInfoController {
     @Value("${server.port}")
     private int port;
 
+    private final Logger logger = LogManager.getLogger(this.getClass());
+
     @RequestMapping(value = "${car.get.info}")
     public ResponseEntity<Car> car(@RequestParam String carId) {
         Car car = service.findCarByBeaconId(carId);
@@ -73,13 +77,13 @@ public class CarInfoController {
         try {
             fileInputStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         try {
             fileInputStream.read(b);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         return new ResponseEntity<>(b, headers, HttpStatus.OK);
@@ -124,7 +128,7 @@ public class CarInfoController {
         try {
             url = new URL(protocol, host, port, pathBuilder.toString());
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return url;
     }

@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version '1.5.4.RELEASE'
 }
 
-apply plugin: 'war'
+//apply plugin: 'war'
 
 ext {
     profiles = ['deployLocal']
