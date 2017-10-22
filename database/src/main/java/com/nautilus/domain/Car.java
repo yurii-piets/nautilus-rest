@@ -4,7 +4,6 @@ package com.nautilus.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nautilus.constants.CarStatus;
 import com.nautilus.dto.car.CarRegisterDTO;
-import com.nautilus.dto.car.CarUpdateDTO;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +41,8 @@ public class Car {
     @JsonIgnore
     private UserConfig owner;
 
-    @OneToMany(fetch = FetchType.LAZY)
     @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY)
     private Set<CarStatusSnapshot> statusSnapshots;
 
     private CarStatus status;

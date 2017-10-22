@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 @Configuration
@@ -44,7 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .usersByUsernameQuery(DEF_USERS_BY_EMAIL_QUERY)
                 .authoritiesByUsernameQuery(DEF_AUTHORITIES_BY_USERNAME_QUERY)
                 .passwordEncoder(new MD5())
-            .and()
+                .and()
                 .inMemoryAuthentication()
                 .withUser("actuator").password("actuator").roles("ACTUATOR");
     }
@@ -67,6 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable();
     }
 
+    @PostConstruct
     private void initMappings() {
         initAuthenticatedMethods();
         initPermitAllMappings();
@@ -90,7 +92,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private void initPermitAllMappings() {
         permitAllMappings = new String[]{
-                properties.getIndex(),
                 properties.getUserRegister()
         };
     }

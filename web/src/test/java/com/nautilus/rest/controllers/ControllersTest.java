@@ -5,25 +5,14 @@ import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.rest.mapping.MappingProperties;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.time.Year;
-import java.util.Arrays;
-
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,7 +20,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@Ignore
 public class ControllersTest {
 
     @Autowired
@@ -40,18 +28,12 @@ public class ControllersTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-            MediaType.APPLICATION_JSON.getSubtype(),
-            Charset.forName("utf8"));
-
-    @Test
-    public void index() throws Exception {
-        mockMvc.perform(get(properties.getIndex())).andExpect(status().isOk());
-    }
+    @Autowired
+    private JsonUtility jsonUtility;
 
     @Test
     public void userRegister() throws Exception {
-        String registerJson = json(new RegisterUserDTO(
+        String registerJson = jsonUtility.json(new RegisterUserDTO(
                 "yurii@mail.com",
                 "+48777111444",
                 "Jack",
@@ -60,22 +42,23 @@ public class ControllersTest {
         );
 
         mockMvc.perform(post(properties.getUserRegister())
-                .contentType(contentType)
+                .contentType(jsonUtility.getContentType())
                 .content(registerJson))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void userUpdate() throws Exception {
-        mockMvc.perform(get(properties.getUserUpdate())).andExpect(status().isOk());
+
+//        mockMvc.perform(get(properties.getUserUpdate())).andExpect(status().isOk());
     }
 
     @Test
     public void carFound() throws Exception {
         CarStatusDTO carStatusDTO = new CarStatusDTO("11111", new CarLocationDTO(159.00, 11.0));
-        String carStatusJson = json(carStatusDTO);
+        String carStatusJson = jsonUtility.json(carStatusDTO);
         mockMvc.perform(post(properties.getCarFound())
-                .contentType(contentType)
+                .contentType(jsonUtility.getContentType())
                 .content(carStatusJson))
                 .andExpect(status().isOk());
     }
@@ -91,10 +74,10 @@ public class ControllersTest {
         carRegisterDTO.setColor("red");
         carRegisterDTO.setYearOfProduction("1999");
         carRegisterDTO.setDescription("My car is very nice. I love my car");
-        String registerJson = json(carRegisterDTO);
+        String registerJson = jsonUtility.json(carRegisterDTO);
 
         mockMvc.perform(post(properties.getCarRegister())
-                .contentType(contentType)
+                .contentType(jsonUtility.getContentType())
                 .content(registerJson))
                 .andExpect(status().isOk());
     }
@@ -102,25 +85,5 @@ public class ControllersTest {
     @Test
     public void carUpdate() throws Exception {
         mockMvc.perform(get(properties.getCarUpdate())).andExpect(status().isOk());
-    }
-
-
-    private HttpMessageConverter mappingJackson2HttpMessageConverter;
-
-    @Autowired
-    void setConverters(HttpMessageConverter<?>[] converters) {
-
-        mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream()
-                .filter(hmc -> hmc instanceof MappingJackson2HttpMessageConverter)
-                .findAny()
-                .orElse(null);
-
-        assertNotNull("the JSON message converter must not be null", this.mappingJackson2HttpMessageConverter);
-    }
-
-    protected String json(Object o) throws IOException {
-        MockHttpOutputMessage mockHttpOutputMessage = new MockHttpOutputMessage();
-        mappingJackson2HttpMessageConverter.write(o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
-        return mockHttpOutputMessage.getBodyAsString();
     }
 }

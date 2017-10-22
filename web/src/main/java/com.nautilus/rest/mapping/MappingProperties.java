@@ -44,9 +44,5 @@ public class MappingProperties {
 
     @Value("${car.get.photos}")
     private String carPhotos;
-
-    //delete this om production
-    @Value("${test.index}")
-    private String index;
 }
 

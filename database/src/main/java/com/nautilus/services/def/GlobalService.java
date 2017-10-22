@@ -20,7 +20,7 @@ public interface GlobalService {
     boolean checkPhoneNumberIsFree(String phoneNumber);
 
     UserConfig findUserConfigByPhoneNumber(String phoneNumber);
-    UserConfig findUserConfigByEmail(String email);
+
     Car findCarByBeaconId(String beaconId);
     CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException;
 

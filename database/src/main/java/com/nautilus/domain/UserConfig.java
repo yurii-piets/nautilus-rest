@@ -3,18 +3,17 @@ package com.nautilus.domain;
 import com.nautilus.algorithm.MD5;
 import com.nautilus.constants.Authorities;
 import com.nautilus.dto.user.RegisterUserDTO;
-import com.nautilus.dto.user.UpdateUserDTO;
-import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.Set;
 
 @Entity

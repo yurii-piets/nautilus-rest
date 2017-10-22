@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Set;
 
 @Service
@@ -73,11 +71,6 @@ public class GlobalServiceImpl implements GlobalService {
     @Override
     public UserConfig findUserConfigByPhoneNumber(String phoneNumber) {
         return userRepository.findUserConfigByPhoneNumber(phoneNumber);
-    }
-
-    @Override
-    public UserConfig findUserConfigByEmail(String email) {
-        return userRepository.findUserConfigByEmail(email);
     }
 
     @Override
