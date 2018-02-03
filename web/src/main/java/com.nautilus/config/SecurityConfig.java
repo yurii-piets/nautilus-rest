@@ -2,6 +2,7 @@ package com.nautilus.config;
 
 
 import com.nautilus.algorithm.MD5;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,10 +30,10 @@ import static com.nautilus.rest.controllers.user.UserInfoController.USER_INFO_MA
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     private final static String[] AUTHENTICATED_MAPPINGS = new String[]{
             CAR_INFO_BASIC_MAPPING,

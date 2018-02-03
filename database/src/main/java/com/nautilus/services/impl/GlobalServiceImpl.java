@@ -11,6 +11,7 @@ import com.nautilus.repository.CarRepository;
 import com.nautilus.repository.CarStatusSnapshotRepository;
 import com.nautilus.repository.UserRepository;
 import com.nautilus.services.def.GlobalService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,19 +20,16 @@ import java.util.Set;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class GlobalServiceImpl implements GlobalService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private CarRepository carRepository;
+    private final CarRepository carRepository;
 
-    @Autowired
-    private CarStatusSnapshotRepository carStatusSnapshotRepository;
+    private final CarStatusSnapshotRepository carStatusSnapshotRepository;
 
-    @Autowired
-    private CarLocationRepository carLocationRepository;
+    private final CarLocationRepository carLocationRepository;
 
     @Override
     public void save(UserConfig user) {

@@ -1,12 +1,14 @@
 package com.nautilus.utilities;
 
 import com.nautilus.services.def.GlobalService;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.DirectoryScanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -16,15 +18,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class FileAccessUtility {
-    @Value("${upload.path}")
-    private String UPLOAD_FOLDER;
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
-    @Autowired
-    private GlobalService service;
+    @Value("${upload.path}")
+    private String UPLOAD_FOLDER;
+
+    private final GlobalService service;
 
     public void saveCarPhotos(String carId, List<MultipartFile> files) {
         Long userID = service.getUserIdConfigByCarBeaconId(carId);
