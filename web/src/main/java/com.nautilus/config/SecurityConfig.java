@@ -18,7 +18,9 @@ import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static com.nautilus.rest.controllers.car.CarInfoController.CAR_INFO_BASIC_MAPPING;
 import static com.nautilus.rest.controllers.car.FoundCarController.CAR_FOUND_MAPPING;
+import static com.nautilus.rest.controllers.car.RegisterCarController.REGISTER_CAR_MAPPING;
 import static com.nautilus.rest.controllers.car.UpdateCarController.CAR_UPDATE_MAPPING;
 import static com.nautilus.rest.controllers.user.RegisterController.REGISTER_USER_MAPPING;
 import static com.nautilus.rest.controllers.user.UpdateUserController.USER_UPDATE_MAPPING;
@@ -33,11 +35,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private DataSource dataSource;
 
     private final static String[] AUTHENTICATED_MAPPINGS = new String[]{
-            USER_INFO_MAPPING,
-            USER_CAR_MAPPING,
-            USER_UPDATE_MAPPING,
+            CAR_INFO_BASIC_MAPPING,
+            CAR_INFO_BASIC_MAPPING + "/**",
             CAR_FOUND_MAPPING,
-            CAR_UPDATE_MAPPING
+            CAR_FOUND_MAPPING + "/**",
+            REGISTER_CAR_MAPPING,
+            REGISTER_CAR_MAPPING + "/**",
+            CAR_UPDATE_MAPPING,
+            CAR_UPDATE_MAPPING + "/**",
+            USER_UPDATE_MAPPING,
+            USER_UPDATE_MAPPING + "/**",
+            USER_INFO_MAPPING,
+            USER_INFO_MAPPING + "/**",
+            USER_CAR_MAPPING,
+            USER_CAR_MAPPING + "/**",
     };
 
     private final static String[] PERMIT_ALL_MAPPINGS = new String[]{
