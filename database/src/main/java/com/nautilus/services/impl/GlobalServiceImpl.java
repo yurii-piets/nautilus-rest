@@ -92,15 +92,15 @@ public class GlobalServiceImpl implements GlobalService {
     }
 
     @Override
-    public Long getUserIdConfigByCarBeaconId(String carId) {
-        Car car = carRepository.findCarByBeaconId(carId);
+    public Long getUserIdConfigBeaconId(String beaconId) {
+        Car car = carRepository.findCarByBeaconId(beaconId);
         UserConfig owner = car.getOwner();
         return owner.getUserId();
     }
 
     @Override
-    public Car getCarById(String carId) {
-        return carRepository.findCarByBeaconId(carId);
+    public Car getCarById(String beaconId) {
+        return carRepository.findCarByBeaconId(beaconId);
     }
 
     @Override

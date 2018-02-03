@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.DirectoryScanner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,8 +27,8 @@ public class FileAccessUtility {
 
     private final GlobalService service;
 
-    public void saveCarPhotos(String carId, List<MultipartFile> files) {
-        Long userID = service.getUserIdConfigByCarBeaconId(carId);
+    public void saveCarPhotos(String beaconId, List<MultipartFile> files) {
+        Long userID = service.getUserIdConfigBeaconId(beaconId);
 
         int fileCount = 0;
         for (MultipartFile file : files) {
@@ -40,7 +38,7 @@ public class FileAccessUtility {
 
             try {
                 byte[] bytes = file.getBytes();
-                String folderPath = UPLOAD_FOLDER + userID + "/" + carId + "/";
+                String folderPath = UPLOAD_FOLDER + userID + "/" + beaconId + "/";
                 String[] splited = file.getOriginalFilename().split("\\.");
                 String type = splited.length != 0 ? splited[splited.length - 1] : file.getOriginalFilename();
                 createPath(folderPath);
@@ -54,12 +52,12 @@ public class FileAccessUtility {
         }
     }
 
-    public void deleteAndSaveCarPhotos(String carId, List<MultipartFile> files) {
-        Long userID = service.getUserIdConfigByCarBeaconId(carId);
-        String folderPath = UPLOAD_FOLDER + userID + "/" + carId + "/";
+    public void deleteAndSaveCarPhotos(String beaconId, List<MultipartFile> files) {
+        Long userID = service.getUserIdConfigBeaconId(beaconId);
+        String folderPath = UPLOAD_FOLDER + userID + "/" + beaconId + "/";
         clearDir(folderPath);
 
-        saveCarPhotos(carId, files);
+        saveCarPhotos(beaconId, files);
     }
 
     private void clearDir(String folderPath) {
@@ -88,8 +86,8 @@ public class FileAccessUtility {
         }
     }
 
-    public File getCarPhotos(Long userId, String carId, String index) {
-        String path = UPLOAD_FOLDER + userId + "/" + carId;
+    public File getCarPhotos(Long userId, String beaconId, String index) {
+        String path = UPLOAD_FOLDER + userId + "/" + beaconId;
         String wildcardFileName = index + ".**";
 
         DirectoryScanner scanner = new DirectoryScanner();
@@ -108,8 +106,8 @@ public class FileAccessUtility {
         return file;
     }
 
-    public int countOfPhotos(Long userId, String carId) {
-        String path = UPLOAD_FOLDER + "/" + userId + "/" + carId;
+    public int countOfPhotos(Long userId, String beaconId) {
+        String path = UPLOAD_FOLDER + "/" + userId + "/" + beaconId;
         File dir = new File(path);
 
         if (!dir.exists() || !dir.isDirectory()) {

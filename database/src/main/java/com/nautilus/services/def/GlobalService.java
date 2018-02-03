@@ -27,9 +27,9 @@ public interface GlobalService {
 
     CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException;
 
-    Long getUserIdConfigByCarBeaconId(String carId);
+    Long getUserIdConfigBeaconId(String beaconId);
 
-    Car getCarById(String carId);
+    Car getCarById(String beaconId);
 
     String findEmailByPhoneNumber(String phoneNumber);
 
