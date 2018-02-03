@@ -39,7 +39,7 @@ public class UpdateUserController {
     public ResponseEntity<?> update(@PathVariable String userPhone,
                                     @RequestBody String updateBody) {
         if (!authorizationService.hasAccessByPhoneNumber(userPhone)) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         UserConfig user = service.findUserConfigByPhoneNumber(userPhone);

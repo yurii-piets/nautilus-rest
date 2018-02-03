@@ -42,7 +42,7 @@ public class RegisterCarController {
                                       @RequestBody @Valid CarRegisterDTO carRegisterDTO) {
 
         if (!authorizationService.hasAccessByPhoneNumber(phoneNumber)) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         UserConfig user = service.findUserConfigByPhoneNumber(phoneNumber);
@@ -76,7 +76,7 @@ public class RegisterCarController {
                                                @RequestParam("file") List<MultipartFile> files) {
 
         if (!authorizationService.hasAccessByBeaconId(beaconId)) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         Car car = service.getCarById(beaconId);

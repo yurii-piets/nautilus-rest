@@ -57,7 +57,7 @@ public class CarInfoController {
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> car(@PathVariable String beaconId) {
         if(!authorizationService.hasAccessByBeaconId(beaconId)){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         Car car = service.findCarByBeaconId(beaconId);
@@ -71,7 +71,7 @@ public class CarInfoController {
     @RequestMapping(value = "/photos/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<Set<URL>> photos(@PathVariable String beaconId) {
         if(!authorizationService.hasAccessByBeaconId(beaconId)){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         Car car = service.findCarByBeaconId(beaconId);
@@ -105,7 +105,7 @@ public class CarInfoController {
                                         @PathVariable String index
     ) {
         if(!authorizationService.hasAccessByBeaconId(beaconId)){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         HttpHeaders headers = new HttpHeaders();

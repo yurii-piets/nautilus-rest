@@ -51,7 +51,7 @@ public class UpdateCarController {
                                  @RequestBody String updateBody) {
 
         if (!authorizationService.hasAccessByBeaconId(beaconId)) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         Car car = service.findCarByBeaconId(beaconId);
@@ -80,7 +80,7 @@ public class UpdateCarController {
                                        @RequestParam("file") List<MultipartFile> files) {
 
         if (!authorizationService.hasAccessByBeaconId(beaconId)) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         if (files == null || files.isEmpty()) {
