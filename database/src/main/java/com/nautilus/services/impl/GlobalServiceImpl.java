@@ -12,7 +12,6 @@ import com.nautilus.repository.CarStatusSnapshotRepository;
 import com.nautilus.repository.UserRepository;
 import com.nautilus.services.def.GlobalService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,5 +101,14 @@ public class GlobalServiceImpl implements GlobalService {
     @Override
     public Car getCarById(String carId) {
         return carRepository.findCarByBeaconId(carId);
+    }
+
+    @Override
+    public String findEmailByPhoneNumber(String phoneNumber) {
+        UserConfig user = userRepository.findUserConfigByPhoneNumber(phoneNumber);
+        if (user == null) {
+            return null;
+        }
+        return user.getEmail();
     }
 }

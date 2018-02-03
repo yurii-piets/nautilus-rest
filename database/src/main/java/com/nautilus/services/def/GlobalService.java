@@ -30,4 +30,6 @@ public interface GlobalService {
     Long getUserIdConfigByCarBeaconId(String carId);
 
     Car getCarById(String carId);
+
+    String findEmailByPhoneNumber(String phoneNumber);
 }
