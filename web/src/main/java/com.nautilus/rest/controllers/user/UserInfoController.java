@@ -29,7 +29,7 @@ public class UserInfoController {
 
     @RequestMapping(path = "/{userPhone}", method = RequestMethod.GET)
     public ResponseEntity<?> userInfo(@PathVariable String userPhone) {
-        if (!authorizationService.hasAccess(userPhone)) {
+        if (!authorizationService.hasAccessByPhoneNumber(userPhone)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -50,7 +50,7 @@ public class UserInfoController {
 
     @RequestMapping(value = USER_CAR_MAPPING + "/{userPhone}", method = RequestMethod.GET)
     public ResponseEntity<?> userCars(@PathVariable String userPhone) {
-        if(!authorizationService.hasAccess(userPhone)) {
+        if(!authorizationService.hasAccessByPhoneNumber(userPhone)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 

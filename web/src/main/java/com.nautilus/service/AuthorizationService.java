@@ -2,12 +2,8 @@ package com.nautilus.service;
 
 import com.nautilus.services.def.GlobalService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import javax.sql.DataSource;
-import java.sql.PreparedStatement;
 
 @Service
 @RequiredArgsConstructor
@@ -17,14 +13,32 @@ public class AuthorizationService {
 
     private final static String infoQuery = "select phoneNumber from userconfig where email = ?;";
 
-    public boolean hasAccess(String phoneNumber){
+    public boolean hasAccessByPhoneNumber(String phoneNumber) {
         String email = globalService.findEmailByPhoneNumber(phoneNumber);
 
-        if(email == null){
+        if (email == null) {
             return false;
         }
 
         String authenticationEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if(authenticationEmail == null) {
+            return false;
+        }
+
+        return email.equals(authenticationEmail);
+    }
+
+    public boolean hasAccessByBeaconId(String beaconId) {
+        String email = globalService.findEmailByBeaconId(beaconId);
+        if(email == null) {
+            return false;
+        }
+        String authenticationEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(authenticationEmail == null){
+            return false;
+        }
+
         return email.equals(authenticationEmail);
     }
 }

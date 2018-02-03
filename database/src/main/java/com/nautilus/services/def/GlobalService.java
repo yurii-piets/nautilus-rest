@@ -32,4 +32,6 @@ public interface GlobalService {
     Car getCarById(String carId);
 
     String findEmailByPhoneNumber(String phoneNumber);
+
+    String findEmailByBeaconId(String beaconId);
 }

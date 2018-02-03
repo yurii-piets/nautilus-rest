@@ -38,7 +38,7 @@ public class UpdateUserController {
     @RequestMapping(path = "/{userPhone}", method = RequestMethod.PATCH)
     public ResponseEntity<?> update(@PathVariable String userPhone,
                                     @RequestBody String updateBody) {
-        if (!authorizationService.hasAccess(userPhone)) {
+        if (!authorizationService.hasAccessByPhoneNumber(userPhone)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 

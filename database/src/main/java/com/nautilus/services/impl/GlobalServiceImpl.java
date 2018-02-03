@@ -111,4 +111,15 @@ public class GlobalServiceImpl implements GlobalService {
         }
         return user.getEmail();
     }
+
+    @Override
+    public String findEmailByBeaconId(String beaconId) {
+        Car car = carRepository.findCarByBeaconId(beaconId);
+
+        if (car == null){
+            return null;
+        }
+
+        return car.getOwner().getEmail();
+    }
 }

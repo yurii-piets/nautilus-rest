@@ -2,6 +2,7 @@ package com.nautilus.rest.controllers.car;
 
 import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
+import com.nautilus.service.AuthorizationService;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,8 @@ public class CarInfoController {
 
     private final FileAccessUtility fileAccessUtility;
 
+    private final AuthorizationService authorizationService;
+
     @Value("${server.protocol}")
     private String protocol;
 
@@ -52,9 +55,12 @@ public class CarInfoController {
     private Integer port;
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
-    public ResponseEntity<Car> car(@PathVariable String beaconId) {
-        Car car = service.findCarByBeaconId(beaconId);
+    public ResponseEntity<?> car(@PathVariable String beaconId) {
+        if(!authorizationService.hasAccessByBeaconId(beaconId)){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
+        Car car = service.findCarByBeaconId(beaconId);
         if (car == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -64,6 +70,10 @@ public class CarInfoController {
 
     @RequestMapping(value = "/photos/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<Set<URL>> photos(@PathVariable String beaconId) {
+        if(!authorizationService.hasAccessByBeaconId(beaconId)){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         Car car = service.findCarByBeaconId(beaconId);
         if (car == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -94,6 +104,10 @@ public class CarInfoController {
                                         @PathVariable String beaconId,
                                         @PathVariable String index
     ) {
+        if(!authorizationService.hasAccessByBeaconId(beaconId)){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         File file = fileAccessUtility.getCarPhotos(userId, beaconId, index);
@@ -112,12 +126,9 @@ public class CarInfoController {
     private URL buildUrl(@RequestParam String beaconId, Long userId, int i) {
         StringBuilder pathBuilder = new StringBuilder();
         pathBuilder.append(CAR_INFO_BASIC_MAPPING + "/photos")
-                .append("/")
-                .append(userId)
-                .append("/")
-                .append(beaconId)
-                .append("/")
-                .append(i);
+                .append("/").append(userId)
+                .append("/").append(beaconId)
+                .append("/").append(i);
         URL url = null;
         try {
             url = new URL(protocol, host, port, pathBuilder.toString());
