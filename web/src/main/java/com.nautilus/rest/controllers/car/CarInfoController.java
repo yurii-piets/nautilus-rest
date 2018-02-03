@@ -29,12 +29,12 @@ import java.util.Set;
 
 import static com.nautilus.rest.controllers.car.CarInfoController.CAR_INFO_BASIC_MAPPING;
 
-//@RestController
-//@RequestMapping(path = CAR_INFO_BASIC_MAPPING)
+@RestController
+@RequestMapping(path = CAR_INFO_BASIC_MAPPING)
 @RequiredArgsConstructor
 public class CarInfoController {
 
-    public final static String CAR_INFO_BASIC_MAPPING = "car/info";
+    public final static String CAR_INFO_BASIC_MAPPING = "/car/info";
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
