@@ -4,6 +4,7 @@ import com.nautilus.constants.CarStatus;
 import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.car.CarRegisterDTO;
+import com.nautilus.service.AuthorizationService;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
 import lombok.RequiredArgsConstructor;
@@ -34,20 +35,23 @@ public class RegisterCarController {
 
     private final FileAccessUtility fileSaveUtility;
 
+    private final AuthorizationService authorizationService;
+
     @RequestMapping(value = "/{phoneNumber}", method = RequestMethod.POST)
     public ResponseEntity<?> register(@PathVariable String phoneNumber,
-                                   @RequestBody @Valid CarRegisterDTO carRegisterDTO) {
+                                      @RequestBody @Valid CarRegisterDTO carRegisterDTO) {
+
+        if (!authorizationService.hasAccessByPhoneNumber(phoneNumber)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
         UserConfig user = service.findUserConfigByPhoneNumber(phoneNumber);
-
         if (user == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
-        Car duplicateCar = service.findCarByBeaconIdOrRegisterNumber(
-                carRegisterDTO.getBeaconId(), carRegisterDTO.getRegisterNumber());
-
-        if(duplicateCar != null){
+        Car duplicatedCar = service.findCarByBeaconIdOrRegisterNumber(carRegisterDTO.getBeaconId(), carRegisterDTO.getRegisterNumber());
+        if (duplicatedCar != null) {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
@@ -67,12 +71,15 @@ public class RegisterCarController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/photos/{carId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> registerCarPhotos(@PathVariable String carId,
-                                            @RequestParam("file") List<MultipartFile> files) {
+    @RequestMapping(value = "/photos/{beaconId}", method = RequestMethod.PUT)
+    public ResponseEntity<?> registerCarPhotos(@PathVariable String beaconId,
+                                               @RequestParam("file") List<MultipartFile> files) {
 
-        Car car = service.getCarById(carId);
+        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
+        Car car = service.getCarById(beaconId);
         if (car == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
@@ -81,7 +88,7 @@ public class RegisterCarController {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
-        fileSaveUtility.saveCarPhotos(carId, files);
+        fileSaveUtility.saveCarPhotos(beaconId, files);
 
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
