@@ -1,5 +1,6 @@
 package com.nautilus.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nautilus.dto.car.CarStatusDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class CarLocation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long locationId;
 
     @NotNull

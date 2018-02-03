@@ -29,13 +29,14 @@ public class CarStatusSnapshot {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long snapshotId;
 
     @OneToOne
-    @JsonIgnore
     private CarLocation carLocation;
 
     @ManyToOne
+    @JsonIgnore
     private Car car;
 
     private Timestamp captureTime;

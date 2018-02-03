@@ -64,6 +64,20 @@ public class CarInfoController {
         return new ResponseEntity<>(car, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/captures/{beaconId}", method = RequestMethod.GET)
+    public ResponseEntity<?> carCaptures(@PathVariable String beaconId) {
+        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        Car car = service.findCarByBeaconId(beaconId);
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(car.getStatusSnapshots(), HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/photos/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<Set<URL>> photos(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
