@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.sql.Date;
 
 import static com.nautilus.rest.controllers.car.FoundCarController.CAR_FOUND_MAPPING;
 
@@ -64,10 +65,12 @@ public class FoundCarController {
             service.save(carLocation);
 
             Car car = service.findCarByBeaconId(carStatusDTO.getBeaconId());
-            CarStatusSnapshot carStatusSnapshot = new CarStatusSnapshot();
-            carStatusSnapshot.setCarLocation(carLocation);
-            carStatusSnapshot.setCar(car);
-            carStatusSnapshot.setTimestamp(new Timestamp(new Date().getTime()));
+            CarStatusSnapshot carStatusSnapshot = CarStatusSnapshot.builder()
+                .carLocation(carLocation)
+                .car(car)
+                .captureTime(carStatusDTO.getCaptureTime())
+                .build();
+
             service.save(carStatusSnapshot);
 
             car.getStatusSnapshots().add(carStatusSnapshot);

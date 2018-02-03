@@ -12,7 +12,6 @@ import com.nautilus.repository.CarStatusSnapshotRepository;
 import com.nautilus.repository.UserRepository;
 import com.nautilus.services.def.GlobalService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,14 +92,34 @@ public class GlobalServiceImpl implements GlobalService {
     }
 
     @Override
-    public Long getUserIdConfigByCarBeaconId(String carId) {
-        Car car = carRepository.findCarByBeaconId(carId);
+    public Long getUserIdConfigBeaconId(String beaconId) {
+        Car car = carRepository.findCarByBeaconId(beaconId);
         UserConfig owner = car.getOwner();
         return owner.getUserId();
     }
 
     @Override
-    public Car getCarById(String carId) {
-        return carRepository.findCarByBeaconId(carId);
+    public Car getCarById(String beaconId) {
+        return carRepository.findCarByBeaconId(beaconId);
+    }
+
+    @Override
+    public String findEmailByPhoneNumber(String phoneNumber) {
+        UserConfig user = userRepository.findUserConfigByPhoneNumber(phoneNumber);
+        if (user == null) {
+            return null;
+        }
+        return user.getEmail();
+    }
+
+    @Override
+    public String findEmailByBeaconId(String beaconId) {
+        Car car = carRepository.findCarByBeaconId(beaconId);
+
+        if (car == null){
+            return null;
+        }
+
+        return car.getOwner().getEmail();
     }
 }

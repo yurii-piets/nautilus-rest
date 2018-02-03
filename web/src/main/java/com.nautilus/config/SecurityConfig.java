@@ -57,14 +57,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     };
 
     private static final String DEF_USERS_BY_EMAIL_QUERY =
-            "select email, password, enabled "
-                    + "from userconfig "
-                    + "where email = ?";
+            "SELECT email, password, enabled "
+                    + "FROM userconfig "
+                    + "WHERE email = ?";
 
     private static final String DEF_AUTHORITIES_BY_USERNAME_QUERY =
-            "select email, authorities "
-                    + "from userconfig "
-                    + "where email = ?";
+            "SELECT email, authorities "
+                    + "FROM userconfig "
+                    + "WHERE email = ?";
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {

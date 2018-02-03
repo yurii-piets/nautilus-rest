@@ -1,8 +1,8 @@
 package com.nautilus.rest.controllers.user;
 
-import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.UserInfo;
+import com.nautilus.service.AuthorizationService;
 import com.nautilus.services.def.GlobalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,10 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Set;
 
 import static com.nautilus.rest.controllers.user.UserInfoController.USER_INFO_MAPPING;
 
@@ -28,10 +25,15 @@ public class UserInfoController {
 
     private final GlobalService service;
 
+    private final AuthorizationService authorizationService;
+
     @RequestMapping(path = "/{userPhone}", method = RequestMethod.GET)
     public ResponseEntity<?> userInfo(@PathVariable String userPhone) {
-        UserConfig user = service.findUserConfigByPhoneNumber(userPhone);
+        if (!authorizationService.hasAccessByPhoneNumber(userPhone)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
+        UserConfig user = service.findUserConfigByPhoneNumber(userPhone);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -48,8 +50,11 @@ public class UserInfoController {
 
     @RequestMapping(value = USER_CAR_MAPPING + "/{userPhone}", method = RequestMethod.GET)
     public ResponseEntity<?> userCars(@PathVariable String userPhone) {
-        UserConfig user = service.findUserConfigByPhoneNumber(userPhone);
+        if(!authorizationService.hasAccessByPhoneNumber(userPhone)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
+        UserConfig user = service.findUserConfigByPhoneNumber(userPhone);
         if (userPhone == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

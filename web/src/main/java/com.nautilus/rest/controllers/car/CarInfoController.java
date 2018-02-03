@@ -2,6 +2,7 @@ package com.nautilus.rest.controllers.car;
 
 import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
+import com.nautilus.service.AuthorizationService;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,8 @@ public class CarInfoController {
 
     private final FileAccessUtility fileAccessUtility;
 
+    private final AuthorizationService authorizationService;
+
     @Value("${server.protocol}")
     private String protocol;
 
@@ -52,14 +55,27 @@ public class CarInfoController {
     private Integer port;
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
-    public ResponseEntity<Car> car(@PathVariable String beaconId) {
+    public ResponseEntity<?> car(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
-
         if (car == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(car, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/captures/{beaconId}", method = RequestMethod.GET)
+    public ResponseEntity<?> carCaptures(@PathVariable String beaconId) {
+        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        Car car = service.findCarByBeaconId(beaconId);
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(car.getStatusSnapshots(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/photos/{beaconId}", method = RequestMethod.GET)
@@ -104,7 +120,7 @@ public class CarInfoController {
             fileInputStream.read(b);
             return new ResponseEntity<>(b, headers, HttpStatus.OK);
         } catch (IOException e) {
-            logger.error("Unexpected", e);
+            logger.error("Unexpected: ", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -112,17 +128,14 @@ public class CarInfoController {
     private URL buildUrl(@RequestParam String beaconId, Long userId, int i) {
         StringBuilder pathBuilder = new StringBuilder();
         pathBuilder.append(CAR_INFO_BASIC_MAPPING + "/photos")
-                .append("/")
-                .append(userId)
-                .append("/")
-                .append(beaconId)
-                .append("/")
-                .append(i);
+                .append("/").append(userId)
+                .append("/").append(beaconId)
+                .append("/").append(i);
         URL url = null;
         try {
             url = new URL(protocol, host, port, pathBuilder.toString());
         } catch (MalformedURLException e) {
-            logger.error(e.getMessage());
+            logger.error("Unexpected: ", e);
         }
         return url;
     }

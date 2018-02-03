@@ -2,6 +2,7 @@ package com.nautilus.rest.controllers.car;
 
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.nautilus.domain.Car;
+import com.nautilus.service.AuthorizationService;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
 import com.nautilus.utilities.JsonPatchUtility;
@@ -38,6 +39,8 @@ public class UpdateCarController {
 
     private final JsonPatchUtility patchUtility;
 
+    private final AuthorizationService authorizationService;
+
     /*
     * @param Car beaconId
     * @param update entity, matches pattern : [{"op": "replace", "path": "/registerNumber", "value": "WW121"}]
@@ -47,8 +50,11 @@ public class UpdateCarController {
     public ResponseEntity update(@PathVariable String beaconId,
                                  @RequestBody String updateBody) {
 
-        Car car = service.findCarByBeaconId(beaconId);
+        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
+        Car car = service.findCarByBeaconId(beaconId);
         if (car == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
@@ -59,10 +65,10 @@ public class UpdateCarController {
             mergedCar.setStatusSnapshots(car.getStatusSnapshots());
             service.save(mergedCar);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Unexpected: ", e);
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (JsonPatchException e) {
-            logger.error(e.getMessage());
+            logger.error("Unexpected: ", e);
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
@@ -73,8 +79,8 @@ public class UpdateCarController {
     public ResponseEntity updatePhotos(@PathVariable String beaconId,
                                        @RequestParam("file") List<MultipartFile> files) {
 
-        if (beaconId == null || beaconId.isEmpty()) {
-            new ResponseEntity(HttpStatus.NOT_FOUND);
+        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         if (files == null || files.isEmpty()) {
