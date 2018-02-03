@@ -52,10 +52,10 @@ public class UpdateUserController {
             service.save(mergedUser);
             return new ResponseEntity(HttpStatus.OK);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Unexpected: ", e);
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (JsonPatchException e) {
-            logger.error(e.getMessage());
+            logger.error("Unexpected: ", e);
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }

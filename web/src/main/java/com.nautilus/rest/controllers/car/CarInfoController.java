@@ -120,7 +120,7 @@ public class CarInfoController {
             fileInputStream.read(b);
             return new ResponseEntity<>(b, headers, HttpStatus.OK);
         } catch (IOException e) {
-            logger.error("Unexpected", e);
+            logger.error("Unexpected: ", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -135,7 +135,7 @@ public class CarInfoController {
         try {
             url = new URL(protocol, host, port, pathBuilder.toString());
         } catch (MalformedURLException e) {
-            logger.error(e.getMessage());
+            logger.error("Unexpected: ", e);
         }
         return url;
     }

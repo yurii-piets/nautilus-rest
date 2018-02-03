@@ -46,7 +46,7 @@ public class FileAccessUtility {
                 Files.write(path, bytes);
                 logger.warn("File has been written!");
             } catch (IOException e) {
-                logger.error(e.getMessage());
+                logger.error("Unexpected: ", e);
             }
             fileCount++;
         }
