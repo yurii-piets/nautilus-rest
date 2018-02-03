@@ -1,11 +1,11 @@
 server:
-  protocol: https
+  protocol: http
   host: localhost
-  port: 8443
-  ssl:
-    key-store: ${NAUTILUS_SSL_STORE}
-    key-store-password: ${NAUTILUS_SSL_PASSWORD}
-    keyStoreType: PKCS12
-    keyAlias: tomcat
+  port: 8080
+#  ssl:
+#    key-store: ${NAUTILUS_SSL_STORE}
+#    key-store-password: ${NAUTILUS_SSL_PASSWORD}
+#    keyStoreType: PKCS12
+#    keyAlias: tomcat
 
 upload.path: upload/
