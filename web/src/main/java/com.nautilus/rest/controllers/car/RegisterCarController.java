@@ -6,9 +6,10 @@ import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,24 +21,37 @@ import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
 
+import static com.nautilus.rest.controllers.car.RegisterCarController.REGISTER_CAR_MAPPING;
+
 @RestController
+@RequestMapping(path = REGISTER_CAR_MAPPING)
+@RequiredArgsConstructor
 public class RegisterCarController {
 
-    @Autowired
-    private GlobalService service;
+    public final static String REGISTER_CAR_MAPPING = "/car/register";
 
-    @Autowired
-    private FileAccessUtility fileSaveUtility;
+    private final GlobalService service;
 
-    @RequestMapping(value = "${car.register}", method = RequestMethod.POST)
-    public ResponseEntity register(@RequestBody @Valid CarRegisterDTO carRegisterDTO) {
-        Car car = new Car(carRegisterDTO);
+    private final FileAccessUtility fileSaveUtility;
 
-        UserConfig user = service.findUserConfigByPhoneNumber(carRegisterDTO.getUserPhoneNumber());
+    @RequestMapping(value = "/{phoneNumber}", method = RequestMethod.POST)
+    public ResponseEntity<?> register(@PathVariable String phoneNumber,
+                                   @RequestBody @Valid CarRegisterDTO carRegisterDTO) {
 
-        if(user == null){
+        UserConfig user = service.findUserConfigByPhoneNumber(phoneNumber);
+
+        if (user == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
+
+        Car duplicateCar = service.findCarByBeaconIdOrRegisterNumber(
+                carRegisterDTO.getBeaconId(), carRegisterDTO.getRegisterNumber());
+
+        if(duplicateCar != null){
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        Car car = new Car(carRegisterDTO);
 
         car.setOwner(user);
         car.setStatus(CarStatus.TESTING);
@@ -53,10 +67,13 @@ public class RegisterCarController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "${car.register-car-photos}", method = RequestMethod.PUT)
-    public ResponseEntity registerCarPhotos(@RequestParam String carId,
-                                        @RequestParam("file") List<MultipartFile> files) {
-        if (carId == null || carId.isEmpty()) {
+    @RequestMapping(value = "/photos/{carId}", method = RequestMethod.PUT)
+    public ResponseEntity<?> registerCarPhotos(@PathVariable String carId,
+                                            @RequestParam("file") List<MultipartFile> files) {
+
+        Car car = service.getCarById(carId);
+
+        if (car == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 

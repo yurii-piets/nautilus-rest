@@ -79,10 +79,15 @@ public class GlobalServiceImpl implements GlobalService {
     }
 
     @Override
+    public Car findCarByBeaconIdOrRegisterNumber(String beaconId, String registerNumber) {
+        return carRepository.findCarByBeaconIdOrRegisterNumber(beaconId, registerNumber);
+    }
+
+    @Override
     public CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException {
         Car car = carRepository.findCarByBeaconId(beaconId);
 
-        if(car == null){
+        if (car == null) {
             throw new WrongCarBeaconIdException("No such car with beacon id: " + beaconId);
         }
 
@@ -94,5 +99,10 @@ public class GlobalServiceImpl implements GlobalService {
         Car car = carRepository.findCarByBeaconId(carId);
         UserConfig owner = car.getOwner();
         return owner.getUserId();
+    }
+
+    @Override
+    public Car getCarById(String carId) {
+        return carRepository.findCarByBeaconId(carId);
     }
 }

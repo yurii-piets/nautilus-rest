@@ -1,7 +1,7 @@
 package com.nautilus.config;
 
+
 import com.nautilus.algorithm.MD5;
-import com.nautilus.rest.mapping.MappingProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,22 +10,33 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+
+import static com.nautilus.rest.controllers.car.FoundCarController.CAR_FOUND_MAPPING;
+import static com.nautilus.rest.controllers.car.UpdateCarController.CAR_UPDATE_MAPPING;
+import static com.nautilus.rest.controllers.user.RegisterController.REGISTER_USER_MAPPING;
+import static com.nautilus.rest.controllers.user.UpdateUserController.USER_UPDATE_MAPPING;
+import static com.nautilus.rest.controllers.user.UserInfoController.USER_CAR_MAPPING;
+import static com.nautilus.rest.controllers.user.UserInfoController.USER_INFO_MAPPING;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private MappingProperties properties;
-
-    @Autowired
     private DataSource dataSource;
 
-    private String[] authenticatedMappings;
+    private final static String[] AUTHENTICATED_MAPPINGS = new String[]{
+            USER_INFO_MAPPING,
+            USER_CAR_MAPPING,
+            USER_UPDATE_MAPPING,
+            CAR_FOUND_MAPPING,
+            CAR_UPDATE_MAPPING
+    };
 
-    private String[] permitAllMappings;
+    private final static String[] PERMIT_ALL_MAPPINGS = new String[]{
+            REGISTER_USER_MAPPING
+    };
 
     private static final String DEF_USERS_BY_EMAIL_QUERY =
             "select email, password, enabled "
@@ -45,54 +56,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .usersByUsernameQuery(DEF_USERS_BY_EMAIL_QUERY)
                 .authoritiesByUsernameQuery(DEF_AUTHORITIES_BY_USERNAME_QUERY)
                 .passwordEncoder(new MD5())
-                .and()
+            .and()
                 .inMemoryAuthentication()
                 .withUser("actuator").password("actuator").roles("ACTUATOR");
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        initMappings();
-
         http
                 .authorizeRequests()
-                .antMatchers(authenticatedMappings).authenticated()
-                .antMatchers(permitAllMappings).permitAll()
+                .antMatchers(AUTHENTICATED_MAPPINGS).authenticated()
+                .antMatchers(PERMIT_ALL_MAPPINGS).permitAll()
                 .anyRequest().permitAll()
-                .and()
+            .and()
                 .httpBasic()
-                .and()
+            .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+            .and()
                 .csrf().disable();
-    }
-
-    @PostConstruct
-    private void initMappings() {
-        initAuthenticatedMethods();
-        initPermitAllMappings();
-    }
-
-    private void initAuthenticatedMethods() {
-        authenticatedMappings = new String[]{
-                properties.getUserUpdate(),
-                properties.getCarFound(),
-                properties.getCarRegister(),
-                properties.getCarUpdate(),
-                properties.getRegisterCarPhotos(),
-                properties.getCarUpdatePhotos(),
-                properties.getUserInfo(),
-                properties.getUserCars(),
-                properties.getCarInfo(),
-                properties.getCarPhotos(),
-                properties.getCarPhotos() + "/**"
-        };
-    }
-
-    private void initPermitAllMappings() {
-        permitAllMappings = new String[]{
-                properties.getUserRegister()
-        };
     }
 }

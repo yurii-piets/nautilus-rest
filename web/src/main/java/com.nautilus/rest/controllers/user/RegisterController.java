@@ -5,6 +5,7 @@ import com.nautilus.constants.RegisterStatus;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.services.def.GlobalService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +18,16 @@ import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.nautilus.rest.controllers.user.RegisterController.REGISTER_USER_MAPPING;
+
 @RestController
-@RequestMapping(value = "${user.register}")
+@RequestMapping(value = REGISTER_USER_MAPPING)
+@RequiredArgsConstructor
 public class RegisterController {
 
-    @Autowired
-    private GlobalService service;
+    public final static String REGISTER_USER_MAPPING = "/user/register";
+
+    private final GlobalService service;
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Set<RegisterStatus>> register(@RequestBody @Valid RegisterUserDTO registerDTO) {

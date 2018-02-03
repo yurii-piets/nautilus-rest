@@ -7,11 +7,13 @@ import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.exceptions.WrongCarBeaconIdException;
 import com.nautilus.services.def.GlobalService;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,24 +23,40 @@ import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import static com.nautilus.rest.controllers.car.FoundCarController.CAR_FOUND_MAPPING;
+
 @RestController
-@RequestMapping(value = "${car.found}")
+@RequestMapping(value = CAR_FOUND_MAPPING)
+@RequiredArgsConstructor
 public class FoundCarController {
 
-    @Autowired
-    private GlobalService service;
+    public final static String CAR_FOUND_MAPPING = "/car/found";
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
+    private final GlobalService service;
+
+    @RequestMapping(value = "{beaconId}", method = RequestMethod.GET)
+    public ResponseEntity<?> foundStatus(@PathVariable String beaconId) {
+        Car car = service.findCarByBeaconId(beaconId);
+
+        if(car == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(car.getStatus(), HttpStatus.OK);
+    }
+
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<CarStatus> found(@RequestBody @Valid CarStatusDTO carStatusDTO) {
+    public ResponseEntity<?> found(@RequestBody @Valid CarStatusDTO carStatusDTO) {
 
         CarStatus status;
         try {
             status = service.getCarStatusByCarBeaconId(carStatusDTO.getBeaconId());
         } catch (WrongCarBeaconIdException e) {
             status = CarStatus.TESTING;
-            logger.error(e.getMessage());
+            logger.error("Unexpected: ", e);
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {

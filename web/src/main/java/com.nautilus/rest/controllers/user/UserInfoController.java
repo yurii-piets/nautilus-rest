@@ -4,9 +4,10 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.UserInfo;
 import com.nautilus.services.def.GlobalService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,36 +15,45 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
 
+import static com.nautilus.rest.controllers.user.UserInfoController.USER_INFO_MAPPING;
 
 @RestController
-@RequestMapping(method = RequestMethod.GET)
+@RequestMapping(path = USER_INFO_MAPPING)
+@RequiredArgsConstructor
 public class UserInfoController {
 
-    @Autowired
-    private GlobalService service;
+    public final static String USER_INFO_MAPPING = "/user/info";
 
-    @RequestMapping(value="${user.get.info}")
-    public ResponseEntity<UserInfo> userInfo(@RequestParam String userPhone){
-        UserConfig userConfig = service.findUserConfigByPhoneNumber(userPhone);
+    public final static String USER_CAR_MAPPING = "/cars";
 
-        UserInfo userInfo = new UserInfo();
-        userInfo.setEmail(userConfig.getEmail());
-        userInfo.setPhoneNumber(userConfig.getPhoneNumber());
-        userInfo.setUserName(userConfig.getName());
-        userInfo.setUserSurname(userConfig.getSurname());
+    private final GlobalService service;
+
+    @RequestMapping(path = "/{userPhone}", method = RequestMethod.GET)
+    public ResponseEntity<?> userInfo(@PathVariable String userPhone) {
+        UserConfig user = service.findUserConfigByPhoneNumber(userPhone);
+
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        UserInfo userInfo = UserInfo.builder()
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .userName(user.getName())
+                .userSurname(user.getSurname())
+                .build();
 
         return new ResponseEntity<>(userInfo, HttpStatus.OK);
     }
 
-    @RequestMapping(value="${user.get.cars}")
-    public ResponseEntity<Set<Car>> userCars(@RequestParam String userPhone){
-        UserConfig config = service.findUserConfigByPhoneNumber(userPhone);
+    @RequestMapping(value = USER_CAR_MAPPING + "/{userPhone}", method = RequestMethod.GET)
+    public ResponseEntity<?> userCars(@PathVariable String userPhone) {
+        UserConfig user = service.findUserConfigByPhoneNumber(userPhone);
 
-        if(userPhone == null){
+        if (userPhone == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Set<Car> cars = config.getCars();
-        return new ResponseEntity<>(cars, HttpStatus.OK);
+        return new ResponseEntity<>(user.getCars(), HttpStatus.OK);
     }
 }

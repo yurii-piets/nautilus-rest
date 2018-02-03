@@ -2,12 +2,11 @@ package com.nautilus.rest.controllers.car;
 
 import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
-import com.nautilus.rest.mapping.MappingProperties;
 import com.nautilus.services.def.GlobalService;
 import com.nautilus.utilities.FileAccessUtility;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,18 +27,20 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-@RestController
-@RequestMapping(method = RequestMethod.GET)
+import static com.nautilus.rest.controllers.car.CarInfoController.CAR_INFO_BASIC_MAPPING;
+
+//@RestController
+//@RequestMapping(path = CAR_INFO_BASIC_MAPPING)
+@RequiredArgsConstructor
 public class CarInfoController {
 
-    @Autowired
-    private GlobalService service;
+    public final static String CAR_INFO_BASIC_MAPPING = "car/info";
 
-    @Autowired
-    private FileAccessUtility fileAccessUtility;
+    private final Logger logger = LogManager.getLogger(this.getClass());
 
-    @Autowired
-    private MappingProperties properties;
+    private final GlobalService service;
+
+    private final FileAccessUtility fileAccessUtility;
 
     @Value("${server.protocol}")
     private String protocol;
@@ -48,13 +49,11 @@ public class CarInfoController {
     private String host;
 
     @Value("${server.port}")
-    private int port;
+    private Integer port;
 
-    private final Logger logger = LogManager.getLogger(this.getClass());
-
-    @RequestMapping(value = "${car.get.info}")
-    public ResponseEntity<Car> car(@RequestParam String carId) {
-        Car car = service.findCarByBeaconId(carId);
+    @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
+    public ResponseEntity<Car> car(@PathVariable String beaconId) {
+        Car car = service.findCarByBeaconId(beaconId);
 
         if (car == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -63,67 +62,62 @@ public class CarInfoController {
         return new ResponseEntity<>(car, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "${car.get.photos}/{userId}/{beaconId}/{index}")
-    public ResponseEntity<byte[]> photo(@PathVariable Long userId,
-                                               @PathVariable String beaconId,
-                                               @PathVariable String index
-    ){
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        File file = fileAccessUtility.getCarPhotos(userId, beaconId, index);
-
-        byte[] b = new byte[(int) file.length()];
-        FileInputStream fileInputStream = null;
-        try {
-            fileInputStream = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            logger.error(e.getMessage());
-        }
-
-        try {
-            fileInputStream.read(b);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-
-        return new ResponseEntity<>(b, headers, HttpStatus.OK);
-    }
-
-    @RequestMapping(value="${car.get.photos}" )
-    public ResponseEntity<Set<URL>> photos(@RequestParam String beaconId){
-
-        // TODO: 19/10/2017 create method in service to checj if car with current beaconid exists
+    @RequestMapping(value = "/photos/{beaconId}", method = RequestMethod.GET)
+    public ResponseEntity<Set<URL>> photos(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
-        if(car == null){
+        if (car == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         UserConfig owner = car.getOwner();
-        if(owner == null){
+        if (owner == null) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
         Long userId = owner.getUserId();
-        if(userId == null){
+        if (userId == null) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
         Set<URL> urls = new HashSet<>();
         int size = fileAccessUtility.countOfPhotos(userId, beaconId);
 
-        for(int i = 0; i < size; ++i){
+        for (int i = 0; i < size; ++i) {
             urls.add(buildUrl(beaconId, userId, i));
         }
 
         return new ResponseEntity<>(urls, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "photos/{userId}/{beaconId}/{index}", method = RequestMethod.GET)
+    public ResponseEntity<?> photo(@PathVariable Long userId,
+                                        @PathVariable String beaconId,
+                                        @PathVariable String index
+    ) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        File file = fileAccessUtility.getCarPhotos(userId, beaconId, index);
+
+        try {
+            byte[] b = new byte[(int) file.length()];
+            FileInputStream fileInputStream = new FileInputStream(file);
+            fileInputStream.read(b);
+            return new ResponseEntity<>(b, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            logger.error("Unexpected", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private URL buildUrl(@RequestParam String beaconId, Long userId, int i) {
         StringBuilder pathBuilder = new StringBuilder();
-        pathBuilder.append(properties.getCarPhotos());
-        pathBuilder.append("/"); pathBuilder.append(userId);
-        pathBuilder.append("/"); pathBuilder.append(beaconId);
-        pathBuilder.append("/"); pathBuilder.append(i);
+        pathBuilder.append(CAR_INFO_BASIC_MAPPING + "/photos")
+                .append("/")
+                .append(userId)
+                .append("/")
+                .append(beaconId)
+                .append("/")
+                .append(i);
         URL url = null;
         try {
             url = new URL(protocol, host, port, pathBuilder.toString());

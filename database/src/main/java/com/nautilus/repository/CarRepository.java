@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface CarRepository extends JpaRepository<Car, String> {
 
     Car findCarByBeaconId(String beaconId);
+    Car findCarByBeaconIdOrRegisterNumber(String beaconId, String registerNumber);
 }

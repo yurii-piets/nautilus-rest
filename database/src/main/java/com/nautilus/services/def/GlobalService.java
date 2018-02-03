@@ -22,7 +22,12 @@ public interface GlobalService {
     UserConfig findUserConfigByPhoneNumber(String phoneNumber);
 
     Car findCarByBeaconId(String beaconId);
+
+    Car findCarByBeaconIdOrRegisterNumber(String beaconId, String registerNumber);
+
     CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException;
 
     Long getUserIdConfigByCarBeaconId(String carId);
+
+    Car getCarById(String carId);
 }
