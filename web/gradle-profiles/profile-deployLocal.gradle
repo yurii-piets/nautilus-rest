@@ -1,7 +1,7 @@
 apply plugin: 'war'
 
 war {
-    baseName = 'nautilus-app'
+    baseName = 'nautilus-rest'
     version = '0.0.1'
 }
 
