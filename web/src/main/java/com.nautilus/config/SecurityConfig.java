@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static com.nautilus.rest.controllers.IndexController.INDEX_MAPPING;
 import static com.nautilus.rest.controllers.car.CarInfoController.CAR_INFO_BASIC_MAPPING;
 import static com.nautilus.rest.controllers.car.FoundCarController.CAR_FOUND_MAPPING;
 import static com.nautilus.rest.controllers.car.RegisterCarController.REGISTER_CAR_MAPPING;
@@ -50,6 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             USER_INFO_MAPPING + "/**",
             USER_CAR_MAPPING,
             USER_CAR_MAPPING + "/**",
+            INDEX_MAPPING
     };
 
     private final static String[] PERMIT_ALL_MAPPINGS = new String[]{
