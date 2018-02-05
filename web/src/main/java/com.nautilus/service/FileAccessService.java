@@ -1,4 +1,4 @@
-package com.nautilus.utilities;
+package com.nautilus.service;
 
 import com.nautilus.services.def.GlobalService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FileAccessUtility {
+public class FileAccessService {
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
@@ -60,32 +60,6 @@ public class FileAccessUtility {
         saveCarPhotos(beaconId, files);
     }
 
-    private void clearDir(String folderPath) {
-        File dir = new File(folderPath);
-
-        if (!dir.exists() || !dir.isDirectory()) {
-            return;
-        }
-
-        if (!dir.canWrite()) {
-            dir.setWritable(true);
-        }
-
-        for (File file : dir.listFiles()) {
-            file.delete();
-        }
-    }
-
-    private void createPath(String path) {
-        File file = new File(path);
-        if (!file.exists() || !file.isDirectory()) {
-            file.mkdirs();
-        }
-        if (file.canWrite()) {
-            file.setWritable(true);
-        }
-    }
-
     public File getCarPhotos(Long userId, String beaconId, String index) {
         String path = UPLOAD_FOLDER + userId + "/" + beaconId;
         String wildcardFileName = index + ".**";
@@ -123,5 +97,31 @@ public class FileAccessUtility {
         int size = files != null ? files.length : 0;
 
         return size;
+    }
+
+    private void clearDir(String folderPath) {
+        File dir = new File(folderPath);
+
+        if (!dir.exists() || !dir.isDirectory()) {
+            return;
+        }
+
+        if (!dir.canWrite()) {
+            dir.setWritable(true);
+        }
+
+        for (File file : dir.listFiles()) {
+            file.delete();
+        }
+    }
+
+    private void createPath(String path) {
+        File file = new File(path);
+        if (!file.exists() || !file.isDirectory()) {
+            file.mkdirs();
+        }
+        if (file.canWrite()) {
+            file.setWritable(true);
+        }
     }
 }

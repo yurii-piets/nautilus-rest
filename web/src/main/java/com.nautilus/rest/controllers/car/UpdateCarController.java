@@ -4,7 +4,7 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.nautilus.domain.Car;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.services.def.GlobalService;
-import com.nautilus.utilities.FileAccessUtility;
+import com.nautilus.service.FileAccessService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +35,7 @@ public class UpdateCarController {
 
     private final GlobalService service;
 
-    private final FileAccessUtility fileSaveUtility;
+    private final FileAccessService fileAccessService;
 
     private final JsonPatchUtility patchUtility;
 
@@ -87,7 +87,7 @@ public class UpdateCarController {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
-        fileSaveUtility.deleteAndSaveCarPhotos(beaconId, files);
+        fileAccessService.deleteAndSaveCarPhotos(beaconId, files);
 
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }

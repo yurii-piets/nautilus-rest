@@ -4,7 +4,7 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.services.def.GlobalService;
-import com.nautilus.utilities.FileAccessUtility;
+import com.nautilus.service.FileAccessService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,7 +40,7 @@ public class CarInfoController {
 
     private final GlobalService service;
 
-    private final FileAccessUtility fileAccessUtility;
+    private final FileAccessService fileAccessService;
 
     private final AuthorizationService authorizationService;
 
@@ -96,7 +95,7 @@ public class CarInfoController {
         }
 
         Set<URL> urls = new HashSet<>();
-        int size = fileAccessUtility.countOfPhotos(userId, beaconId);
+        int size = fileAccessService.countOfPhotos(userId, beaconId);
 
         for (int i = 0; i < size; ++i) {
             urls.add(buildUrl(beaconId, userId, i));
@@ -112,7 +111,7 @@ public class CarInfoController {
     ) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
-        File file = fileAccessUtility.getCarPhotos(userId, beaconId, index);
+        File file = fileAccessService.getCarPhotos(userId, beaconId, index);
 
         try {
             byte[] b = new byte[(int) file.length()];

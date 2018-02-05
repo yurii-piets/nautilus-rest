@@ -6,7 +6,7 @@ import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.services.def.GlobalService;
-import com.nautilus.utilities.FileAccessUtility;
+import com.nautilus.service.FileAccessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ public class RegisterCarController {
 
     private final GlobalService service;
 
-    private final FileAccessUtility fileSaveUtility;
+    private final FileAccessService fileAccessService;
 
     private final AuthorizationService authorizationService;
 
@@ -88,7 +88,7 @@ public class RegisterCarController {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
-        fileSaveUtility.saveCarPhotos(beaconId, files);
+        fileAccessService.saveCarPhotos(beaconId, files);
 
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
