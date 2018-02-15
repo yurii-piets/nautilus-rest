@@ -1,11 +1,10 @@
 package com.nautilus.config;
 
-
 import com.nautilus.algorithm.MD5;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,14 +19,11 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.nautilus.rest.controllers.IndexController.INDEX_MAPPING;
-import static com.nautilus.rest.controllers.car.CarInfoController.CAR_INFO_BASIC_MAPPING;
-import static com.nautilus.rest.controllers.car.FoundCarController.CAR_FOUND_MAPPING;
-import static com.nautilus.rest.controllers.car.RegisterCarController.REGISTER_CAR_MAPPING;
-import static com.nautilus.rest.controllers.car.UpdateCarController.CAR_UPDATE_MAPPING;
-import static com.nautilus.rest.controllers.user.RegisterController.REGISTER_USER_MAPPING;
-import static com.nautilus.rest.controllers.user.UpdateUserController.USER_UPDATE_MAPPING;
-import static com.nautilus.rest.controllers.user.UserInfoController.USER_CAR_MAPPING;
-import static com.nautilus.rest.controllers.user.UserInfoController.USER_INFO_MAPPING;
+import static com.nautilus.rest.controllers.car.CarCapturesController.CAR_FOUND_MAPPING;
+import static com.nautilus.rest.controllers.car.CarController.CAR_MAPPING;
+import static com.nautilus.rest.controllers.car.CarPhotosController.CAR_PHOTOS_MAPPING;
+import static com.nautilus.rest.controllers.user.UserController.USER_CAR_MAPPING;
+import static com.nautilus.rest.controllers.user.UserController.USER_MAPPING;
 
 @Configuration
 @EnableWebSecurity
@@ -37,25 +33,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final DataSource dataSource;
 
     private final static String[] AUTHENTICATED_MAPPINGS = new String[]{
-            CAR_INFO_BASIC_MAPPING,
-            CAR_INFO_BASIC_MAPPING + "/**",
+            USER_MAPPING,
+            USER_MAPPING + "/**",
+            USER_MAPPING + USER_CAR_MAPPING,
+            USER_MAPPING + USER_CAR_MAPPING + "/**",
+            CAR_MAPPING,
+            CAR_MAPPING + "/**",
+            CAR_PHOTOS_MAPPING,
+            CAR_PHOTOS_MAPPING + "/**",
             CAR_FOUND_MAPPING,
             CAR_FOUND_MAPPING + "/**",
-            REGISTER_CAR_MAPPING,
-            REGISTER_CAR_MAPPING + "/**",
-            CAR_UPDATE_MAPPING,
-            CAR_UPDATE_MAPPING + "/**",
-            USER_UPDATE_MAPPING,
-            USER_UPDATE_MAPPING + "/**",
-            USER_INFO_MAPPING,
-            USER_INFO_MAPPING + "/**",
-            USER_CAR_MAPPING,
-            USER_CAR_MAPPING + "/**",
             INDEX_MAPPING
     };
 
     private final static String[] PERMIT_ALL_MAPPINGS = new String[]{
-            REGISTER_USER_MAPPING
+
     };
 
     private static final String DEF_USERS_BY_EMAIL_QUERY =
@@ -85,6 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
+                .antMatchers(HttpMethod.POST, USER_MAPPING).permitAll()
                 .antMatchers(AUTHENTICATED_MAPPINGS).authenticated()
                 .antMatchers(PERMIT_ALL_MAPPINGS).permitAll()
                 .anyRequest().permitAll()

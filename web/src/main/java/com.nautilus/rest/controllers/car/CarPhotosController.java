@@ -3,8 +3,9 @@ package com.nautilus.rest.controllers.car;
 import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.service.AuthorizationService;
-import com.nautilus.services.def.GlobalService;
 import com.nautilus.service.FileAccessService;
+import com.nautilus.services.def.GlobalService;
+import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,22 +27,25 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import static com.nautilus.rest.controllers.car.CarInfoController.CAR_INFO_BASIC_MAPPING;
+import static com.nautilus.rest.controllers.car.CarPhotosController.CAR_PHOTOS_MAPPING;
 
 @RestController
-@RequestMapping(path = CAR_INFO_BASIC_MAPPING)
+@RequestMapping(path = CAR_PHOTOS_MAPPING)
 @RequiredArgsConstructor
-public class CarInfoController {
+public class CarPhotosController {
 
-    public final static String CAR_INFO_BASIC_MAPPING = "/car/info";
+    public final static String CAR_PHOTOS_MAPPING = "/car/photos";
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
     private final GlobalService service;
 
     private final FileAccessService fileAccessService;
+
+    private final JsonPatchUtility patchUtility;
 
     private final AuthorizationService authorizationService;
 
@@ -54,30 +59,6 @@ public class CarInfoController {
     private Integer port;
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
-    public ResponseEntity<?> car(@PathVariable String beaconId) {
-        Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return new ResponseEntity<>(car, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/captures/{beaconId}", method = RequestMethod.GET)
-    public ResponseEntity<?> carCaptures(@PathVariable String beaconId) {
-        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return new ResponseEntity<>(car.getStatusSnapshots(), HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/photos/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<Set<URL>> photos(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
         if (car == null) {
@@ -104,10 +85,10 @@ public class CarInfoController {
         return new ResponseEntity<>(urls, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "photos/{userId}/{beaconId}/{index}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{userId}/{beaconId}/{index}", method = RequestMethod.GET)
     public ResponseEntity<?> photo(@PathVariable Long userId,
-                                        @PathVariable String beaconId,
-                                        @PathVariable String index
+                                   @PathVariable String beaconId,
+                                   @PathVariable String index
     ) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
@@ -124,9 +105,48 @@ public class CarInfoController {
         }
     }
 
-    private URL buildUrl(@RequestParam String beaconId, Long userId, int i) {
+    @RequestMapping(value = "/{beaconId}", method = RequestMethod.POST)
+    public ResponseEntity<?> register(@PathVariable String beaconId,
+                                      @RequestParam("file") List<MultipartFile> files) {
+
+        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        Car car = service.getCarById(beaconId);
+        if (car == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
+        if (files == null || files.isEmpty()) {
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        fileAccessService.saveCarPhotos(beaconId, files);
+
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
+    @RequestMapping(value = "/{beaconId}", method = RequestMethod.PUT)
+    public ResponseEntity update(@PathVariable String beaconId,
+                                 @RequestParam("file") List<MultipartFile> files) {
+
+        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        if (files == null || files.isEmpty()) {
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        fileAccessService.deleteAndSaveCarPhotos(beaconId, files);
+
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
+    private URL buildUrl(String beaconId, Long userId, int i) {
         StringBuilder pathBuilder = new StringBuilder();
-        pathBuilder.append(CAR_INFO_BASIC_MAPPING + "/photos")
+        pathBuilder.append(CAR_PHOTOS_MAPPING + "/photos")
                 .append("/").append(userId)
                 .append("/").append(beaconId)
                 .append("/").append(i);

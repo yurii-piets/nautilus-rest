@@ -73,7 +73,7 @@ public class ControllersTest {
         carRegisterDTO.setModel("146");
         carRegisterDTO.setColor("red");
         carRegisterDTO.setYearOfProduction("1999");
-        carRegisterDTO.setDescription("My car is very nice. I love my car");
+        carRegisterDTO.setDescription("My info is very nice. I love my info");
         String registerJson = jsonUtility.json(carRegisterDTO);
 
         mockMvc.perform(post(properties.getCarRegister())
