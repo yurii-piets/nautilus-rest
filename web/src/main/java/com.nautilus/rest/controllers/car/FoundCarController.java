@@ -5,7 +5,6 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.CarLocation;
 import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.dto.car.CarStatusDTO;
-import com.nautilus.exceptions.WrongCarBeaconIdException;
 import com.nautilus.services.def.GlobalService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -51,13 +50,9 @@ public class FoundCarController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> found(@RequestBody @Valid CarStatusDTO carStatusDTO) {
 
-        CarStatus status;
-        try {
-            status = service.getCarStatusByCarBeaconId(carStatusDTO.getBeaconId());
-        } catch (WrongCarBeaconIdException e) {
+        CarStatus status = service.getCarStatusByCarBeaconId(carStatusDTO.getBeaconId());
+        if(status == null) {
             status = CarStatus.TESTING;
-            logger.error("Unexpected: ", e);
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {

@@ -5,7 +5,6 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.CarLocation;
 import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.domain.UserConfig;
-import com.nautilus.exceptions.WrongCarBeaconIdException;
 
 import java.util.Set;
 
@@ -25,7 +24,7 @@ public interface GlobalService {
 
     Car findCarByBeaconIdOrRegisterNumber(String beaconId, String registerNumber);
 
-    CarStatus getCarStatusByCarBeaconId(String beaconId) throws WrongCarBeaconIdException;
+    CarStatus getCarStatusByCarBeaconId(String beaconId);
 
     Long getUserIdConfigBeaconId(String beaconId);
 
