@@ -3,19 +3,20 @@ package com.nautilus.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.jws.HandlerChain;
-import javax.persistence.*;
-import java.sql.Date;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -35,7 +36,7 @@ public class CarStatusSnapshot {
     @OneToOne
     private CarLocation carLocation;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JsonIgnore
     private Car car;
 

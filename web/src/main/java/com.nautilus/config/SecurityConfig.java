@@ -79,6 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, USER_MAPPING).permitAll()
                 .antMatchers(AUTHENTICATED_MAPPINGS).authenticated()
+                .antMatchers("/actuator/**").authenticated()
                 .antMatchers(PERMIT_ALL_MAPPINGS).permitAll()
                 .anyRequest().permitAll()
             .and()

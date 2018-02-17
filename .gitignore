@@ -4,4 +4,7 @@ gradle/
 build/
 .idea/
 upload/
+logs/
+
 *.iml
+*.log

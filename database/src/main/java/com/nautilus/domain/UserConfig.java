@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,7 +38,7 @@ public class UserConfig {
 
     private Authorities authorities;
 
-    @OneToMany
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private Set<Car> cars;
 
     public UserConfig(RegisterUserDTO registerDTO) {

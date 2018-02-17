@@ -3,11 +3,13 @@ package com.nautilus.rest.controllers.user;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.nautilus.constants.Authorities;
 import com.nautilus.constants.RegisterStatus;
+import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.dto.user.UserInfo;
 import com.nautilus.service.AuthorizationService;
-import com.nautilus.services.def.GlobalService;
+import com.nautilus.service.FileAccessService;
+import com.nautilus.services.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.nautilus.rest.controllers.user.UserController.USER_MAPPING;
 
@@ -43,6 +47,8 @@ public class UserController {
     private final AuthorizationService authorizationService;
 
     private final JsonPatchUtility patchUtility;
+
+    private final FileAccessService fileAccessService;
 
     @RequestMapping(path = "/{userPhone}", method = RequestMethod.GET)
     public ResponseEntity<?> info(@PathVariable String userPhone) {
@@ -112,6 +118,23 @@ public class UserController {
             logger.error("Unexpected: ", e);
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
+    }
+
+    @RequestMapping(path = "/{userPhone}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> delete(@PathVariable String userPhone){
+        if (!authorizationService.hasAccessByPhoneNumber(userPhone)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        UserConfig user = service.findUserConfigByPhoneNumber(userPhone);
+        if (user == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
+        service.delete(user);
+        fileAccessService.deleteUser(user.getUserId());
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(value = USER_CAR_MAPPING + "/{userPhone}", method = RequestMethod.GET)

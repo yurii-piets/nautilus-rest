@@ -4,7 +4,7 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.FileAccessService;
-import com.nautilus.services.def.GlobalService;
+import com.nautilus.services.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;

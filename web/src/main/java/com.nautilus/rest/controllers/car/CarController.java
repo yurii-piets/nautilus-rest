@@ -7,13 +7,14 @@ import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.FileAccessService;
-import com.nautilus.services.def.GlobalService;
+import com.nautilus.services.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,8 @@ public class CarController {
 
     private final AuthorizationService authorizationService;
 
+    private final FileAccessService fileAccessService;
+
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> info(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
@@ -62,15 +65,9 @@ public class CarController {
         return new ResponseEntity<>(car.getStatus(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{phoneNumber}", method = RequestMethod.POST)
-    public ResponseEntity<?> register(@PathVariable String phoneNumber,
-                                      @RequestBody @Valid CarRegisterDTO carRegisterDTO) {
-
-        if (!authorizationService.hasAccessByPhoneNumber(phoneNumber)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        UserConfig user = service.findUserConfigByPhoneNumber(phoneNumber);
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<?> register(@RequestBody @Valid CarRegisterDTO carRegisterDTO) {
+        UserConfig user = service.findUserConfigByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         if (user == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
@@ -128,5 +125,22 @@ public class CarController {
         }
 
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{beaconId}", method = RequestMethod.DELETE)
+    public ResponseEntity delete(@PathVariable String beaconId) {
+        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        Car car = service.findCarByBeaconId(beaconId);
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        service.delete(car);
+        fileAccessService.deleteCar(car.getOwner().getUserId(), car.getBeaconId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

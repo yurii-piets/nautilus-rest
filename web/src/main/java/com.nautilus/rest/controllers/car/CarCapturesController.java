@@ -7,7 +7,7 @@ import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.FileAccessService;
-import com.nautilus.services.def.GlobalService;
+import com.nautilus.services.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;

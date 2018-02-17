@@ -1,12 +1,13 @@
 package com.nautilus.service;
 
-import com.nautilus.services.def.GlobalService;
+import com.nautilus.services.GlobalService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.DirectoryScanner;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -97,6 +99,16 @@ public class FileAccessService {
         int size = files != null ? files.length : 0;
 
         return size;
+    }
+
+    public void deleteCar(Long userId, String beaconId) {
+        String path = UPLOAD_FOLDER + userId + "/" + beaconId;
+        FileSystemUtils.deleteRecursively(new File(path));
+    }
+
+    public void deleteUser(Long userId) {
+        String path = UPLOAD_FOLDER + userId;
+        FileSystemUtils.deleteRecursively(new File(path));
     }
 
     private void clearDir(String folderPath) {

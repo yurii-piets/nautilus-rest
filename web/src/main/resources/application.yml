@@ -8,4 +8,5 @@ server:
 #    keyStoreType: PKCS12
 #    keyAlias: tomcat
 
+management.contextPath: /actuator
 upload.path: upload/
