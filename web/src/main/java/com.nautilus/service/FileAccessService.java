@@ -15,8 +15,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +34,9 @@ public class FileAccessService {
     public void saveCarPhotos(String beaconId, List<MultipartFile> files) {
         Long userID = service.getUserIdConfigBeaconId(beaconId);
 
-        int fileCount = 0;
+        int fileCount = getLastIndex(userID, beaconId);
         for (MultipartFile file : files) {
+            fileCount = fileCount + 1;
             if (file == null || file.isEmpty()) {
                 logger.warn("File is empty!");
             }
@@ -50,19 +53,12 @@ public class FileAccessService {
             } catch (IOException e) {
                 logger.error("Unexpected: ", e);
             }
-            fileCount++;
         }
     }
 
-    public void deleteAndSaveCarPhotos(String beaconId, List<MultipartFile> files) {
-        Long userID = service.getUserIdConfigBeaconId(beaconId);
-        String folderPath = UPLOAD_FOLDER + userID + "/" + beaconId + "/";
-        clearDir(folderPath);
+    public File getCarPhotos(String beaconId, String index) {
+        Long userId = service.getUserIdConfigBeaconId(beaconId);
 
-        saveCarPhotos(beaconId, files);
-    }
-
-    public File getCarPhotos(Long userId, String beaconId, String index) {
         String path = UPLOAD_FOLDER + userId + "/" + beaconId;
         String wildcardFileName = index + ".**";
 
@@ -82,23 +78,22 @@ public class FileAccessService {
         return file;
     }
 
-    public int countOfPhotos(Long userId, String beaconId) {
+    public List<Integer> getListOfIndices(Long userId, String beaconId) {
         String path = UPLOAD_FOLDER + "/" + userId + "/" + beaconId;
         File dir = new File(path);
 
         if (!dir.exists() || !dir.isDirectory()) {
-            return -1;
+            return Collections.emptyList();
         }
 
         if (!dir.canRead()) {
             dir.setReadable(true);
         }
 
-        File[] files = dir.listFiles();
-
-        int size = files != null ? files.length : 0;
-
-        return size;
+        return Arrays.stream(dir.list())
+                .map(s -> s.split("\\.")[0])
+                .map(Integer::new)
+                .collect(Collectors.toList());
     }
 
     public void deleteCar(Long userId, String beaconId) {
@@ -111,20 +106,36 @@ public class FileAccessService {
         FileSystemUtils.deleteRecursively(new File(path));
     }
 
-    private void clearDir(String folderPath) {
-        File dir = new File(folderPath);
+    public boolean deleteCarPhoto(Long userId, String beaconId, String index) {
+        String path = UPLOAD_FOLDER + userId + "/" + beaconId;
+        File dir = new File(path);
 
-        if (!dir.exists() || !dir.isDirectory()) {
-            return;
+        File file = Arrays.stream(dir.list())
+                .filter(name -> name.matches(index + "\\..+"))
+                .findFirst()
+                .map(s -> new File(path + "/" + s))
+                .orElse(null);
+
+        return file != null
+                && file.exists()
+                && file.setWritable(true)
+                && file.delete();
+    }
+
+    private int getLastIndex(Long userId, String beaconId) {
+        String path = UPLOAD_FOLDER + userId + "/" + beaconId;
+        File dir = new File(path);
+
+        String[] list = dir.list();
+        if(list == null){
+            return -1;
         }
 
-        if (!dir.canWrite()) {
-            dir.setWritable(true);
-        }
-
-        for (File file : dir.listFiles()) {
-            file.delete();
-        }
+        return Arrays.stream(list)
+                .map(name -> name.split("\\..+")[0])
+                .map(Integer::new)
+                .max(Integer::compare)
+                .orElse(0);
     }
 
     private void createPath(String path) {

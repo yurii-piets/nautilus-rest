@@ -9,7 +9,6 @@ import com.nautilus.repository.CarLocationRepository;
 import com.nautilus.repository.CarRepository;
 import com.nautilus.repository.CarStatusSnapshotRepository;
 import com.nautilus.repository.UserRepository;
-import com.nautilus.services.GlobalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,5 +119,13 @@ public class GlobalService {
 
     public UserConfig findUserConfigByEmail(String email) {
         return userRepository.findUserConfigByEmail(email);
+    }
+
+    public void update(UserConfig user) {
+        userRepository.save(user);
+    }
+
+    public void update(Car car) {
+        carRepository.save(car);
     }
 }

@@ -31,6 +31,7 @@ import java.util.Set;
 public class Car {
 
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carId;
 

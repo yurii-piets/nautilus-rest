@@ -5,7 +5,6 @@ import com.nautilus.domain.UserConfig;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.FileAccessService;
 import com.nautilus.services.GlobalService;
-import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,8 +44,6 @@ public class CarPhotosController {
 
     private final FileAccessService fileAccessService;
 
-    private final JsonPatchUtility patchUtility;
-
     private final AuthorizationService authorizationService;
 
     @Value("${server.protocol}")
@@ -58,8 +55,11 @@ public class CarPhotosController {
     @Value("${server.port}")
     private Integer port;
 
+    @Value("${server.contextPath}")
+    private String contextPath;
+
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
-    public ResponseEntity<Set<URL>> photos(@PathVariable String beaconId) {
+    public ResponseEntity<?> photos(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
         if (car == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -76,23 +76,27 @@ public class CarPhotosController {
         }
 
         Set<URL> urls = new HashSet<>();
-        int size = fileAccessService.countOfPhotos(userId, beaconId);
+        List<Integer> indices = fileAccessService.getListOfIndices(userId, beaconId);
 
-        for (int i = 0; i < size; ++i) {
-            urls.add(buildUrl(beaconId, userId, i));
+        for (Integer index : indices) {
+            urls.add(buildUrl(beaconId, index));
         }
 
         return new ResponseEntity<>(urls, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{userId}/{beaconId}/{index}", method = RequestMethod.GET)
-    public ResponseEntity<?> photo(@PathVariable Long userId,
-                                   @PathVariable String beaconId,
+    @RequestMapping(value = "/{beaconId}/{index}", method = RequestMethod.GET)
+    public ResponseEntity<?> photo(@PathVariable String beaconId,
                                    @PathVariable String index
     ) {
+        Car car = service.findCarByBeaconId(beaconId);
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
-        File file = fileAccessService.getCarPhotos(userId, beaconId, index);
+        File file = fileAccessService.getCarPhotos(beaconId, index);
 
         try {
             byte[] b = new byte[(int) file.length()];
@@ -123,33 +127,41 @@ public class CarPhotosController {
         }
 
         fileAccessService.saveCarPhotos(beaconId, files);
-
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
-    @RequestMapping(value = "/{beaconId}", method = RequestMethod.PUT)
-    public ResponseEntity update(@PathVariable String beaconId,
-                                 @RequestParam("file") List<MultipartFile> files) {
-
+    @RequestMapping(value = "/{beaconId}/{index}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> delete(@PathVariable String beaconId,
+                                    @PathVariable String index
+    ) {
         if (!authorizationService.hasAccessByBeaconId(beaconId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        if (files == null || files.isEmpty()) {
-            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+        Car car = service.findCarByBeaconId(beaconId);
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        fileAccessService.deleteAndSaveCarPhotos(beaconId, files);
+        UserConfig owner = car.getOwner();
+        if (owner == null || owner.getUserId() == null) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
 
-        return new ResponseEntity(HttpStatus.ACCEPTED);
+        boolean deleted = fileAccessService.deleteCarPhoto(owner.getUserId(), beaconId, index);
+        if (!deleted) {
+            return new ResponseEntity<>(HttpStatus.INSUFFICIENT_STORAGE);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private URL buildUrl(String beaconId, Long userId, int i) {
+    private URL buildUrl(String beaconId, int index) {
         StringBuilder pathBuilder = new StringBuilder();
-        pathBuilder.append(CAR_PHOTOS_MAPPING + "/photos")
-                .append("/").append(userId)
+        pathBuilder
+                .append(contextPath)
+                .append(CAR_PHOTOS_MAPPING)
                 .append("/").append(beaconId)
-                .append("/").append(i);
+                .append("/").append(index);
         URL url = null;
         try {
             url = new URL(protocol, host, port, pathBuilder.toString());

@@ -1,0 +1,561 @@
+swagger: "2.0"
+info:
+  description: "This is a sample server Nautilus rest api."
+  version: "0.0.1"
+  title: "Nautilus"
+  termsOfService: ""
+  contact:
+    email: "piets.yurii@gmail.com"
+#cahnge host on prod
+host: "localhost:8080"
+basePath: "/nautilus"
+tags:
+  - name: "car"
+    description: "Operations about car."
+  - name: "user"
+    description: "Operations about user."
+schemes:
+  - "http"
+  - "https"
+paths:
+  /user:
+    get:
+      tags:
+        - user
+      summary: "User info."
+      description: "Basic info that cotains info: email, phone number, name, surname"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            items:
+              $ref: "#/definitions/UserInfo"
+        401:
+          description: Not authenticated
+        404:
+          description: User not found
+      security:
+        - BasicAuth: []
+    post:
+      tags:
+        - user
+      summary: "Register user."
+      description: "Register user data passed as body of the requst."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "User data that should be registered."
+          required: true
+          schema:
+            $ref: "#/definitions/RegisterUserDTO"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+        406:
+          description: "User registration info is not acceptable."
+          schema:
+            enum:
+              - EMAIL_NOT_FREE
+              - PHONE_NUMBER_NOT_FREE
+      security: []
+
+    patch:
+      tags:
+        - user
+      summary: "Partial update."
+      description: "Partial update of user data."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Partial update body due to specification (http://jsonpatch.com/)."
+          required: true
+          schema:
+            $ref: "#/definitions/PartialUpdateBody"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+        400:
+          description: Bad request
+        401:
+          description: Not authenticated
+        404:
+          description: User not found
+        422:
+          description: Unprocessable Entity
+
+      security:
+        - BasicAuth: []
+
+    delete:
+      tags:
+          - user
+      summary: "Delete user."
+      description: "Delete all user data, including all cars data."
+      responses:
+        200:
+          description: OK
+        401:
+          description: Not authenticated
+        404:
+          description: User not found
+
+      security:
+        - BasicAuth: []
+
+  /user/cars:
+    get:
+      tags:
+        - user
+      summary: "User's cars."
+      description: "User's cars."
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Car"
+        401:
+          description: Not authenticated
+        404:
+          description: User not found
+      security:
+        - BasicAuth: []
+  /car:
+    post:
+      tags:
+        - car
+      summary: "Register car."
+      description: "Register car passed as a parameter and asign it to the current user."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Car register dto."
+          required: true
+          schema:
+            $ref: "#/definitions/CarRegisterDTO"
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            items:
+              $ref: "#/definitions/Car"
+        401:
+          description: Not authenticated
+        404:
+          description: User not found
+        406:
+          description: Car with that beaconId or registration number already exists.
+      security:
+        - BasicAuth: []
+
+  /car/{beaconId}:
+    get:
+      tags:
+          - car
+      summary: "Car info."
+      description: "Car basic infornmation and description."
+      parameters:
+        - in: "path"
+          name: "beaconId"
+          schema:
+            type: "string"
+          required: true
+          description: "Id of the beacon that is paired with the car."
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            items:
+              $ref: "#/definitions/Car"
+        401:
+          description: Not authenticated
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []
+
+    patch:
+      tags:
+        - car
+      summary: "Update car."
+      description: "Partial update of the car."
+      produces:
+        - application/json
+      parameters:
+        - in: "path"
+          name: beaconId
+          schema:
+            type: "string"
+          required: true
+          description: "Id of the beacon that is paired with the car."
+        - in: "body"
+          name: "body"
+          description: "Partial update body due to specification (http://jsonpatch.com/)."
+          required: true
+          schema:
+            $ref: "#/definitions/PartialUpdateBody"
+      responses:
+        200:
+          description: OK
+        400:
+          description: Bad Request
+        401:
+          description: Not authenticated
+        403:
+          description: "User do not have permission to modify current car."
+        404:
+          description: "Car does not exist."
+        422:
+          description: "Unprocessable Entity"
+      security:
+        - BasicAuth: []
+
+    delete:
+      tags:
+        - car
+      summary: "Delete car."
+      description: "Delete all car data with all captures data."
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: "string"
+          required: true
+          description: "Id of the beacon that is paired with the car."
+      responses:
+        200:
+          description: OK
+        401:
+          description: Not authenticated
+        404:
+          description: User not found
+        406:
+          description: User does not have permission to delete the car
+      security:
+        - BasicAuth: []
+
+  /car/status/{beaconId}:
+    get:
+      tags:
+        - car
+      summary: "Car status"
+      description: "Car status."
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: "string"
+          required: true
+          description: "Id of the beacon that is paired with the car."
+      responses:
+        200:
+          description: OK
+          schema:
+            type: "string"
+            enum:
+              - OK
+              - STOLEN
+              - TESTING
+        401:
+          description: Not authenticated
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []
+
+  /car/captures/{beaconId}:
+    get:
+      tags:
+        - car
+      summary: "Car capures"
+      description: "List of the car captures points."
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: "string"
+          required: true
+          description: "Id of the beacon that is paired with the car."
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            $ref: "#/definitions/CarStatusSnapshot"
+        401:
+          description: Not authenticated
+        404:
+          description: Car not found
+        406:
+          description: Not enoght permissions to get info.
+      security:
+          - BasicAuth: []
+
+  /car/capture:
+    post:
+      tags:
+        - car
+      summary: "Capture car"
+      description: "Capture car location with timestamp."
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: "string"
+          required: true
+          description: "Id of the beacon that is paired with the car."
+        - in: "body"
+          name: "body"
+          description: "Car register dto."
+          required: true
+          schema:
+            type: object
+            $ref: "#/definitions/CarStatusDTO"
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: string
+            enum:
+              - OK
+              - STOLEN
+              - TESTING
+        401:
+          description: Not authenticated
+      security:
+        - BasicAuth: []
+  /car/photos:
+    get:
+      tags:
+        - car
+      summary: "Car photos"
+      description: "List of urls to car photos."
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: "string"
+          required: true
+          description: "Id of the beacon that is paired with the car."
+      responses:
+        200:
+          description: OK
+          schema:
+            type: string
+            description: URL
+        401:
+          description: Not authenticated
+        404:
+          description: Car not found
+        409:
+          description: Conflict
+      security:
+        - BasicAuth: []
+    post:
+      tags:
+        - car
+      summary: "Post car photos."
+      description: "Post car photos."
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: "string"
+          required: true
+          description: "Id of the beacon that is paired with the car."
+        - in: body
+          name: body
+          description: "List of the car images."
+          required: true
+          schema:
+            type: object
+            description: MultipartFile
+      responses:
+        202:
+          description: Car photos was accepted and being saved.
+        401:
+          description: Not authorized.
+        403:
+          description: Forbidden, user does not dave permision to save car photos.
+        404:
+          description: Car not found.
+        406:
+          description: Car photos list is emtpy.
+      security:
+        - BasicAuth: []
+
+  /car/photos/{beaconId}/{index}:
+    get:
+      tags:
+        - car
+      summary: "Car photo"
+      description: "Car photo."
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: "string"
+          required: true
+          description: "Id of the beacon that is paired with the car."
+        - in: path
+          name: index
+          schema:
+            type: integer
+          required: true
+          description: "Internal index of the photo."
+      responses:
+        200:
+          description: OK
+          schema:
+            type: file
+        500:
+          description: "Interal server error"
+      security:
+        - BasicAuth: []
+
+    delete:
+      tags:
+        - car
+      summary: "Delete car photo"
+      description: "Delete car photo."
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: "string"
+          required: true
+          description: "Id of the beacon that is paired with the car."
+        - in: path
+          name: index
+          schema:
+            type: integer
+          required: true
+          description: "Internal index of the photo."
+      responses:
+        200:
+          description: OK
+        401:
+          description: Not authorized.
+        403:
+          description: User does not have enought permision to delete photo.
+        404:
+          description: Car not found.
+      security:
+        - BasicAuth: []
+
+securityDefinitions:
+  BasicAuth:
+    type: basic
+
+definitions:
+  UserInfo:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      userName:
+        type: "string"
+      userSurname:
+        type: "string"
+      phoneNumber:
+        type: "string"
+
+  RegisterUserDTO:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      userName:
+        type: "string"
+      userSurname:
+        type: "string"
+      phoneNumber:
+        type: "string"
+      password:
+        type: "string"
+  PartialUpdateBody:
+    properties:
+      op:
+        type: "string"
+      path:
+        type: "string"
+      value:
+        type: "string"
+
+  Car:
+    properties:
+      beaconId:
+        type: string
+      registerNumber:
+        type: string
+      mark:
+        type: string
+      model:
+        type: string
+      color:
+        type: string
+      yearOfProduction:
+        type: string
+      description:
+        type: string
+      status:
+        type: string
+        enum:
+          - OK
+          - STOLEN
+          - TESTING
+
+  CarRegisterDTO:
+    properties:
+      beaconId:
+        type: string
+      registerNumber:
+        type: string
+      mark:
+        type: string
+      model:
+        type: string
+      color:
+        type: string
+      yearOfProduction:
+        type: string
+      description:
+        type: string
+
+  CarStatusSnapshot:
+    properties:
+      carLocation:
+        type: object
+      captureTime:
+        type: object
+        description: Timestamp
+
+  CarStatusDTO:
+    properties:
+      location:
+        type: object
+      captureTime:
+        type: object
+        description: Timestamp
+
+  CarLocation:
+    properties:
+      longitude:
+        type: number
+      latitude:
+        type: number

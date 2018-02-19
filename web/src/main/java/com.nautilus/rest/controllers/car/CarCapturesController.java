@@ -6,12 +6,8 @@ import com.nautilus.domain.CarLocation;
 import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.service.AuthorizationService;
-import com.nautilus.service.FileAccessService;
 import com.nautilus.services.GlobalService;
-import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,13 +27,7 @@ public class CarCapturesController {
 
     public final static String CAR_FOUND_MAPPING = "/car";
 
-    private final Logger logger = LogManager.getLogger(this.getClass());
-
     private final GlobalService service;
-
-    private final FileAccessService fileAccessService;
-
-    private final JsonPatchUtility patchUtility;
 
     private final AuthorizationService authorizationService;
 

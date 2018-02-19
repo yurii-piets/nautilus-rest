@@ -115,7 +115,8 @@ public class CarController {
             Car mergedCar = (Car) patchUtility.patch(updateBody, car).get();
             mergedCar.setOwner(car.getOwner());
             mergedCar.setStatusSnapshots(car.getStatusSnapshots());
-            service.save(mergedCar);
+            mergedCar.setCarId(car.getCarId());
+            service.update(mergedCar);
         } catch (IOException e) {
             logger.error("Unexpected: ", e);
             return new ResponseEntity(HttpStatus.BAD_REQUEST);

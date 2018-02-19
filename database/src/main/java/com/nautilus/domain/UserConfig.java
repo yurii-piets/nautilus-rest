@@ -38,7 +38,7 @@ public class UserConfig {
 
     private Authorities authorities;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
     private Set<Car> cars;
 
     public UserConfig(RegisterUserDTO registerDTO) {
