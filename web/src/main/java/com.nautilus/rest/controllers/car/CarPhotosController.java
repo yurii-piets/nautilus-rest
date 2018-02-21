@@ -113,9 +113,7 @@ public class CarPhotosController {
     public ResponseEntity<?> register(@PathVariable String beaconId,
                                       @RequestParam("file") List<MultipartFile> files) {
 
-        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+        authorizationService.hasAccessByBeaconId(beaconId);
 
         Car car = service.getCarById(beaconId);
         if (car == null) {
@@ -134,9 +132,7 @@ public class CarPhotosController {
     public ResponseEntity<?> delete(@PathVariable String beaconId,
                                     @PathVariable String index
     ) {
-        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+        authorizationService.hasAccessByBeaconId(beaconId);
 
         Car car = service.findCarByBeaconId(beaconId);
         if (car == null) {

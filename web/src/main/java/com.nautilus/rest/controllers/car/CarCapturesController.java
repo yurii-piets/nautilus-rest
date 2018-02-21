@@ -33,9 +33,7 @@ public class CarCapturesController {
 
     @RequestMapping(value = "/captures/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> captures(@PathVariable String beaconId) {
-        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+        authorizationService.hasAccessByBeaconId(beaconId);
 
         Car car = service.findCarByBeaconId(beaconId);
         if (car == null) {

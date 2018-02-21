@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -106,23 +105,6 @@ public class UserController {
             logger.error("Unexpected: ", e);
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
-    }
-
-    @RequestMapping(path = "/{userPhone}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> delete(@PathVariable String userPhone){
-        if (!authorizationService.hasAccessByPhoneNumber(userPhone)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        UserConfig user = service.findUserConfigByPhoneNumber(userPhone);
-        if (user == null) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
-
-        service.delete(user);
-        fileAccessService.deleteUser(user.getUserId());
-
-        return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.DELETE)

@@ -1,6 +1,6 @@
 allprojects {
     group = 'com.nautilus'
-    version = '0.0.3-SNAPSHOT'
+    version = '0.0.4-SNAPSHOT'
 
     ext {
         applicationName = 'nautilus-rest'

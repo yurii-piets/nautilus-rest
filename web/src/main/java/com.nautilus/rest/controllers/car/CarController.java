@@ -58,7 +58,7 @@ public class CarController {
     public ResponseEntity<?> status(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
 
-        if(car == null){
+        if (car == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -94,17 +94,15 @@ public class CarController {
     }
 
     /**
-        * @param beaconId
-        * @param updateBody, matches pattern : [{"op": "replace", "path": "/registerNumber", "value": "WW121"}]
-        * @return ResponseEntity with HttpStatus
-    */
+     * @param beaconId
+     * @param updateBody, matches pattern : [{"op": "replace", "path": "/registerNumber", "value": "WW121"}]
+     * @return ResponseEntity with HttpStatus
+     */
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.PATCH)
     public ResponseEntity update(@PathVariable String beaconId,
                                  @RequestBody String updateBody) {
 
-        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+        authorizationService.hasAccessByBeaconId(beaconId);
 
         Car car = service.findCarByBeaconId(beaconId);
         if (car == null) {
@@ -130,9 +128,7 @@ public class CarController {
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.DELETE)
     public ResponseEntity delete(@PathVariable String beaconId) {
-        if (!authorizationService.hasAccessByBeaconId(beaconId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+        authorizationService.hasAccessByBeaconId(beaconId);
 
         Car car = service.findCarByBeaconId(beaconId);
         if (car == null) {

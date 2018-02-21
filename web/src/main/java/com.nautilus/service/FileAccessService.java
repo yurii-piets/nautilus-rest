@@ -73,9 +73,7 @@ public class FileAccessService {
             return null;
         }
 
-        File file = new File(path + "/" + files[0]);
-
-        return file;
+        return new File(path + "/" + files[0]);
     }
 
     public List<Integer> getListOfIndices(Long userId, String beaconId) {
@@ -90,7 +88,12 @@ public class FileAccessService {
             dir.setReadable(true);
         }
 
-        return Arrays.stream(dir.list())
+        String[] list = dir.list();
+        if (list == null) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(list)
                 .map(s -> s.split("\\.")[0])
                 .map(Integer::new)
                 .collect(Collectors.toList());
@@ -110,7 +113,12 @@ public class FileAccessService {
         String path = UPLOAD_FOLDER + userId + "/" + beaconId;
         File dir = new File(path);
 
-        File file = Arrays.stream(dir.list())
+        String[] list = dir.list();
+        if (list == null) {
+            return false;
+        }
+
+        File file = Arrays.stream(list)
                 .filter(name -> name.matches(index + "\\..+"))
                 .findFirst()
                 .map(s -> new File(path + "/" + s))
@@ -127,7 +135,7 @@ public class FileAccessService {
         File dir = new File(path);
 
         String[] list = dir.list();
-        if(list == null){
+        if (list == null) {
             return -1;
         }
 
