@@ -5,19 +5,24 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.DirectoryScanner;
+import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,10 +31,14 @@ public class FileAccessService {
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
-    @Value("${upload.path}")
-    private String UPLOAD_FOLDER;
+    private static final String MICRO_FOLDER_NAME = "micro";
+
+    private static final Predicate<String> CAR_FILENAME_PREDICATE = s -> s.matches("[0-9]*");
 
     private final GlobalService service;
+
+    @Value("${upload.path}")
+    private String UPLOAD_FOLDER;
 
     public void saveCarPhotos(String beaconId, List<MultipartFile> files) {
         Long userID = service.getUserIdConfigBeaconId(beaconId);
@@ -42,18 +51,42 @@ public class FileAccessService {
             }
 
             try {
-                byte[] bytes = file.getBytes();
-                String folderPath = UPLOAD_FOLDER + userID + "/" + beaconId + "/";
-                String[] splited = file.getOriginalFilename().split("\\.");
-                String type = splited.length != 0 ? splited[splited.length - 1] : file.getOriginalFilename();
-                createPath(folderPath);
-                Path path = Paths.get(folderPath + fileCount + "." + type);
-                Files.write(path, bytes);
-                logger.warn("File has been written!");
+                saveImage(beaconId, userID, fileCount, file);
             } catch (IOException e) {
                 logger.error("Unexpected: ", e);
             }
         }
+    }
+
+    private void saveImage(String beaconId, Long userID, int fileCount, MultipartFile file) throws IOException {
+        String folderPath = UPLOAD_FOLDER + userID + "/" + beaconId + "/";
+        createPath(folderPath);
+        String[] splited = file.getOriginalFilename().split("\\.");
+        String type = splited.length != 0 ? splited[splited.length - 1] : file.getOriginalFilename();
+        String originalPath = folderPath + fileCount + "." + type;
+        saveFile(originalPath, file);
+
+        createPath(folderPath + MICRO_FOLDER_NAME + "/");
+        String microPath = folderPath + MICRO_FOLDER_NAME + "/" + fileCount + "." + type;
+
+        BufferedImage sourceImage = ImageIO.read(file.getInputStream());
+        BufferedImage destImage = Scalr.resize(sourceImage, Scalr.Method.ULTRA_QUALITY, 160, 90, Scalr.OP_ANTIALIAS);
+
+        saveFile(microPath, destImage);
+    }
+
+    private void saveFile(String filePath, BufferedImage bufferedImage) throws IOException {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        ImageIO.write(bufferedImage, "jpg", file);
+    }
+
+    private void saveFile(String filePath, MultipartFile file) throws IOException {
+        byte[] bytes = file.getBytes();
+        Path path = Paths.get(filePath);
+        Files.write(path, bytes);
     }
 
     public File getCarPhotos(String beaconId, String index) {
@@ -76,7 +109,27 @@ public class FileAccessService {
         return new File(path + "/" + files[0]);
     }
 
-    public List<Integer> getListOfIndices(Long userId, String beaconId) {
+    public File getCarMicroPhotos(String beaconId, String index) {
+        Long userId = service.getUserIdConfigBeaconId(beaconId);
+
+        String path = UPLOAD_FOLDER + userId + "/" + beaconId + "/" + MICRO_FOLDER_NAME;
+        String wildcardFileName = index + ".**";
+
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setIncludes(new String[]{wildcardFileName});
+        scanner.setBasedir(path);
+        scanner.setCaseSensitive(false);
+        scanner.scan();
+        String[] files = scanner.getIncludedFiles();
+
+        if (files == null || files.length != 1) {
+            return null;
+        }
+
+        return new File(path + "/" + files[0]);
+    }
+
+    public Collection<Integer> getIndices(Long userId, String beaconId) {
         String path = UPLOAD_FOLDER + "/" + userId + "/" + beaconId;
         File dir = new File(path);
 
@@ -95,8 +148,9 @@ public class FileAccessService {
 
         return Arrays.stream(list)
                 .map(s -> s.split("\\.")[0])
+                .filter(CAR_FILENAME_PREDICATE)
                 .map(Integer::new)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     public void deleteCar(Long userId, String beaconId) {
@@ -111,6 +165,11 @@ public class FileAccessService {
 
     public boolean deleteCarPhoto(Long userId, String beaconId, String index) {
         String path = UPLOAD_FOLDER + userId + "/" + beaconId;
+        return deleteFile(index, path)
+                && deleteFile(index, path + "/" + MICRO_FOLDER_NAME);
+    }
+
+    private boolean deleteFile(String index, String path) {
         File dir = new File(path);
 
         String[] list = dir.list();
@@ -141,6 +200,7 @@ public class FileAccessService {
 
         return Arrays.stream(list)
                 .map(name -> name.split("\\..+")[0])
+                .filter(CAR_FILENAME_PREDICATE)
                 .map(Integer::new)
                 .max(Integer::compare)
                 .orElse(0);

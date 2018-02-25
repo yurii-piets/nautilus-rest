@@ -9,5 +9,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-devtools:1.5.4.RELEASE'
     compile("org.springframework.boot:spring-boot-starter-security")
 
+    compile group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
+
     testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.4.RELEASE'
 }

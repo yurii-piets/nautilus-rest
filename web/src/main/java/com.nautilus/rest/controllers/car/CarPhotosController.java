@@ -25,9 +25,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.nautilus.rest.controllers.car.CarPhotosController.CAR_PHOTOS_MAPPING;
 
@@ -37,6 +38,8 @@ import static com.nautilus.rest.controllers.car.CarPhotosController.CAR_PHOTOS_M
 public class CarPhotosController {
 
     public final static String CAR_PHOTOS_MAPPING = "/car/photos";
+
+    private static final String MICRO_MAPPING = "/micro";
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
@@ -65,22 +68,27 @@ public class CarPhotosController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        UserConfig owner = car.getOwner();
-        if (owner == null) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        Collection<Integer> indices = fileAccessService.getIndices(car.getOwner().getUserId(), beaconId);
+
+        Set<URL> urls = indices.stream()
+                .map(i -> buildPhotoUrl(beaconId, i, null))
+                .collect(Collectors.toSet());
+
+        return new ResponseEntity<>(urls, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = MICRO_MAPPING + "/{beaconId}", method = RequestMethod.GET)
+    public ResponseEntity<?> micro(@PathVariable String beaconId) {
+        Car car = service.findCarByBeaconId(beaconId);
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Long userId = owner.getUserId();
-        if (userId == null) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
+        Collection<Integer> indices = fileAccessService.getIndices(car.getOwner().getUserId(), beaconId);
 
-        Set<URL> urls = new HashSet<>();
-        List<Integer> indices = fileAccessService.getListOfIndices(userId, beaconId);
-
-        for (Integer index : indices) {
-            urls.add(buildUrl(beaconId, index));
-        }
+        Set<URL> urls = indices.stream()
+                .map(i -> buildPhotoUrl(beaconId, i, MICRO_MAPPING))
+                .collect(Collectors.toSet());
 
         return new ResponseEntity<>(urls, HttpStatus.OK);
     }
@@ -88,7 +96,7 @@ public class CarPhotosController {
     @RequestMapping(value = "/{beaconId}/{index}", method = RequestMethod.GET)
     public ResponseEntity<?> photo(@PathVariable String beaconId,
                                    @PathVariable String index
-    ) {
+    ) throws IOException {
         Car car = service.findCarByBeaconId(beaconId);
         if (car == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -98,15 +106,30 @@ public class CarPhotosController {
         headers.setContentType(MediaType.IMAGE_JPEG);
         File file = fileAccessService.getCarPhotos(beaconId, index);
 
-        try {
-            byte[] b = new byte[(int) file.length()];
-            FileInputStream fileInputStream = new FileInputStream(file);
-            fileInputStream.read(b);
-            return new ResponseEntity<>(b, headers, HttpStatus.OK);
-        } catch (IOException e) {
-            logger.error("Unexpected: ", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        byte[] b = new byte[(int) file.length()];
+        FileInputStream fileInputStream = new FileInputStream(file);
+        fileInputStream.read(b);
+        return new ResponseEntity<>(b, headers, HttpStatus.OK);
+
+    }
+
+    @RequestMapping(value = MICRO_MAPPING + "/{beaconId}/{index}", method = RequestMethod.GET)
+    public ResponseEntity<?> microPhoto(@PathVariable String beaconId,
+                                        @PathVariable String index
+    ) throws IOException {
+        Car car = service.findCarByBeaconId(beaconId);
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        File file = fileAccessService.getCarMicroPhotos(beaconId, index);
+
+        byte[] b = new byte[(int) file.length()];
+        FileInputStream fileInputStream = new FileInputStream(file);
+        fileInputStream.read(b);
+        return new ResponseEntity<>(b, headers, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.POST)
@@ -151,13 +174,19 @@ public class CarPhotosController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private URL buildUrl(String beaconId, int index) {
-        StringBuilder pathBuilder = new StringBuilder();
-        pathBuilder
+    private URL buildPhotoUrl(String beaconId, int index, String postfix) {
+        StringBuilder pathBuilder = new StringBuilder()
                 .append(contextPath)
-                .append(CAR_PHOTOS_MAPPING)
+                .append(CAR_PHOTOS_MAPPING);
+
+        if (!(postfix == null || !postfix.isEmpty())) {
+            pathBuilder.append(postfix);
+        }
+
+        pathBuilder
                 .append("/").append(beaconId)
                 .append("/").append(index);
+
         URL url = null;
         try {
             url = new URL(protocol, host, port, pathBuilder.toString());
