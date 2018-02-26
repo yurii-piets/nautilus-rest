@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.nautilus.rest.controllers.car.CarPhotosController.CAR_PHOTOS_MAPPING;
+import static com.nautilus.service.FileAccessService.CAPTURES_FOLDER_NAME;
 
 @RestController
 @RequestMapping(path = CAR_PHOTOS_MAPPING)
@@ -40,6 +41,8 @@ public class CarPhotosController {
     public final static String CAR_PHOTOS_MAPPING = "/car/photos";
 
     private static final String MICRO_MAPPING = "/micro";
+
+    private static final String CAPTURES_MAPPING = "/captures";
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
@@ -68,7 +71,7 @@ public class CarPhotosController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Collection<Integer> indices = fileAccessService.getIndices(car.getOwner().getUserId(), beaconId);
+        Collection<Integer> indices = fileAccessService.getIndices(car.getOwner().getUserId(), beaconId, null);
 
         Set<URL> urls = indices.stream()
                 .map(i -> buildPhotoUrl(beaconId, i, null))
@@ -84,10 +87,26 @@ public class CarPhotosController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Collection<Integer> indices = fileAccessService.getIndices(car.getOwner().getUserId(), beaconId);
+        Collection<Integer> indices = fileAccessService.getIndices(car.getOwner().getUserId(), beaconId, null);
 
         Set<URL> urls = indices.stream()
                 .map(i -> buildPhotoUrl(beaconId, i, MICRO_MAPPING))
+                .collect(Collectors.toSet());
+
+        return new ResponseEntity<>(urls, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = CAPTURES_MAPPING + "/{beaconId}", method = RequestMethod.GET)
+    public ResponseEntity<?> captures(@PathVariable String beaconId) {
+        Car car = service.findCarByBeaconId(beaconId);
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Collection<Integer> indices = fileAccessService.getIndices(car.getOwner().getUserId(), beaconId, "/" + CAPTURES_FOLDER_NAME);
+
+        Set<URL> urls = indices.stream()
+                .map(i -> buildPhotoUrl(beaconId, i, CAPTURES_MAPPING))
                 .collect(Collectors.toSet());
 
         return new ResponseEntity<>(urls, HttpStatus.OK);
@@ -132,6 +151,25 @@ public class CarPhotosController {
         return new ResponseEntity<>(b, headers, HttpStatus.OK);
     }
 
+    @RequestMapping(value = CAPTURES_MAPPING + "/{beaconId}/{index}", method = RequestMethod.GET)
+    public ResponseEntity<?> capturePhoto(@PathVariable String beaconId,
+                                          @PathVariable String index
+    ) throws IOException {
+        Car car = service.findCarByBeaconId(beaconId);
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        File file = fileAccessService.getCarCapturesPhotos(beaconId, index);
+
+        byte[] b = new byte[(int) file.length()];
+        FileInputStream fileInputStream = new FileInputStream(file);
+        fileInputStream.read(b);
+        return new ResponseEntity<>(b, headers, HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.POST)
     public ResponseEntity<?> register(@PathVariable String beaconId,
                                       @RequestParam("file") List<MultipartFile> files) {
@@ -149,6 +187,23 @@ public class CarPhotosController {
 
         fileAccessService.saveCarPhotos(beaconId, files);
         return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
+    @RequestMapping(value = CAPTURES_MAPPING + "/{beaconId}", method = RequestMethod.POST)
+    public ResponseEntity<?> capture(@PathVariable String beaconId,
+                                     @RequestParam("file") List<MultipartFile> files) {
+        Car car = service.getCarById(beaconId);
+        if (car == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
+        if (files == null || files.isEmpty()) {
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        fileAccessService.saveCarCapturedPhotos(beaconId, files);
+
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @RequestMapping(value = "/{beaconId}/{index}", method = RequestMethod.DELETE)
@@ -179,7 +234,7 @@ public class CarPhotosController {
                 .append(contextPath)
                 .append(CAR_PHOTOS_MAPPING);
 
-        if (!(postfix == null || !postfix.isEmpty())) {
+        if (!(postfix == null || postfix.isEmpty())) {
             pathBuilder.append(postfix);
         }
 

@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FileAccessService {
 
+    public static final String CAPTURES_FOLDER_NAME = "captures";
     private final Logger logger = LogManager.getLogger(this.getClass());
 
     private static final String MICRO_FOLDER_NAME = "micro";
@@ -43,7 +44,7 @@ public class FileAccessService {
     public void saveCarPhotos(String beaconId, List<MultipartFile> files) {
         Long userID = service.getUserIdConfigBeaconId(beaconId);
 
-        int fileCount = getLastIndex(userID, beaconId);
+        int fileCount = getLastIndex(userID, beaconId, null);
         for (MultipartFile file : files) {
             fileCount = fileCount + 1;
             if (file == null || file.isEmpty()) {
@@ -58,29 +59,22 @@ public class FileAccessService {
         }
     }
 
-    private void saveImage(String beaconId, Long userID, int fileCount, MultipartFile file) throws IOException {
-        String folderPath = UPLOAD_FOLDER + userID + "/" + beaconId + "/";
-        createPath(folderPath);
-        String[] splited = file.getOriginalFilename().split("\\.");
-        String type = splited.length != 0 ? splited[splited.length - 1] : file.getOriginalFilename();
-        String originalPath = folderPath + fileCount + "." + type;
-        saveFile(originalPath, file);
+    public void saveCarCapturedPhotos(String beaconId, List<MultipartFile> files) {
+        Long userID = service.getUserIdConfigBeaconId(beaconId);
 
-        createPath(folderPath + MICRO_FOLDER_NAME + "/");
-        String microPath = folderPath + MICRO_FOLDER_NAME + "/" + fileCount + "." + type;
+        int fileCount = getLastIndex(userID, beaconId, "captures");
+        for (MultipartFile file : files) {
+            fileCount = fileCount + 1;
+            if (file == null || file.isEmpty()) {
+                logger.warn("File is empty!");
+            }
 
-        BufferedImage sourceImage = ImageIO.read(file.getInputStream());
-        BufferedImage destImage = Scalr.resize(sourceImage, Scalr.Method.ULTRA_QUALITY, 160, 90, Scalr.OP_ANTIALIAS);
-
-        saveFile(microPath, destImage);
-    }
-
-    private void saveFile(String filePath, BufferedImage bufferedImage) throws IOException {
-        File file = new File(filePath);
-        if (!file.exists()) {
-            file.createNewFile();
+            try {
+                saveCaptureImage(beaconId, userID, fileCount, file);
+            } catch (IOException e) {
+                logger.error("Unexpected: ", e);
+            }
         }
-        ImageIO.write(bufferedImage, "jpg", file);
     }
 
     private void saveFile(String filePath, MultipartFile file) throws IOException {
@@ -129,8 +123,29 @@ public class FileAccessService {
         return new File(path + "/" + files[0]);
     }
 
-    public Collection<Integer> getIndices(Long userId, String beaconId) {
-        String path = UPLOAD_FOLDER + "/" + userId + "/" + beaconId;
+    public File getCarCapturesPhotos(String beaconId, String index) {
+        Long userId = service.getUserIdConfigBeaconId(beaconId);
+
+        String path = UPLOAD_FOLDER + userId + "/" + beaconId + "/" + CAPTURES_FOLDER_NAME;
+        String wildcardFileName = index + ".**";
+
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setIncludes(new String[]{wildcardFileName});
+        scanner.setBasedir(path);
+        scanner.setCaseSensitive(false);
+        scanner.scan();
+        String[] files = scanner.getIncludedFiles();
+
+        if (files == null || files.length != 1) {
+            return null;
+        }
+
+        return new File(path + "/" + files[0]);
+    }
+
+    public Collection<Integer> getIndices(Long userId, String beaconId, String postfix) {
+        String path = UPLOAD_FOLDER + "/" + userId + "/" + beaconId
+                + (!(postfix == null || postfix.isEmpty()) ? postfix : "");
         File dir = new File(path);
 
         if (!dir.exists() || !dir.isDirectory()) {
@@ -169,6 +184,41 @@ public class FileAccessService {
                 && deleteFile(index, path + "/" + MICRO_FOLDER_NAME);
     }
 
+    private void saveImage(String beaconId, Long userID, int fileCount, MultipartFile file) throws IOException {
+        String folderPath = UPLOAD_FOLDER + userID + "/" + beaconId + "/";
+        createPath(folderPath);
+        String[] splited = file.getOriginalFilename().split("\\.");
+        String type = splited.length != 0 ? splited[splited.length - 1] : file.getOriginalFilename();
+        String originalPath = folderPath + fileCount + "." + type;
+        saveFile(originalPath, file);
+
+        createPath(folderPath + MICRO_FOLDER_NAME + "/");
+        String microPath = folderPath + MICRO_FOLDER_NAME + "/" + fileCount + "." + type;
+        saveFile(microPath, rescalePhoto(file));
+    }
+
+    private void saveCaptureImage(String beaconId, Long userID, int fileCount, MultipartFile file) throws IOException {
+        String folderPath = UPLOAD_FOLDER + userID + "/" + beaconId + "/" + CAPTURES_FOLDER_NAME + "/";
+        createPath(folderPath);
+        String[] splited = file.getOriginalFilename().split("\\.");
+        String type = splited.length != 0 ? splited[splited.length - 1] : file.getOriginalFilename();
+        String originalPath = folderPath + fileCount + "." + type;
+        saveFile(originalPath, file);
+    }
+
+    private void saveFile(String filePath, BufferedImage bufferedImage) throws IOException {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        ImageIO.write(bufferedImage, "jpg", file);
+    }
+
+    private BufferedImage rescalePhoto(MultipartFile file) throws IOException {
+        BufferedImage sourceImage = ImageIO.read(file.getInputStream());
+        return Scalr.resize(sourceImage, Scalr.Method.ULTRA_QUALITY, 160, 90, Scalr.OP_ANTIALIAS);
+    }
+
     private boolean deleteFile(String index, String path) {
         File dir = new File(path);
 
@@ -189,8 +239,9 @@ public class FileAccessService {
                 && file.delete();
     }
 
-    private int getLastIndex(Long userId, String beaconId) {
-        String path = UPLOAD_FOLDER + userId + "/" + beaconId;
+    private int getLastIndex(Long userId, String beaconId, String postfix) {
+        String path = UPLOAD_FOLDER + userId + "/" + beaconId
+                + (!(postfix == null || postfix.isEmpty()) ? "/" + postfix : "");
         File dir = new File(path);
 
         String[] list = dir.list();
