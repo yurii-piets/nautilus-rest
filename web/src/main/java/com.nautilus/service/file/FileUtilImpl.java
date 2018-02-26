@@ -1,0 +1,266 @@
+package com.nautilus.service.file;
+
+import com.nautilus.exception.OverLimitNumberOfFilesException;
+import com.nautilus.services.GlobalService;
+import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.tools.ant.DirectoryScanner;
+import org.imgscalr.Scalr;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class FileUtilImpl implements FileUtil {
+
+    private final Logger logger = LogManager.getLogger(this.getClass());
+
+    private static final String CAPTURES_FOLDER_NAME = "captures";
+
+    private static final String MICRO_FOLDER_NAME = "micro";
+
+    private final Predicate<String> CAR_FILENAME_PREDICATE = s -> s.matches("[0-9]*");
+
+    private final GlobalService service;
+
+    @Value("${photos.path}")
+    private String mainFolder;
+
+    @Value("${photos.max}")
+    private Integer maxPhotos;
+
+    @Override
+    public File getOriginal(String beaconId, Integer index) {
+        String path = createPath(beaconId, null);
+        return getFile(path, index);
+    }
+
+    @Override
+    public File getMicro(String beaconId, Integer index) {
+        String path = createPath(beaconId, "/" + MICRO_FOLDER_NAME);
+        return getFile(path, index);
+    }
+
+    @Override
+    public File getCapture(String beaconId, Integer index) {
+        String path = createPath(beaconId, "/" + CAPTURES_FOLDER_NAME);
+        return getFile(path, index);
+    }
+
+    @Override
+    public File getCaptureMicro(String beaconId, Integer index) {
+        String path = createPath(beaconId, "/" + CAPTURES_FOLDER_NAME + "/" + MICRO_FOLDER_NAME);
+        return getFile(path, index);
+    }
+
+    @Override
+    public Collection<Integer> getOriginalIndices(String beaconId) {
+        String path = createPath(beaconId, null);
+        return getIndices(path);
+    }
+
+    @Override
+    public Collection<Integer> getCaptureIndices(String beaconId) {
+        String path = createPath(beaconId, "/" + CAPTURES_FOLDER_NAME);
+        return getIndices(path);
+    }
+
+    @Override
+    public void saveOriginal(String beaconId, Collection<MultipartFile> files) throws IOException {
+        String path = createPath(beaconId, null);
+        Integer photosCount = getIndices(path).size();
+        if(files.size() + photosCount > maxPhotos) {
+            throw new OverLimitNumberOfFilesException("Excited maximum number of car photos.");
+        }
+
+        saveFiles(beaconId, files, null);
+    }
+
+    @Override
+    public void saveCapture(String beaconId, Collection<MultipartFile> files) throws IOException {
+        saveFiles(beaconId, files, "/" + CAPTURES_FOLDER_NAME);
+    }
+
+    @Override
+    public void delete(Long userId) {
+        String path = mainFolder + "/" + userId;
+        FileSystemUtils.deleteRecursively(new File(path));
+    }
+
+    @Override
+    public void delete(String beaconId) {
+        String path = createPath(beaconId, null);
+        FileSystemUtils.deleteRecursively(new File(path));
+    }
+
+    @Override
+    public void delete(String beaconId, Integer index) {
+        String path = createPath(beaconId, null);
+        deleteFile(index, path);
+
+        String microPath = createPath(beaconId, "/" + MICRO_FOLDER_NAME);
+        deleteFile(index, microPath);
+    }
+
+    private File getFile(String path, Integer index) {
+        String wildcardFileName = index + ".**";
+
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setIncludes(new String[]{wildcardFileName});
+        scanner.setBasedir(path);
+        scanner.setCaseSensitive(false);
+        scanner.scan();
+        String[] files = scanner.getIncludedFiles();
+
+        if (files == null || files.length != 1) {
+            return null;
+        }
+
+        return new File(path + "/" + files[0]);
+    }
+
+    private Collection<Integer> getIndices(String path) {
+        File dir = new File(path);
+
+        if (!dir.exists() || !dir.isDirectory()) {
+            return Collections.emptySet();
+        }
+
+        boolean oldReadable = dir.canRead();
+        if (!dir.canRead()) {
+            dir.setReadable(true);
+        }
+
+        String[] list = dir.list();
+        if (list == null) {
+            return Collections.emptySet();
+        }
+
+        dir.setReadable(oldReadable);
+
+        return Arrays.stream(list)
+                .map(s -> s.split("\\.")[0])
+                .filter(CAR_FILENAME_PREDICATE)
+                .map(Integer::new)
+                .collect(Collectors.toSet());
+    }
+
+    private Integer getLastIndex(String beaconId, String postfix) {
+        String path = createPath(beaconId, postfix);
+        File dir = new File(path);
+
+        String[] list = dir.list();
+        if (list == null) {
+            return -1;
+        }
+
+        return Arrays.stream(list)
+                .map(name -> name.split("\\..+")[0])
+                .filter(CAR_FILENAME_PREDICATE)
+                .map(Integer::new)
+                .max(Integer::compare)
+                .orElse(0);
+    }
+
+    private void saveFiles(String beaconId, Collection<MultipartFile> files, String postfix) throws IOException {
+        Integer lastIndex = getLastIndex(beaconId, postfix);
+
+        for (MultipartFile file : files) {
+            lastIndex = lastIndex + 1;
+            if (file == null || file.isEmpty()) {
+                logger.warn("File is empty!");
+            }
+
+            String fileName = lastIndex + "." + getFileType(file);
+
+            String filePath = createPath(beaconId, postfix);
+            buildPath(filePath);
+            saveFile(filePath + fileName, file);
+
+            filePath = createPath(beaconId, (!(postfix == null || postfix.isEmpty()) ? "/" + postfix : "/") + "/" + MICRO_FOLDER_NAME);
+            buildPath(filePath);
+            saveFile(filePath + fileName, rescale(file));
+        }
+    }
+
+    private String getFileType(MultipartFile file) {
+        String[] splited = file.getOriginalFilename().split("\\.");
+        return splited.length != 0 ? splited[splited.length - 1] : file.getOriginalFilename();
+    }
+
+    private void saveFile(String filePath, MultipartFile file) throws IOException {
+        File f = new File(filePath);
+        boolean oldWritable = f.canWrite();
+        f.setWritable(true);
+
+        byte[] bytes = file.getBytes();
+        Path path = Paths.get(filePath);
+        Files.write(path, bytes);
+
+        f.setWritable(oldWritable);
+    }
+
+    private void saveFile(String filePath, BufferedImage bufferedImage) throws IOException {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        ImageIO.write(bufferedImage, "jpg", file);
+    }
+
+    private BufferedImage rescale(MultipartFile file) throws IOException {
+        BufferedImage sourceImage = ImageIO.read(file.getInputStream());
+        return Scalr.resize(sourceImage, Scalr.Method.ULTRA_QUALITY, 160, 90, Scalr.OP_ANTIALIAS);
+    }
+
+    private String createPath(String beaconId, String postfix) {
+        Long userId = service.getUserIdConfigBeaconId(beaconId);
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(mainFolder)
+                .append(userId).append("/")
+                .append(beaconId).append("/");
+
+        if (!(postfix == null || postfix.isEmpty())) {
+            builder.append(postfix).append("/");
+        }
+
+        return builder.toString();
+    }
+
+    private void buildPath(String path) {
+        File file = new File(path);
+        if (!file.exists() || !file.isDirectory()) {
+            file.mkdirs();
+        }
+
+        if (!file.canWrite()) {
+            file.setWritable(true);
+        }
+    }
+
+    private void deleteFile(Integer index, String path) {
+        File file = getFile(path, index);
+
+        if (file != null && file.exists()) {
+            file.setWritable(true);
+            file.delete();
+        }
+    }
+}

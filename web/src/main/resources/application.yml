@@ -9,5 +9,8 @@ server:
 #    keyStoreType: PKCS12
 #    keyAlias: tomcat
 
+photos:
+  path: upload/
+  max: 10
+
 management.contextPath: /actuator
-upload.path: upload/

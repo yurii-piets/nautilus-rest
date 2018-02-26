@@ -1,6 +1,7 @@
 package com.nautilus.rest.controllers.exception;
 
 import com.nautilus.exception.IllegalAccessException;
+import com.nautilus.exception.OverLimitNumberOfFilesException;
 import com.nautilus.exception.WrongBeaconIdException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,12 @@ public class ExceptionHandlingController extends ResponseEntityExceptionHandler 
     public ResponseEntity<?> handle(WrongBeaconIdException e) {
         logger.error("Unexpected: ", e);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = OverLimitNumberOfFilesException.class)
+    public ResponseEntity<?> handle(OverLimitNumberOfFilesException e) {
+        logger.error("Unexpected: ", e);
+        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
     }
 
     @ExceptionHandler(value = {Exception.class})

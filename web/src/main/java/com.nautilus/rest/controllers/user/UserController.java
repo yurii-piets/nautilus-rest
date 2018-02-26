@@ -6,7 +6,7 @@ import com.nautilus.constants.RegisterStatus;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.dto.user.UserInfo;
-import com.nautilus.service.FileAccessService;
+import com.nautilus.service.file.FileUtil;
 import com.nautilus.services.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class UserController {
 
     private final JsonPatchUtility patchUtility;
 
-    private final FileAccessService fileAccessService;
+    private final FileUtil fileUtil;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> info() {
@@ -112,7 +112,7 @@ public class UserController {
         }
 
         service.delete(user);
-        fileAccessService.deleteUser(user.getUserId());
+        fileUtil.delete(user.getUserId());
 
         return new ResponseEntity(HttpStatus.OK);
     }

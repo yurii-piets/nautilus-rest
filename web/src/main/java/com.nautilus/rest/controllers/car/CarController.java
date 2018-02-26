@@ -6,7 +6,7 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.service.AuthorizationService;
-import com.nautilus.service.FileAccessService;
+import com.nautilus.service.file.FileUtil;
 import com.nautilus.services.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class CarController {
 
     private final AuthorizationService authorizationService;
 
-    private final FileAccessService fileAccessService;
+    private final FileUtil fileUtil;
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> info(@PathVariable String beaconId) {
@@ -120,7 +120,7 @@ public class CarController {
 
         Car car = service.findCarByBeaconId(beaconId);
         service.delete(car);
-        fileAccessService.deleteCar(car.getOwner().getUserId(), car.getBeaconId());
+        fileUtil.delete(car.getBeaconId());
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
