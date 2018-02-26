@@ -67,9 +67,6 @@ public class CarPhotosController {
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> photos(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
 
         Collection<Integer> indices = fileAccessService.getIndices(car.getOwner().getUserId(), beaconId, null);
 
@@ -83,10 +80,6 @@ public class CarPhotosController {
     @RequestMapping(value = MICRO_MAPPING + "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> micro(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
         Collection<Integer> indices = fileAccessService.getIndices(car.getOwner().getUserId(), beaconId, null);
 
         Set<URL> urls = indices.stream()
@@ -116,10 +109,7 @@ public class CarPhotosController {
     public ResponseEntity<?> photo(@PathVariable String beaconId,
                                    @PathVariable String index
     ) throws IOException {
-        Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        service.findCarByBeaconId(beaconId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
@@ -136,10 +126,7 @@ public class CarPhotosController {
     public ResponseEntity<?> microPhoto(@PathVariable String beaconId,
                                         @PathVariable String index
     ) throws IOException {
-        Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        service.findCarByBeaconId(beaconId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
@@ -176,15 +163,11 @@ public class CarPhotosController {
 
         authorizationService.hasAccessByBeaconId(beaconId);
 
-        Car car = service.getCarById(beaconId);
-        if (car == null) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
-
         if (files == null || files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
+        service.findCarByBeaconId(beaconId);
         fileAccessService.saveCarPhotos(beaconId, files);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
@@ -192,11 +175,7 @@ public class CarPhotosController {
     @RequestMapping(value = CAPTURES_MAPPING + "/{beaconId}", method = RequestMethod.POST)
     public ResponseEntity<?> capture(@PathVariable String beaconId,
                                      @RequestParam("file") List<MultipartFile> files) {
-        Car car = service.getCarById(beaconId);
-        if (car == null) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
-
+        service.findCarByBeaconId(beaconId);
         if (files == null || files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
@@ -213,10 +192,6 @@ public class CarPhotosController {
         authorizationService.hasAccessByBeaconId(beaconId);
 
         Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
         UserConfig owner = car.getOwner();
         if (owner == null || owner.getUserId() == null) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);

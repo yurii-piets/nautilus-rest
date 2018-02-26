@@ -47,20 +47,12 @@ public class CarController {
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> info(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
         return new ResponseEntity<>(car, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/status/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> status(@PathVariable String beaconId) {
         Car car = service.findCarByBeaconId(beaconId);
-
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
 
         return new ResponseEntity<>(car.getStatus(), HttpStatus.OK);
     }
@@ -104,12 +96,8 @@ public class CarController {
 
         authorizationService.hasAccessByBeaconId(beaconId);
 
-        Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
-
         try {
+            Car car = service.findCarByBeaconId(beaconId);
             Car mergedCar = (Car) patchUtility.patch(updateBody, car).get();
             mergedCar.setOwner(car.getOwner());
             mergedCar.setStatusSnapshots(car.getStatusSnapshots());
@@ -131,10 +119,6 @@ public class CarController {
         authorizationService.hasAccessByBeaconId(beaconId);
 
         Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
         service.delete(car);
         fileAccessService.deleteCar(car.getOwner().getUserId(), car.getBeaconId());
 

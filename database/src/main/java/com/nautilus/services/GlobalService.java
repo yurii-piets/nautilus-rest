@@ -5,6 +5,7 @@ import com.nautilus.domain.Car;
 import com.nautilus.domain.CarLocation;
 import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.domain.UserConfig;
+import com.nautilus.exception.WrongBeaconIdException;
 import com.nautilus.repository.CarLocationRepository;
 import com.nautilus.repository.CarRepository;
 import com.nautilus.repository.CarStatusSnapshotRepository;
@@ -64,12 +65,12 @@ public class GlobalService {
         return userRepository.findUserConfigByPhoneNumber(phoneNumber) == null;
     }
 
-    public UserConfig findUserConfigByPhoneNumber(String phoneNumber) {
-        return userRepository.findUserConfigByPhoneNumber(phoneNumber);
-    }
-
     public Car findCarByBeaconId(String beaconId) {
-        return carRepository.findCarByBeaconId(beaconId);
+        Car car = carRepository.findCarByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Requested car with id: [" + beaconId + "] does not exist.");
+        }
+        return car;
     }
 
     public Car findCarByBeaconIdOrRegisterNumber(String beaconId, String registerNumber) {
@@ -93,19 +94,6 @@ public class GlobalService {
         return owner.getUserId();
     }
 
-
-    public Car getCarById(String beaconId) {
-        return carRepository.findCarByBeaconId(beaconId);
-    }
-
-    public String findEmailByPhoneNumber(String phoneNumber) {
-        UserConfig user = userRepository.findUserConfigByPhoneNumber(phoneNumber);
-        if (user == null) {
-            return null;
-        }
-        return user.getEmail();
-    }
-
     public String findEmailByBeaconId(String beaconId) {
         Car car = carRepository.findCarByBeaconId(beaconId);
 
@@ -115,7 +103,6 @@ public class GlobalService {
 
         return car.getOwner().getEmail();
     }
-
 
     public UserConfig findUserConfigByEmail(String email) {
         return userRepository.findUserConfigByEmail(email);

@@ -36,10 +36,6 @@ public class CarCapturesController {
         authorizationService.hasAccessByBeaconId(beaconId);
 
         Car car = service.findCarByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
         return new ResponseEntity<>(car.getStatusSnapshots(), HttpStatus.OK);
     }
 
@@ -49,7 +45,7 @@ public class CarCapturesController {
             @RequestBody @Valid CarStatusDTO carStatusDTO) {
 
         CarStatus status = service.getCarStatusByCarBeaconId(beaconId);
-        if(status == null) {
+        if (status == null) {
             status = CarStatus.TESTING;
         }
 
@@ -59,10 +55,10 @@ public class CarCapturesController {
 
             Car car = service.findCarByBeaconId(beaconId);
             CarStatusSnapshot carStatusSnapshot = CarStatusSnapshot.builder()
-                .carLocation(carLocation)
-                .car(car)
-                .captureTime(carStatusDTO.getCaptureTime())
-                .build();
+                    .carLocation(carLocation)
+                    .car(car)
+                    .captureTime(carStatusDTO.getCaptureTime())
+                    .build();
 
             service.save(carStatusSnapshot);
 

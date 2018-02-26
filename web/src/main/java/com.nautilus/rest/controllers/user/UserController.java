@@ -6,7 +6,6 @@ import com.nautilus.constants.RegisterStatus;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.dto.user.UserInfo;
-import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.FileAccessService;
 import com.nautilus.services.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
@@ -44,8 +43,6 @@ public class UserController {
     private final JsonPatchUtility patchUtility;
 
     private final FileAccessService fileAccessService;
-
-    private final AuthorizationService authorizationService;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> info() {
