@@ -59,7 +59,7 @@ public class FileUtilImpl implements FileUtil {
 
     @Override
     public File getCapture(String beaconId, Integer index) throws FileNotFoundException {
-        String path = createPath(beaconId, "CAPTURES_FOLDER_NAME");
+        String path = createPath(beaconId, CAPTURES_FOLDER_NAME);
         return getFile(path, index);
     }
 
