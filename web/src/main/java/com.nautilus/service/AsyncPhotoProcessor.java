@@ -38,7 +38,7 @@ public class AsyncPhotoProcessor {
             buildPath(filePath);
             saveFile(filePath + fileName, fileBody);
 
-            filePath = createPath(beaconId, (!(postfix == null || postfix.isEmpty()) ? "/" + postfix : "/") + "/" + MICRO_FOLDER_NAME);
+            filePath = createPath(beaconId, (!(postfix == null || postfix.isEmpty()) ? postfix : "") + MICRO_FOLDER_NAME);
             buildPath(filePath);
             saveFile(filePath + fileName, rescale(fileBody));
         }

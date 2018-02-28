@@ -1,5 +1,6 @@
 package com.nautilus.service.file;
 
+import com.nautilus.exception.FileNotDeletedException;
 import com.nautilus.exception.OverLimitNumberOfFilesException;
 import com.nautilus.service.AsyncPhotoProcessor;
 import com.nautilus.services.GlobalService;
@@ -13,6 +14,7 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,9 +29,9 @@ public class FileUtilImpl implements FileUtil {
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
-    private static final String CAPTURES_FOLDER_NAME = "captures";
+    private static final String CAPTURES_FOLDER_NAME = "/captures";
 
-    public static final String MICRO_FOLDER_NAME = "micro";
+    public static final String MICRO_FOLDER_NAME = "/micro";
 
     private final Predicate<String> CAR_FILENAME_PREDICATE = s -> s.matches("[0-9]*");
 
@@ -44,26 +46,26 @@ public class FileUtilImpl implements FileUtil {
     private Integer maxPhotos;
 
     @Override
-    public File getOriginal(String beaconId, Integer index) {
+    public File getOriginal(String beaconId, Integer index) throws FileNotFoundException {
         String path = createPath(beaconId, null);
         return getFile(path, index);
     }
 
     @Override
-    public File getMicro(String beaconId, Integer index) {
-        String path = createPath(beaconId, "/" + MICRO_FOLDER_NAME);
+    public File getMicro(String beaconId, Integer index) throws FileNotFoundException {
+        String path = createPath(beaconId, MICRO_FOLDER_NAME);
         return getFile(path, index);
     }
 
     @Override
-    public File getCapture(String beaconId, Integer index) {
-        String path = createPath(beaconId, "/" + CAPTURES_FOLDER_NAME);
+    public File getCapture(String beaconId, Integer index) throws FileNotFoundException {
+        String path = createPath(beaconId, "CAPTURES_FOLDER_NAME");
         return getFile(path, index);
     }
 
     @Override
-    public File getCaptureMicro(String beaconId, Integer index) {
-        String path = createPath(beaconId, "/" + CAPTURES_FOLDER_NAME + "/" + MICRO_FOLDER_NAME);
+    public File getCaptureMicro(String beaconId, Integer index) throws FileNotFoundException {
+        String path = createPath(beaconId, CAPTURES_FOLDER_NAME + MICRO_FOLDER_NAME);
         return getFile(path, index);
     }
 
@@ -75,7 +77,7 @@ public class FileUtilImpl implements FileUtil {
 
     @Override
     public Collection<Integer> getCaptureIndices(String beaconId) {
-        String path = createPath(beaconId, "/" + CAPTURES_FOLDER_NAME);
+        String path = createPath(beaconId, CAPTURES_FOLDER_NAME);
         return getIndices(path);
     }
 
@@ -83,7 +85,7 @@ public class FileUtilImpl implements FileUtil {
     public void saveOriginal(String beaconId, Collection<MultipartFile> files) throws IOException {
         String path = createPath(beaconId, null);
         Integer photosCount = getIndices(path).size();
-        if(files.size() + photosCount > maxPhotos) {
+        if (files.size() + photosCount > maxPhotos) {
             throw new OverLimitNumberOfFilesException("Excited maximum number of car photos.");
         }
 
@@ -92,7 +94,7 @@ public class FileUtilImpl implements FileUtil {
 
     @Override
     public void saveCapture(String beaconId, Collection<MultipartFile> files) throws IOException {
-        saveFiles(beaconId, files, "/" + CAPTURES_FOLDER_NAME);
+        saveFiles(beaconId, files, CAPTURES_FOLDER_NAME);
     }
 
     @Override
@@ -108,15 +110,15 @@ public class FileUtilImpl implements FileUtil {
     }
 
     @Override
-    public void delete(String beaconId, Integer index) {
+    public void delete(String beaconId, Integer index) throws FileNotFoundException {
         String path = createPath(beaconId, null);
         deleteFile(index, path);
 
-        String microPath = createPath(beaconId, "/" + MICRO_FOLDER_NAME);
+        String microPath = createPath(beaconId, MICRO_FOLDER_NAME);
         deleteFile(index, microPath);
     }
 
-    private File getFile(String path, Integer index) {
+    private File getFile(String path, Integer index) throws FileNotFoundException {
         String wildcardFileName = index + ".**";
 
         DirectoryScanner scanner = new DirectoryScanner();
@@ -127,7 +129,7 @@ public class FileUtilImpl implements FileUtil {
         String[] files = scanner.getIncludedFiles();
 
         if (files == null || files.length != 1) {
-            return null;
+            throw new FileNotFoundException("File [" + path + index + "] not found");
         }
 
         return new File(path + "/" + files[0]);
@@ -206,21 +208,28 @@ public class FileUtilImpl implements FileUtil {
         StringBuilder builder = new StringBuilder();
         builder.append(mainFolder)
                 .append(userId).append("/")
-                .append(beaconId).append("/");
+                .append(beaconId);
 
         if (!(postfix == null || postfix.isEmpty())) {
             builder.append(postfix).append("/");
+        } else {
+            builder.append("/");
         }
 
         return builder.toString();
     }
 
-    private void deleteFile(Integer index, String path) {
+    private void deleteFile(Integer index, String path) throws FileNotFoundException {
         File file = getFile(path, index);
 
         if (file != null && file.exists()) {
             file.setWritable(true);
-            file.delete();
+            boolean deleted = file.delete();
+            if (!deleted) {
+                throw new FileNotDeletedException("File [" + path + index + "] was not deleted.");
+            }
+        } else {
+            throw new FileNotFoundException("File [" + path + index + "] not found.");
         }
     }
 }
