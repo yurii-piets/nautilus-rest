@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -223,7 +224,7 @@ public class CarPhotosController {
     @RequestMapping(value = "/{beaconId}/{index}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String beaconId,
                                     @PathVariable Integer index
-    ) {
+    ) throws FileNotFoundException {
 
         authorizationService.hasAccessByBeaconId(beaconId);
         service.findCarByBeaconId(beaconId);

@@ -1,6 +1,6 @@
 allprojects {
     group = 'com.nautilus'
-    version = '0.0.7-SNAPSHOT'
+    version = '0.0.8-SNAPSHOT'
 
     ext {
         applicationName = 'nautilus-rest'
@@ -23,10 +23,10 @@ subprojects {
         compile 'org.projectlombok:lombok:1.16.16'
         compile 'org.hibernate:hibernate-core:5.2.9.Final'
         compile 'com.github.fge:json-patch:1.9'
-        compile group: 'org.apache.ant', name: 'ant', version: '1.8.2'
+        compile 'org.apache.ant:ant:1.8.2'
 
-        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.2'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8.2'
+        compile 'org.apache.logging.log4j:log4j-core:2.8.2'
+        compile 'org.apache.logging.log4j:log4j-api:2.8.2'
 
         compile 'org.springframework.boot:spring-boot-starter-web:1.5.4.RELEASE'
     }

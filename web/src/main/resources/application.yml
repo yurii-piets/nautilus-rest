@@ -9,6 +9,10 @@ server:
 #    keyStoreType: PKCS12
 #    keyAlias: tomcat
 
+spring:
+  main:
+    banner-mode: "off"
+
 photos:
   path: upload/
   max: 10
