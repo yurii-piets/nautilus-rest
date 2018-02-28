@@ -1,27 +1,23 @@
 package com.nautilus.service.file;
 
 import com.nautilus.exception.OverLimitNumberOfFilesException;
+import com.nautilus.service.AsyncPhotoProcessor;
 import com.nautilus.services.GlobalService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.DirectoryScanner;
-import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -33,11 +29,13 @@ public class FileUtilImpl implements FileUtil {
 
     private static final String CAPTURES_FOLDER_NAME = "captures";
 
-    private static final String MICRO_FOLDER_NAME = "micro";
+    public static final String MICRO_FOLDER_NAME = "micro";
 
     private final Predicate<String> CAR_FILENAME_PREDICATE = s -> s.matches("[0-9]*");
 
     private final GlobalService service;
+
+    private final AsyncPhotoProcessor photoProcessor;
 
     @Value("${photos.path}")
     private String mainFolder;
@@ -180,23 +178,20 @@ public class FileUtilImpl implements FileUtil {
 
     private void saveFiles(String beaconId, Collection<MultipartFile> files, String postfix) throws IOException {
         Integer lastIndex = getLastIndex(beaconId, postfix);
+        HashMap<String, byte[]> bytes = new HashMap<>();
 
         for (MultipartFile file : files) {
             lastIndex = lastIndex + 1;
             if (file == null || file.isEmpty()) {
                 logger.warn("File is empty!");
+                continue;
             }
 
             String fileName = lastIndex + "." + getFileType(file);
-
-            String filePath = createPath(beaconId, postfix);
-            buildPath(filePath);
-            saveFile(filePath + fileName, file);
-
-            filePath = createPath(beaconId, (!(postfix == null || postfix.isEmpty()) ? "/" + postfix : "/") + "/" + MICRO_FOLDER_NAME);
-            buildPath(filePath);
-            saveFile(filePath + fileName, rescale(file));
+            bytes.put(fileName, file.getBytes());
         }
+
+        photoProcessor.savePhotos(beaconId, bytes, postfix);
     }
 
     private String getFileType(MultipartFile file) {
@@ -204,30 +199,6 @@ public class FileUtilImpl implements FileUtil {
         return splited.length != 0 ? splited[splited.length - 1] : file.getOriginalFilename();
     }
 
-    private void saveFile(String filePath, MultipartFile file) throws IOException {
-        File f = new File(filePath);
-        boolean oldWritable = f.canWrite();
-        f.setWritable(true);
-
-        byte[] bytes = file.getBytes();
-        Path path = Paths.get(filePath);
-        Files.write(path, bytes);
-
-        f.setWritable(oldWritable);
-    }
-
-    private void saveFile(String filePath, BufferedImage bufferedImage) throws IOException {
-        File file = new File(filePath);
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-        ImageIO.write(bufferedImage, "jpg", file);
-    }
-
-    private BufferedImage rescale(MultipartFile file) throws IOException {
-        BufferedImage sourceImage = ImageIO.read(file.getInputStream());
-        return Scalr.resize(sourceImage, Scalr.Method.ULTRA_QUALITY, 160, 90, Scalr.OP_ANTIALIAS);
-    }
 
     private String createPath(String beaconId, String postfix) {
         Long userId = service.getUserIdConfigBeaconId(beaconId);
@@ -242,17 +213,6 @@ public class FileUtilImpl implements FileUtil {
         }
 
         return builder.toString();
-    }
-
-    private void buildPath(String path) {
-        File file = new File(path);
-        if (!file.exists() || !file.isDirectory()) {
-            file.mkdirs();
-        }
-
-        if (!file.canWrite()) {
-            file.setWritable(true);
-        }
     }
 
     private void deleteFile(Integer index, String path) {
