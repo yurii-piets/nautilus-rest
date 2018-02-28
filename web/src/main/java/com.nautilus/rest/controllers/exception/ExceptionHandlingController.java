@@ -42,7 +42,7 @@ public class ExceptionHandlingController extends ResponseEntityExceptionHandler 
     @ExceptionHandler(value = {FileNotDeletedException.class})
     public ResponseEntity<?> handle(FileNotDeletedException e) {
         logger.error("Unexpected: ", e);
-        return new ResponseEntity<>(HttpStatus.INSUFFICIENT_STORAGE);
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = {Exception.class})
