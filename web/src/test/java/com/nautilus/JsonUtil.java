@@ -1,4 +1,4 @@
-package com.nautilus.rest.controllers;
+package com.nautilus;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import static org.junit.Assert.assertNotNull;
 
 @Service
-class JsonUtility {
+public class JsonUtil {
 
     @Getter
     private MediaType contentType = new MediaType(
@@ -23,7 +23,6 @@ class JsonUtility {
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8")
     );
-
 
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
 
