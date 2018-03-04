@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,6 +36,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserControllerTest {
+
+    private static final String MOCK_USER_EMAIL = "luke.skywalker@nautilus.com";
+    private static final String MOCK_USER_PASSWORD = "star_wars";
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
@@ -60,25 +65,16 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "luke.skywalker@nautilus.com", password = "star_wars", roles = "USER")
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void getWhenUserExist() throws Exception {
         UserInfo user = UserInfo.builder()
-                .email("luke.skywalker@nautilus.com")
+                .email(MOCK_USER_EMAIL)
                 .phoneNumber("111000222")
                 .userName("Luke")
                 .userSurname("Skywalker")
                 .build();
         String userJson = jsonUtil.json(user);
-        UserConfig userConfig = new UserConfig();
-        userConfig.setEmail("luke.skywalker@nautilus.com");
-        userConfig.setPhoneNumber("111000222");
-        userConfig.setName("Luke");
-        userConfig.setSurname("Skywalker");
-        userConfig.setPassword("star_wars");
-        userConfig.setAuthorities(Authorities.USER);
-        userConfig.setEnabled(true);
-
-        when(service.findUserConfigByEmail("luke.skywalker@nautilus.com")).thenReturn(userConfig);
+        createMockUser();
         mockMvc.perform(get(UserController.USER_MAPPING))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(jsonUtil.getContentType()))
@@ -88,15 +84,15 @@ public class UserControllerTest {
     @Test
     public void postWhenUserIsOk() throws Exception {
         RegisterUserDTO userDTO = RegisterUserDTO.builder()
-                .email("luke.skywalker@nautilus.com")
+                .email(MOCK_USER_EMAIL)
                 .phoneNumber("111000222")
                 .userName("Luke")
                 .userSurname("Skywalker")
-                .password("star_wars")
+                .password(MOCK_USER_PASSWORD)
                 .build();
         String userJson = jsonUtil.json(userDTO);
 
-        when(service.checkEmailIsFree("luke.skywalker@nautilus.com")).thenReturn(true);
+        when(service.checkEmailIsFree(MOCK_USER_EMAIL)).thenReturn(true);
         when(service.checkPhoneNumberIsFree("111000222")).thenReturn(true);
 
         mockMvc.perform(post(UserController.USER_MAPPING)
@@ -108,18 +104,18 @@ public class UserControllerTest {
     @Test
     public void postWhenEmailIsNotFree() throws Exception {
         RegisterUserDTO userDTO = RegisterUserDTO.builder()
-                .email("luke.skywalker@nautilus.com")
+                .email(MOCK_USER_EMAIL)
                 .phoneNumber("111000222")
                 .userName("Luke")
                 .userSurname("Skywalker")
-                .password("star_wars")
+                .password(MOCK_USER_PASSWORD)
                 .build();
         String userJson = jsonUtil.json(userDTO);
 
-        when(service.checkEmailIsFree("luke.skywalker@nautilus.com")).thenReturn(false);
+        when(service.checkEmailIsFree(MOCK_USER_EMAIL)).thenReturn(false);
         when(service.checkPhoneNumberIsFree("111000222")).thenReturn(true);
 
-        List<RegisterStatus> statuses = new ArrayList<RegisterStatus>(){{
+        List<RegisterStatus> statuses = new ArrayList<RegisterStatus>() {{
             add(RegisterStatus.EMAIL_NOT_FREE);
         }};
 
@@ -133,18 +129,18 @@ public class UserControllerTest {
     @Test
     public void postWhenEmailAndPhoneNumberIsNotFree() throws Exception {
         RegisterUserDTO userDTO = RegisterUserDTO.builder()
-                .email("luke.skywalker@nautilus.com")
+                .email(MOCK_USER_EMAIL)
                 .phoneNumber("111000222")
                 .userName("Luke")
                 .userSurname("Skywalker")
-                .password("star_wars")
+                .password(MOCK_USER_PASSWORD)
                 .build();
         String userJson = jsonUtil.json(userDTO);
 
-        when(service.checkEmailIsFree("luke.skywalker@nautilus.com")).thenReturn(false);
+        when(service.checkEmailIsFree(MOCK_USER_EMAIL)).thenReturn(false);
         when(service.checkPhoneNumberIsFree("111000222")).thenReturn(false);
 
-        List<RegisterStatus> statuses = new ArrayList<RegisterStatus>(){{
+        List<RegisterStatus> statuses = new ArrayList<RegisterStatus>() {{
             add(RegisterStatus.EMAIL_NOT_FREE);
             add(RegisterStatus.PHONE_NUMBER_NOT_FREE);
         }};
@@ -155,4 +151,64 @@ public class UserControllerTest {
                 .andExpect(content().json(jsonUtil.json(statuses)))
                 .andExpect(status().isNotAcceptable());
     }
+
+    @Test
+    public void patchWhenNoAuth() throws Exception {
+        mockMvc.perform(patch(UserController.USER_MAPPING))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void patchUserEmail() throws Exception {
+        createMockUser();
+
+        String patchJson = "[{\"op\": \"replace\", \"path\": \"/phoneNumber\", \"value\": \"123000789\" }]";
+
+        mockMvc.perform(patch(UserController.USER_MAPPING)
+                .contentType(jsonUtil.getContentType())
+                .content(patchJson))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void patchWhenFieldDoesNotExist() throws Exception {
+        createMockUser();
+
+        String patchJson = "[{\"op\": \"replace\", \"path\": \"/not_exist\", \"value\": \"asd\" }]";
+
+        mockMvc.perform(patch(UserController.USER_MAPPING)
+                .contentType(jsonUtil.getContentType())
+                .content(patchJson))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void deleteWhenNoAuth() throws Exception {
+        mockMvc.perform(delete(UserController.USER_MAPPING))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void deleteUser() throws Exception {
+        createMockUser();
+
+        mockMvc.perform(delete(UserController.USER_MAPPING))
+                .andExpect(status().isOk());
+    }
+
+    private void createMockUser() {
+        UserConfig userConfig = new UserConfig();
+        userConfig.setEmail(MOCK_USER_EMAIL);
+        userConfig.setPhoneNumber("111000222");
+        userConfig.setName("Luke");
+        userConfig.setSurname("Skywalker");
+        userConfig.setPassword(MOCK_USER_PASSWORD);
+        userConfig.setAuthorities(Authorities.USER);
+        userConfig.setEnabled(true);
+        when(service.findUserConfigByEmail(MOCK_USER_EMAIL)).thenReturn(userConfig);
+    }
+
 }
