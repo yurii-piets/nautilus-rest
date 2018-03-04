@@ -3,6 +3,7 @@ package com.nautilus.rest.controllers.user;
 import com.nautilus.JsonUtil;
 import com.nautilus.constants.Authorities;
 import com.nautilus.constants.RegisterStatus;
+import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.dto.user.UserInfo;
@@ -21,7 +22,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -199,6 +202,35 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void getUserCarsWhenNoAuth() throws Exception {
+        mockMvc.perform(get(UserController.USER_MAPPING + UserController.USER_CAR_MAPPING))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void getUserCars() throws Exception {
+        createMockUser();
+
+        Set<Car> set = new HashSet<Car>(){{
+            Car car = new Car();
+            car.setOwner(null);
+            car.setBeaconId("1");
+            car.setRegisterNumber("AA1234AA");
+            car.setMark("Batmobile");
+            car.setColor("Black");
+            car.setYearOfProduction("1939");
+            car.setDescription("The Batmobile's shields are made of ceramic fractal armor panels");
+            add(car);
+        }};
+
+        mockMvc.perform(get(UserController.USER_MAPPING + UserController.USER_CAR_MAPPING))
+                .andExpect(content().contentType(jsonUtil.getContentType()))
+                .andExpect(content().json(jsonUtil.json(set)))
+                .andExpect(status().isOk());
+    }
+
     private void createMockUser() {
         UserConfig userConfig = new UserConfig();
         userConfig.setEmail(MOCK_USER_EMAIL);
@@ -208,6 +240,17 @@ public class UserControllerTest {
         userConfig.setPassword(MOCK_USER_PASSWORD);
         userConfig.setAuthorities(Authorities.USER);
         userConfig.setEnabled(true);
+        userConfig.setCars(new HashSet<Car>(){{
+            Car car = new Car();
+            car.setOwner(userConfig);
+            car.setBeaconId("1");
+            car.setRegisterNumber("AA1234AA");
+            car.setMark("Batmobile");
+            car.setColor("Black");
+            car.setYearOfProduction("1939");
+            car.setDescription("The Batmobile's shields are made of ceramic fractal armor panels");
+            add(car);
+        }});
         when(service.findUserConfigByEmail(MOCK_USER_EMAIL)).thenReturn(userConfig);
     }
 
