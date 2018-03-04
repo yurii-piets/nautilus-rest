@@ -8,8 +8,6 @@ import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.user.RegisterUserDTO;
 import com.nautilus.dto.user.UserInfo;
 import com.nautilus.services.GlobalService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserControllerTest {
 
     private static final String MOCK_USER_EMAIL = "luke.skywalker@nautilus.com";
-    private static final String MOCK_USER_PASSWORD = "star_wars";
 
-    private final Logger logger = LogManager.getLogger(this.getClass());
+    private static final String MOCK_USER_PASSWORD = "star_wars";
 
     @Autowired
     private MockMvc mockMvc;
