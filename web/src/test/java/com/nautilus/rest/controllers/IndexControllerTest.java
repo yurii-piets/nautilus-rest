@@ -35,4 +35,3 @@ public class IndexControllerTest {
                 .andExpect(status().isOk());
     }
 }
-

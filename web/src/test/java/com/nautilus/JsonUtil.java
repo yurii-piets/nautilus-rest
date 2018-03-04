@@ -37,7 +37,7 @@ public class JsonUtil {
         assertNotNull("the JSON message converter must not be null", this.mappingJackson2HttpMessageConverter);
     }
 
-    protected String json(Object o) throws IOException {
+    public String json(Object o) throws IOException {
         MockHttpOutputMessage mockHttpOutputMessage = new MockHttpOutputMessage();
         mappingJackson2HttpMessageConverter.write(o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
         return mockHttpOutputMessage.getBodyAsString();
