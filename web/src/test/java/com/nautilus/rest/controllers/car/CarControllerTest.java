@@ -6,6 +6,7 @@ import com.nautilus.constants.CarStatus;
 import com.nautilus.domain.Car;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.car.CarRegisterDTO;
+import com.nautilus.service.file.FileUtil;
 import com.nautilus.services.GlobalService;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,8 +22,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.LinkedHashSet;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,6 +51,9 @@ public class CarControllerTest {
 
     @MockBean
     private GlobalService service;
+
+    @MockBean
+    private FileUtil fileUtil;
 
     private static Car mockCar;
 
@@ -133,6 +140,69 @@ public class CarControllerTest {
         mockMvc.perform(post(CarController.CAR_MAPPING)
                 .contentType(jsonUtil.getContentType())
                 .content(carJson))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void patchCarWhenNoAuth() throws Exception {
+        mockMvc.perform(patch(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void patchWhenNoRightToModifyCar() throws Exception {
+        when(service.findEmailByBeaconId(MOCK_CAR_BEACON_ID))
+                .thenReturn("wrong_email@nautilus.com");
+
+        String jsonPatchContent = "[{\"op\": \"replace\", \"path\": \"/color\", \"value\": \"White\" }]";
+        mockMvc.perform(delete(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID)
+                .contentType(jsonUtil.getContentType())
+                .content(jsonPatchContent))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void patchCar() throws Exception {
+        when(service.findEmailByBeaconId(MOCK_CAR_BEACON_ID))
+                .thenReturn(MOCK_USER_EMAIL);
+        when(service.findCarByBeaconId(MOCK_CAR_BEACON_ID))
+                .thenReturn(mockCar);
+
+        String jsonPatchContent = "[{\"op\": \"replace\", \"path\": \"/color\", \"value\": \"White\" }]";
+        mockMvc.perform(patch(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID)
+                .contentType(jsonUtil.getContentType())
+                .content(jsonPatchContent))
+        .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteCarWhenNoAuth() throws Exception {
+        mockMvc.perform(delete(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void deleteCarWhenNoRightToModifyCar() throws Exception {
+        when(service.findEmailByBeaconId(MOCK_CAR_BEACON_ID))
+                .thenReturn("wrong_email@nautilus.com");
+
+        mockMvc.perform(delete(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void deleteCar() throws Exception {
+        when(service.findEmailByBeaconId(MOCK_CAR_BEACON_ID))
+                .thenReturn(MOCK_USER_EMAIL);
+        when(service.findCarByBeaconId(MOCK_CAR_BEACON_ID))
+                .thenReturn(mockCar);
+        doNothing().when(fileUtil).delete(MOCK_CAR_BEACON_ID);
+
+        mockMvc.perform(delete(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID))
                 .andExpect(status().isOk());
     }
 
