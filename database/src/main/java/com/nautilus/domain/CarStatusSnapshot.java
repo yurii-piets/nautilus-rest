@@ -22,8 +22,8 @@ import java.sql.Timestamp;
 @Setter
 @Getter
 @Builder
-@RequiredArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode(exclude = "carLocation")
 @ToString(exclude = "carLocation")
 public class CarStatusSnapshot {
@@ -41,4 +41,9 @@ public class CarStatusSnapshot {
     private Car car;
 
     private Timestamp captureTime;
+
+    public CarStatusSnapshot(CarLocation carLocation, Timestamp captureTime) {
+        this.carLocation = carLocation;
+        this.captureTime = captureTime;
+    }
 }

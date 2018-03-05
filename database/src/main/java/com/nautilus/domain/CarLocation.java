@@ -38,6 +38,11 @@ public class CarLocation {
     @Max(value = MAX_LATITUDE)
     private Double latitude;
 
+    public CarLocation(Double longitude, Double latitude) {
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
+
     public CarLocation(CarStatusDTO carStatusDTO) {
         this.longitude = carStatusDTO.getLocation().getLongitude();
         this.latitude = carStatusDTO.getLocation().getLatitude();

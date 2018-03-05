@@ -3,11 +3,15 @@ package com.nautilus;
 import com.nautilus.constants.Authorities;
 import com.nautilus.constants.CarStatus;
 import com.nautilus.domain.Car;
+import com.nautilus.domain.CarLocation;
+import com.nautilus.domain.CarStatusSnapshot;
 import com.nautilus.domain.UserConfig;
 import com.nautilus.dto.car.CarRegisterDTO;
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class MockUtil {
 
@@ -26,7 +30,7 @@ public class MockUtil {
         userConfig.setPassword(MOCK_USER_PASSWORD);
         userConfig.setAuthorities(Authorities.USER);
         userConfig.setEnabled(true);
-        userConfig.setCars(new HashSet<Car>(){{
+        userConfig.setCars(new HashSet<Car>() {{
             Car car = new Car();
             car.setOwner(userConfig);
             car.setBeaconId("1");
@@ -80,5 +84,26 @@ public class MockUtil {
         userConfig.setCars(new LinkedHashSet<>());
 
         return userConfig;
+    }
+
+    public static Car buildMockCarWithCaptures() {
+        Car mockCar = new Car();
+        mockCar.setCarId(1L);
+        mockCar.setBeaconId(MOCK_CAR_BEACON_ID);
+        mockCar.setRegisterNumber("AA1234BB");
+        mockCar.setMark("Batmobile");
+        mockCar.setModel("XX");
+        mockCar.setYearOfProduction("1939");
+        mockCar.setDescription("Does batmobile needs a description?");
+        mockCar.setStatus(CarStatus.OK);
+
+        Set<CarStatusSnapshot> snapshots = new LinkedHashSet<>();
+        snapshots.add(new CarStatusSnapshot(new CarLocation(19.20, 12.22), new Timestamp(1)));
+        snapshots.add(new CarStatusSnapshot(new CarLocation(29.20, 22.22), new Timestamp(11)));
+        snapshots.add(new CarStatusSnapshot(new CarLocation(39.20, 32.22), new Timestamp(111)));
+        snapshots.add(new CarStatusSnapshot(new CarLocation(49.20, 42.22), new Timestamp(1111)));
+        mockCar.setStatusSnapshots(snapshots);
+
+        return mockCar;
     }
 }
