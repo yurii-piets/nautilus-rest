@@ -22,6 +22,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.LinkedHashSet;
 
+import static com.nautilus.MockUtil.MOCK_CAR_BEACON_ID;
+import static com.nautilus.MockUtil.MOCK_USER_EMAIL;
+import static com.nautilus.MockUtil.MOCK_USER_PASSWORD;
+import static com.nautilus.MockUtil.buildMockCar;
+import static com.nautilus.MockUtil.buildMockCarRegisterDTO;
+import static com.nautilus.MockUtil.buildMockUserConfig;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -36,12 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CarControllerTest {
-
-    private static final String MOCK_CAR_BEACON_ID = "2412794";
-
-    private static final String MOCK_USER_EMAIL = "luke.skywalker@nautilus.com";
-
-    private static final String MOCK_USER_PASSWORD = "star_wars";
 
     @Autowired
     private MockMvc mockMvc;
@@ -100,7 +100,7 @@ public class CarControllerTest {
 
     @Test
     public void postCarWhenNoAuth() throws Exception {
-        CarRegisterDTO carRegisterDTO = buildMockCarRegisterDTO();
+        CarRegisterDTO carRegisterDTO = buildMockCarRegisterDTO(mockCar);
         String carJson = jsonUtil.json(carRegisterDTO);
 
         mockMvc.perform(post(CarController.CAR_MAPPING)
@@ -117,7 +117,7 @@ public class CarControllerTest {
         when(service.findCarByBeaconIdOrRegisterNumber(mockCar.getBeaconId(), mockCar.getRegisterNumber()))
                 .thenReturn(mockCar);
 
-        CarRegisterDTO carRegisterDTO = buildMockCarRegisterDTO();
+        CarRegisterDTO carRegisterDTO = buildMockCarRegisterDTO(mockCar);
         String carJson = jsonUtil.json(carRegisterDTO);
 
         mockMvc.perform(post(CarController.CAR_MAPPING)
@@ -134,7 +134,7 @@ public class CarControllerTest {
         when(service.findCarByBeaconIdOrRegisterNumber(mockCar.getBeaconId(), mockCar.getRegisterNumber()))
                 .thenReturn(null);
 
-        CarRegisterDTO carRegisterDTO = buildMockCarRegisterDTO();
+        CarRegisterDTO carRegisterDTO = buildMockCarRegisterDTO(mockCar);
         String carJson = jsonUtil.json(carRegisterDTO);
 
         mockMvc.perform(post(CarController.CAR_MAPPING)
@@ -204,46 +204,5 @@ public class CarControllerTest {
 
         mockMvc.perform(delete(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID))
                 .andExpect(status().isOk());
-    }
-
-    private CarRegisterDTO buildMockCarRegisterDTO() {
-        CarRegisterDTO carRegisterDTO = new CarRegisterDTO();
-        carRegisterDTO.setBeaconId(mockCar.getBeaconId());
-        carRegisterDTO.setColor(mockCar.getColor());
-        carRegisterDTO.setDescription(mockCar.getDescription());
-        carRegisterDTO.setMark(mockCar.getMark());
-        carRegisterDTO.setModel(mockCar.getModel());
-        carRegisterDTO.setRegisterNumber(mockCar.getRegisterNumber());
-        carRegisterDTO.setYearOfProduction(mockCar.getYearOfProduction());
-
-        return carRegisterDTO;
-    }
-
-    private static Car buildMockCar() {
-        Car mockCar = new Car();
-        mockCar.setCarId(1L);
-        mockCar.setBeaconId(MOCK_CAR_BEACON_ID);
-        mockCar.setRegisterNumber("AA1234BB");
-        mockCar.setMark("Batmobile");
-        mockCar.setModel("XX");
-        mockCar.setYearOfProduction("1939");
-        mockCar.setDescription("Does batmobile needs a description?");
-        mockCar.setStatus(CarStatus.OK);
-
-        return mockCar;
-    }
-
-    private static UserConfig buildMockUserConfig() {
-        UserConfig userConfig = new UserConfig();
-        userConfig.setEmail(MOCK_USER_EMAIL);
-        userConfig.setPhoneNumber("111000222");
-        userConfig.setName("Luke");
-        userConfig.setSurname("Skywalker");
-        userConfig.setPassword(MOCK_USER_PASSWORD);
-        userConfig.setAuthorities(Authorities.USER);
-        userConfig.setEnabled(true);
-        userConfig.setCars(new LinkedHashSet<>());
-
-        return userConfig;
     }
 }
