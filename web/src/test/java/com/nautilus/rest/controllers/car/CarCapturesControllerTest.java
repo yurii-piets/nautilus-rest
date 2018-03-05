@@ -2,6 +2,8 @@ package com.nautilus.rest.controllers.car;
 
 import com.nautilus.JsonUtil;
 import com.nautilus.domain.Car;
+import com.nautilus.dto.car.CarLocationDTO;
+import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.services.GlobalService;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,11 +17,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.sql.Timestamp;
+
 import static com.nautilus.MockUtil.MOCK_CAR_BEACON_ID;
 import static com.nautilus.MockUtil.buildMockCarWithCaptures;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -82,13 +86,33 @@ public class CarCapturesControllerTest {
     }
 
     @Test
-    public void postCarCaptureWhenNoAuth() {
-        fail();
+    public void postCarCaptureWhenNoAuth() throws Exception {
+        String carStatusDTOJson = jsonUtil.json(new CarStatusDTO());
+
+        mockMvc.perform(post(CarCapturesController.CAR_FOUND_MAPPING + "/capture/" + MOCK_CAR_BEACON_ID)
+                .contentType(jsonUtil.getContentType())
+                .content(carStatusDTOJson))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
-    public void postCarCapture() {
-        fail();
+    public void postCarCapture() throws Exception {
+        when(service.findCarByBeaconId(MOCK_CAR_BEACON_ID))
+                .thenReturn(mockCar);
+
+        when(service.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID))
+                .thenReturn(mockCar.getStatus());
+
+        String carStatusDTOJson
+                = jsonUtil.json(new CarStatusDTO(new CarLocationDTO(11.22, 33.44), new Timestamp(1)));
+        String okStatusJson = jsonUtil.json(mockCar.getStatus());
+
+        mockMvc.perform(post(CarCapturesController.CAR_FOUND_MAPPING + "/capture/" + MOCK_CAR_BEACON_ID)
+                .contentType(jsonUtil.getContentType())
+                .content(carStatusDTOJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(jsonUtil.getContentType()))
+                .andExpect(content().json(okStatusJson));
     }
 }
