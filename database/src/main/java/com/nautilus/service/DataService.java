@@ -1,0 +1,89 @@
+package com.nautilus.service;
+
+import com.nautilus.constants.CarStatus;
+import com.nautilus.domain.CarNode;
+import com.nautilus.domain.CarStatusSnapshotNode;
+import com.nautilus.domain.UserNode;
+import com.nautilus.exception.WrongBeaconIdException;
+import com.nautilus.repository.CarRepository;
+import com.nautilus.repository.CarStatusSnapshotRepository;
+import com.nautilus.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class DataService {
+
+    private final CarRepository carRepository;
+
+    private final CarStatusSnapshotRepository carStatusSnapshotRepository;
+
+    private final UserRepository userRepository;
+
+    public void save(UserNode user) {
+        userRepository.save(user);
+    }
+
+    public void save(CarNode car) {
+        carRepository.save(car);
+    }
+
+    public void save(CarStatusSnapshotNode carStatusSnapshot) {
+        carStatusSnapshotRepository.save(carStatusSnapshot);
+    }
+
+    public void deleteUserById(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    public void deleteCarById(Long id) {
+        carRepository.deleteById(id);
+    }
+
+    public boolean checkEmailIsFree(String email) {
+        return userRepository.findUserNodeByEmail(email) == null;
+    }
+
+    public boolean checkPhoneNumberIsFree(String phoneNumber) {
+        return userRepository.findUserNodeByPhoneNumber(phoneNumber) == null;
+    }
+
+    public CarStatus getCarStatusByCarBeaconId(String beaconId) {
+        CarNode car = carRepository.findCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
+        return car.getStatus();
+    }
+
+    public Long getUserIdByBeaconId(String beaconId) {
+        CarNode car = carRepository.findCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
+        UserNode owner = car.getOwner();
+        if (owner == null) {
+            return null;
+        }
+        return owner.getId();
+    }
+
+    public String getEmailByBeaconId(String beaconId) {
+        CarNode car = carRepository.findCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
+        UserNode owner = car.getOwner();
+        if (owner == null) {
+            return null;
+        }
+        return owner.getEmail();
+    }
+
+    public UserNode getUserNodeByEmail(String email) {
+        return userRepository.findUserNodeByEmail(email);
+    }
+}
