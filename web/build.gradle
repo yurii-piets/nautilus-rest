@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    compile project(':database')
+    compile project(':database-postgres')
 
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.1.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.0.1.RELEASE'
