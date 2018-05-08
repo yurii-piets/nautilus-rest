@@ -22,7 +22,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 @EnableJpaRepositories(basePackages = DataSourceConfig.PACKAGE_TO_SCAN_REPOSITORIES)
-@PropertySource("classpath:database_application.properties")
+@PropertySource("classpath:database.properties")
 public class DataSourceConfig {
 
     static final String PACKAGE_TO_SCAN_REPOSITORIES = "com.nautilus.repository";

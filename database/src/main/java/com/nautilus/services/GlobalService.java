@@ -54,7 +54,7 @@ public class GlobalService {
     }
 
     public void save(Set<UserConfig> userConfigs) {
-        userRepository.save(userConfigs);
+        userRepository.saveAll(userConfigs);
     }
 
     public boolean checkEmailIsFree(String email) {

@@ -59,11 +59,11 @@ public class CarPhotosController {
     @Value("${server.port}")
     private Integer port;
 
+    @Value("${server.servlet.contextPath}")
+    private String contextPath;
+
     @Value("${photos.max}")
     private Integer maxPhotos;
-
-    @Value("${server.contextPath}")
-    private String contextPath;
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> photos(@PathVariable String beaconId) {
