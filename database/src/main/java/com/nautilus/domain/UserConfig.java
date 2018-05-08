@@ -11,6 +11,8 @@ import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,6 +38,7 @@ public class UserConfig {
     private String password;
     private Boolean enabled;
 
+    @Enumerated(EnumType.STRING)
     private Authorities authorities;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
