@@ -1,7 +1,7 @@
 package com.nautilus.postgres.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.nautilus.dto.car.CarStatusDTO;
+import com.nautilus.dto.car.CarStatusSnapshotDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -38,9 +38,9 @@ public class CarLocation {
     @Max(value = MAX_LATITUDE)
     private Double latitude;
 
-    public CarLocation(CarStatusDTO carStatusDTO) {
-        this.longitude = carStatusDTO.getLocation().getLongitude();
-        this.latitude = carStatusDTO.getLocation().getLatitude();
+    public CarLocation(CarStatusSnapshotDto carStatusSnapshotDto) {
+        this.longitude = carStatusSnapshotDto.getLocation().getLongitude();
+        this.latitude = carStatusSnapshotDto.getLocation().getLatitude();
     }
 
 }

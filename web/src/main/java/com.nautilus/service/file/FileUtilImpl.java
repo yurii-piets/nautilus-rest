@@ -3,7 +3,7 @@ package com.nautilus.service.file;
 import com.nautilus.exception.FileNotDeletedException;
 import com.nautilus.exception.OverLimitNumberOfFilesException;
 import com.nautilus.service.AsyncPhotoProcessor;
-import com.nautilus.postgres.services.GlobalService;
+import com.nautilus.service.DataService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +35,7 @@ public class FileUtilImpl implements FileUtil {
 
     private final Predicate<String> CAR_FILENAME_PREDICATE = s -> s.matches("[0-9]*");
 
-    private final GlobalService service;
+    private final DataService service;
 
     private final AsyncPhotoProcessor photoProcessor;
 
@@ -203,7 +203,7 @@ public class FileUtilImpl implements FileUtil {
 
 
     private String createPath(String beaconId, String postfix) {
-        Long userId = service.getUserIdConfigBeaconId(beaconId);
+        Long userId = service.getUserIdByBeaconId(beaconId);
 
         StringBuilder builder = new StringBuilder();
         builder.append(mainFolder)

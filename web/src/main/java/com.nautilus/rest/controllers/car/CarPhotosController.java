@@ -1,8 +1,10 @@
 package com.nautilus.rest.controllers.car;
 
+import com.nautilus.exception.WrongBeaconIdException;
+import com.nautilus.node.CarNode;
 import com.nautilus.service.AuthorizationService;
+import com.nautilus.service.DataService;
 import com.nautilus.service.file.FileUtil;
-import com.nautilus.postgres.services.GlobalService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +46,7 @@ public class CarPhotosController {
 
     private static final String CAPTURES_MAPPING = "/captures";
 
-    private final GlobalService service;
+    private final DataService service;
 
     private final FileUtil fileUtil;
 
@@ -67,7 +69,10 @@ public class CarPhotosController {
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> photos(@PathVariable String beaconId) {
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
 
         Collection<Integer> indices = fileUtil.getOriginalIndices(beaconId);
 
@@ -80,7 +85,11 @@ public class CarPhotosController {
 
     @RequestMapping(value = MICRO_MAPPING + "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> micro(@PathVariable String beaconId) {
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
+
         Collection<Integer> indices = fileUtil.getOriginalIndices(beaconId);
 
         Set<URL> urls = indices.stream()
@@ -92,7 +101,10 @@ public class CarPhotosController {
 
     @RequestMapping(value = CAPTURES_MAPPING + "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> captures(@PathVariable String beaconId) {
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
 
         Collection<Integer> indices = fileUtil.getCaptureIndices(beaconId);
 
@@ -105,7 +117,10 @@ public class CarPhotosController {
 
     @RequestMapping(value = CAPTURES_MAPPING + MICRO_MAPPING + "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> capturesMicro(@PathVariable String beaconId) {
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
 
         Collection<Integer> indices = fileUtil.getCaptureIndices(beaconId);
 
@@ -120,7 +135,10 @@ public class CarPhotosController {
     public ResponseEntity<?> photo(@PathVariable String beaconId,
                                    @PathVariable Integer index
     ) throws IOException {
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
@@ -137,7 +155,10 @@ public class CarPhotosController {
     public ResponseEntity<?> microPhoto(@PathVariable String beaconId,
                                         @PathVariable Integer index
     ) throws IOException {
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
@@ -153,7 +174,10 @@ public class CarPhotosController {
     public ResponseEntity<?> capturePhoto(@PathVariable String beaconId,
                                           @PathVariable Integer index
     ) throws IOException {
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
@@ -169,7 +193,10 @@ public class CarPhotosController {
     public ResponseEntity<?> microCapture(@PathVariable String beaconId,
                                           @PathVariable Integer index
     ) throws IOException {
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
@@ -195,7 +222,11 @@ public class CarPhotosController {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
+
         fileUtil.saveOriginal(beaconId, files);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
@@ -203,7 +234,11 @@ public class CarPhotosController {
     @RequestMapping(value = CAPTURES_MAPPING + "/{beaconId}", method = RequestMethod.POST)
     public ResponseEntity<?> capture(@PathVariable String beaconId,
                                      @RequestParam("file") List<MultipartFile> files) throws IOException {
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
+
         if (files == null || files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
@@ -216,7 +251,10 @@ public class CarPhotosController {
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String beaconId) {
         authorizationService.hasAccessByBeaconId(beaconId);
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
         fileUtil.delete(beaconId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -227,7 +265,10 @@ public class CarPhotosController {
     ) throws FileNotFoundException {
 
         authorizationService.hasAccessByBeaconId(beaconId);
-        service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
         fileUtil.delete(beaconId, index);
         return new ResponseEntity<>(HttpStatus.OK);
     }

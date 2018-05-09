@@ -1,13 +1,11 @@
 package com.nautilus.rest.controllers.user;
 
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.nautilus.constants.Authorities;
 import com.nautilus.constants.RegisterStatus;
-import com.nautilus.postgres.domain.UserConfig;
-import com.nautilus.dto.user.RegisterUserDTO;
-import com.nautilus.dto.user.UserInfo;
+import com.nautilus.dto.user.RegisterUserDto;
+import com.nautilus.node.UserNode;
+import com.nautilus.service.DataService;
 import com.nautilus.service.file.FileUtil;
-import com.nautilus.postgres.services.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -38,7 +36,7 @@ public class UserController {
 
     public final static String USER_CAR_MAPPING = "/cars";
 
-    private final GlobalService service;
+    private final DataService service;
 
     private final JsonPatchUtility patchUtility;
 
@@ -46,54 +44,39 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> info() {
-        UserConfig user = service.findUserConfigByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        UserNode user = service.getUserNodeByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        UserInfo userInfo = UserInfo.builder()
-                .email(user.getEmail())
-                .phoneNumber(user.getPhoneNumber())
-                .userName(user.getName())
-                .userSurname(user.getSurname())
-                .build();
-
-        return new ResponseEntity<>(userInfo, HttpStatus.OK);
+        return new ResponseEntity<>(user.toUserInfoDto(), HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> register(@RequestBody @Valid RegisterUserDTO registerDTO) {
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterUserDto registerDto) {
         Set<RegisterStatus> statuses = new HashSet<>();
-
-        if (!service.checkEmailIsFree(registerDTO.getEmail())) {
+        if (!service.checkEmailIsFree(registerDto.getEmail())) {
             statuses.add(RegisterStatus.EMAIL_NOT_FREE);
         }
-
-        if (!service.checkPhoneNumberIsFree(registerDTO.getPhoneNumber())) {
+        if (!service.checkPhoneNumberIsFree(registerDto.getPhoneNumber())) {
             statuses.add(RegisterStatus.PHONE_NUMBER_NOT_FREE);
         }
-
         if (!statuses.isEmpty()) {
             return new ResponseEntity<>(statuses, HttpStatus.NOT_ACCEPTABLE);
         }
-
-        UserConfig user = new UserConfig(registerDTO);
-        user.setAuthorities(Authorities.USER);
-        service.save(user);
-
+        service.save(new UserNode(registerDto));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.PATCH)
     public ResponseEntity<?> update(@RequestBody String updateBody) {
-        UserConfig user = service.findUserConfigByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        UserNode user = service.getUserNodeByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         if (user == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
         try {
-            UserConfig mergedUser = (UserConfig) patchUtility.patch(updateBody, user).get();
-            service.update(mergedUser);
+            UserNode mergedUser = (UserNode) patchUtility.patch(updateBody, user).get();
+            service.save(mergedUser);
             return new ResponseEntity(HttpStatus.OK);
         } catch (IOException e) {
             logger.error("Unexpected: ", e);
@@ -105,25 +88,22 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity<?> delete(){
-        UserConfig user = service.findUserConfigByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+    public ResponseEntity<?> delete() {
+        UserNode user = service.getUserNodeByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         if (user == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-
-        service.delete(user);
-        fileUtil.delete(user.getUserId());
-
+        service.deleteUserById(user.getId());
+        fileUtil.delete(user.getId());
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(value = USER_CAR_MAPPING, method = RequestMethod.GET)
     public ResponseEntity<?> userCars() {
-        UserConfig user = service.findUserConfigByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        UserNode user = service.getUserNodeByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
         return new ResponseEntity<>(user.getCars(), HttpStatus.OK);
     }
 }

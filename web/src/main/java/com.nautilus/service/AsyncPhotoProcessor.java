@@ -1,6 +1,5 @@
 package com.nautilus.service;
 
-import com.nautilus.postgres.services.GlobalService;
 import lombok.RequiredArgsConstructor;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +23,7 @@ import static com.nautilus.service.file.FileUtilImpl.MICRO_FOLDER_NAME;
 @RequiredArgsConstructor
 public class AsyncPhotoProcessor {
 
-    private final GlobalService service;
+    private final DataService service;
 
     @Value("${photos.path}")
     private String mainFolder;
@@ -80,7 +79,7 @@ public class AsyncPhotoProcessor {
     }
 
     private String createPath(String beaconId, String postfix) {
-        Long userId = service.getUserIdConfigBeaconId(beaconId);
+        Long userId = service.getUserIdByBeaconId(beaconId);
 
         StringBuilder builder = new StringBuilder();
         builder.append(mainFolder)

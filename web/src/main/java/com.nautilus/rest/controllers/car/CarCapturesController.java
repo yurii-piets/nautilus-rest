@@ -1,12 +1,11 @@
 package com.nautilus.rest.controllers.car;
 
 import com.nautilus.constants.CarStatus;
-import com.nautilus.postgres.domain.Car;
-import com.nautilus.postgres.domain.CarLocation;
-import com.nautilus.postgres.domain.CarStatusSnapshot;
-import com.nautilus.dto.car.CarStatusDTO;
+import com.nautilus.dto.car.CarStatusSnapshotDto;
+import com.nautilus.node.CarNode;
+import com.nautilus.node.CarStatusSnapshotNode;
 import com.nautilus.service.AuthorizationService;
-import com.nautilus.postgres.services.GlobalService;
+import com.nautilus.service.DataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,22 +26,21 @@ public class CarCapturesController {
 
     public final static String CAR_FOUND_MAPPING = "/car";
 
-    private final GlobalService service;
+    private final DataService service;
 
     private final AuthorizationService authorizationService;
 
     @RequestMapping(value = "/captures/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> captures(@PathVariable String beaconId) {
         authorizationService.hasAccessByBeaconId(beaconId);
-
-        Car car = service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
         return new ResponseEntity<>(car.getStatusSnapshots(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/capture/{beaconId}", method = RequestMethod.POST)
     public ResponseEntity<?> capture(
             @PathVariable String beaconId,
-            @RequestBody @Valid CarStatusDTO carStatusDTO) {
+            @RequestBody @Valid CarStatusSnapshotDto carStatusSnapshotDto) {
 
         CarStatus status = service.getCarStatusByCarBeaconId(beaconId);
         if (status == null) {
@@ -50,20 +48,14 @@ public class CarCapturesController {
         }
 
         if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {
-            CarLocation carLocation = new CarLocation(carStatusDTO);
-            service.save(carLocation);
-
-            Car car = service.findCarByBeaconId(beaconId);
-            CarStatusSnapshot carStatusSnapshot = CarStatusSnapshot.builder()
-                    .carLocation(carLocation)
+            CarNode car = service.getCarNodeByBeaconId(beaconId);
+            CarStatusSnapshotNode carStatusSnapshot = CarStatusSnapshotNode.builder()
                     .car(car)
-                    .captureTime(carStatusDTO.getCaptureTime())
+                    .carLocation(carStatusSnapshotDto.getLocation())
+                    .time(carStatusSnapshotDto.getCaptureTime())
                     .build();
 
             service.save(carStatusSnapshot);
-
-            car.getStatusSnapshots().add(carStatusSnapshot);
-            service.save(car);
         }
 
         return new ResponseEntity<>(status, HttpStatus.OK);

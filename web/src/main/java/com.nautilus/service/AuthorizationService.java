@@ -1,16 +1,15 @@
 package com.nautilus.service;
 
-import com.nautilus.postgres.services.GlobalService;
+import com.nautilus.exception.IllegalAccessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import com.nautilus.exception.IllegalAccessException;
 
 @Service
 @RequiredArgsConstructor
 public class AuthorizationService {
 
-    private final GlobalService globalService;
+    private final DataService dataService;
 
     public void hasAccessByBeaconId(String beaconId) {
         if(!checkAccessByBeaconId(beaconId)){
@@ -20,7 +19,7 @@ public class AuthorizationService {
     }
 
     private boolean checkAccessByBeaconId(String beaconId) {
-        String email = globalService.findEmailByBeaconId(beaconId);
+        String email = dataService.getEmailByBeaconId(beaconId);
         if (email == null) {
             return false;
         }

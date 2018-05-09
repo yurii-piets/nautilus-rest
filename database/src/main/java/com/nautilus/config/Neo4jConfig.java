@@ -28,7 +28,7 @@ public class Neo4jConfig {
 
     @Bean
     public SessionFactory sessionFactory() {
-        return new SessionFactory(configuration(), "com.nautilus.domain");
+        return new SessionFactory(configuration(), "com.nautilus.node");
     }
 
     @Bean

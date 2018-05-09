@@ -1,6 +1,7 @@
 package com.nautilus.config;
 
 import com.nautilus.algorithm.MD5;
+import com.nautilus.security.CustomerUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,11 +11,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -30,8 +31,6 @@ import static com.nautilus.rest.controllers.user.UserController.USER_MAPPING;
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final DataSource dataSource;
-
     private final static String[] AUTHENTICATED_MAPPINGS = new String[]{
             USER_MAPPING,
             USER_MAPPING + "/**",
@@ -43,34 +42,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             CAR_PHOTOS_MAPPING + "/**",
             CAR_FOUND_MAPPING,
             CAR_FOUND_MAPPING + "/**",
+            "/actuator/**",
             INDEX_MAPPING
     };
-
-    private final static String[] PERMIT_ALL_MAPPINGS = new String[]{
-
-    };
-
-    private static final String DEF_USERS_BY_EMAIL_QUERY =
-            "SELECT email, password, enabled "
-                    + "FROM userconfig "
-                    + "WHERE email = ?";
-
-    private static final String DEF_AUTHORITIES_BY_USERNAME_QUERY =
-            "SELECT email, authorities "
-                    + "FROM userconfig "
-                    + "WHERE email = ?";
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .jdbcAuthentication()
-                .dataSource(dataSource)
-                .usersByUsernameQuery(DEF_USERS_BY_EMAIL_QUERY)
-                .authoritiesByUsernameQuery(DEF_AUTHORITIES_BY_USERNAME_QUERY)
+                .userDetailsService(neo4jUserDetails())
                 .passwordEncoder(new MD5())
             .and()
                 .inMemoryAuthentication()
                 .withUser("actuator").password("actuator").roles("ACTUATOR");
+    }
+
+    @Bean
+    public UserDetailsService neo4jUserDetails() {
+        return new CustomerUserDetailsService();
     }
 
     @Override
@@ -79,9 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, USER_MAPPING).permitAll()
                 .antMatchers(AUTHENTICATED_MAPPINGS).authenticated()
-                .antMatchers("/actuator/**").authenticated()
-                .antMatchers(PERMIT_ALL_MAPPINGS).permitAll()
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
             .and()
                 .httpBasic()
             .and()

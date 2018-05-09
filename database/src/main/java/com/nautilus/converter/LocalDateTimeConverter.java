@@ -1,4 +1,4 @@
-package com.nautilus.domain.converter;
+package com.nautilus.converter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

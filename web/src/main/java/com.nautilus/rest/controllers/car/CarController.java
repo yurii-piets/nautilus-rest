@@ -1,13 +1,12 @@
 package com.nautilus.rest.controllers.car;
 
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.nautilus.constants.CarStatus;
-import com.nautilus.postgres.domain.Car;
-import com.nautilus.postgres.domain.UserConfig;
-import com.nautilus.dto.car.CarRegisterDTO;
+import com.nautilus.dto.car.CarRegisterDto;
+import com.nautilus.node.CarNode;
+import com.nautilus.node.UserNode;
 import com.nautilus.service.AuthorizationService;
+import com.nautilus.service.DataService;
 import com.nautilus.service.file.FileUtil;
-import com.nautilus.postgres.services.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.HashSet;
 
 import static com.nautilus.rest.controllers.car.CarController.CAR_MAPPING;
 
@@ -36,7 +34,7 @@ public class CarController {
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
-    private final GlobalService service;
+    private final DataService service;
 
     private final JsonPatchUtility patchUtility;
 
@@ -46,42 +44,30 @@ public class CarController {
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> info(@PathVariable String beaconId) {
-        Car car = service.findCarByBeaconId(beaconId);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
         return new ResponseEntity<>(car, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/status/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> status(@PathVariable String beaconId) {
-        Car car = service.findCarByBeaconId(beaconId);
-
-        return new ResponseEntity<>(car.getStatus(), HttpStatus.OK);
+        return new ResponseEntity<>(service.getCarStatusByCarBeaconId(beaconId), HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> register(@RequestBody @Valid CarRegisterDTO carRegisterDTO) {
-        UserConfig user = service.findUserConfigByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+    public ResponseEntity<?> register(@RequestBody @Valid CarRegisterDto carRegisterDto) {
+        UserNode user = service.getUserNodeByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         if (user == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
-        Car duplicatedCar = service.findCarByBeaconIdOrRegisterNumber(carRegisterDTO.getBeaconId(), carRegisterDTO.getRegisterNumber());
+        CarNode duplicatedCar = service.getCarNodeByBeaconIdOrRegisterNumber(carRegisterDto.getBeaconId(), carRegisterDto.getRegisterNumber());
         if (duplicatedCar != null) {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
-        Car car = new Car(carRegisterDTO);
-
-        car.setOwner(user);
-        car.setStatus(CarStatus.TESTING);
-
+        CarNode car = new CarNode(carRegisterDto, user);
         user.getCars().add(car);
-
-        service.save(car);
-
-        service.save(new HashSet<UserConfig>() {{
-            add(user);
-        }});
-
+        service.save(user);
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -97,12 +83,12 @@ public class CarController {
         authorizationService.hasAccessByBeaconId(beaconId);
 
         try {
-            Car car = service.findCarByBeaconId(beaconId);
-            Car mergedCar = (Car) patchUtility.patch(updateBody, car).get();
+            CarNode car = service.getCarNodeByBeaconId(beaconId);
+            CarNode mergedCar = (CarNode) patchUtility.patch(updateBody, car).get();
             mergedCar.setOwner(car.getOwner());
             mergedCar.setStatusSnapshots(car.getStatusSnapshots());
-            mergedCar.setCarId(car.getCarId());
-            service.update(mergedCar);
+            mergedCar.setId(car.getId());
+            service.save(mergedCar);
         } catch (IOException e) {
             logger.error("Unexpected: ", e);
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -118,8 +104,8 @@ public class CarController {
     public ResponseEntity delete(@PathVariable String beaconId) {
         authorizationService.hasAccessByBeaconId(beaconId);
 
-        Car car = service.findCarByBeaconId(beaconId);
-        service.delete(car);
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        service.deleteCarById(car.getId());
         fileUtil.delete(car.getBeaconId());
 
         return new ResponseEntity<>(HttpStatus.OK);

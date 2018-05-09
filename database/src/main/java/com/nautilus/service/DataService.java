@@ -1,9 +1,9 @@
 package com.nautilus.service;
 
 import com.nautilus.constants.CarStatus;
-import com.nautilus.domain.CarNode;
-import com.nautilus.domain.CarStatusSnapshotNode;
-import com.nautilus.domain.UserNode;
+import com.nautilus.node.CarNode;
+import com.nautilus.node.CarStatusSnapshotNode;
+import com.nautilus.node.UserNode;
 import com.nautilus.exception.WrongBeaconIdException;
 import com.nautilus.repository.CarRepository;
 import com.nautilus.repository.CarStatusSnapshotRepository;
@@ -85,5 +85,13 @@ public class DataService {
 
     public UserNode getUserNodeByEmail(String email) {
         return userRepository.findUserNodeByEmail(email);
+    }
+
+    public CarNode getCarNodeByBeaconId(String beaconId) {
+        return carRepository.findCarNodeByBeaconId(beaconId);
+    }
+
+    public CarNode getCarNodeByBeaconIdOrRegisterNumber(String beaconId, String registerNumber) {
+        return carRepository.findCarNodeByBeaconIdOrRegisterNumber(beaconId, registerNumber);
     }
 }

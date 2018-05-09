@@ -2,7 +2,7 @@ package com.nautilus.postgres.domain;
 
 import com.nautilus.algorithm.MD5;
 import com.nautilus.constants.Authorities;
-import com.nautilus.dto.user.RegisterUserDTO;
+import com.nautilus.dto.user.RegisterUserDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class UserConfig {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
     private Set<Car> cars;
 
-    public UserConfig(RegisterUserDTO registerDTO) {
+    public UserConfig(RegisterUserDto registerDTO) {
         this.name = registerDTO.getUserName();
         this.surname = registerDTO.getUserSurname();
         this.phoneNumber = registerDTO.getPhoneNumber();

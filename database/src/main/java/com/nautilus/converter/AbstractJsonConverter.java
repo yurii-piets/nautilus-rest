@@ -1,4 +1,4 @@
-package com.nautilus.domain.converter;
+package com.nautilus.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
