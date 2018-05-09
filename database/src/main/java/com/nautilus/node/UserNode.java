@@ -1,7 +1,7 @@
 package com.nautilus.node;
 
 import com.nautilus.algorithm.MD5;
-import com.nautilus.constants.Authorities;
+import com.nautilus.dto.constants.Authorities;
 import com.nautilus.dto.user.RegisterUserDto;
 import com.nautilus.dto.user.UserInfoDto;
 import lombok.Data;

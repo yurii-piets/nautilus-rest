@@ -1,3 +1,4 @@
 dependencies  {
+    compile project(':common')
     compile 'org.springframework.data:spring-data-neo4j:5.0.7.RELEASE'
 }

@@ -1,2 +1,3 @@
 include ':database'
+include ':common'
 include ':data-processing-microservice'

@@ -1,6 +1,6 @@
 package com.nautilus.service;
 
-import com.nautilus.constants.CarStatus;
+import com.nautilus.dto.constants.CarStatus;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.CarStatusSnapshotNode;
 import com.nautilus.node.UserNode;

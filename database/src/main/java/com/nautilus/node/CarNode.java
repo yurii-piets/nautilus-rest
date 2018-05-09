@@ -1,6 +1,6 @@
 package com.nautilus.node;
 
-import com.nautilus.constants.CarStatus;
+import com.nautilus.dto.constants.CarStatus;
 import com.nautilus.dto.car.CarRegisterDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

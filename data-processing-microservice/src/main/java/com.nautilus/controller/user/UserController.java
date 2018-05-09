@@ -1,7 +1,7 @@
 package com.nautilus.controller.user;
 
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.nautilus.constants.RegisterError;
+import com.nautilus.dto.constants.RegisterError;
 import com.nautilus.dto.user.RegisterUserDto;
 import com.nautilus.node.UserNode;
 import com.nautilus.service.DataService;

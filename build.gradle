@@ -20,7 +20,6 @@ subprojects {
     }
 
     dependencies {
-        compile 'com.nautilus:nautilus-common:0.0.1-SNAPSHOT'
         compile 'org.projectlombok:lombok:1.16.20'
         compile 'com.github.fge:json-patch:1.9'
         compile 'org.apache.ant:ant:1.8.2'

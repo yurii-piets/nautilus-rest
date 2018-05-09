@@ -1,6 +1,6 @@
 package com.nautilus.controller.car;
 
-import com.nautilus.constants.CarStatus;
+import com.nautilus.dto.constants.CarStatus;
 import com.nautilus.dto.car.CarStatusSnapshotDto;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.CarStatusSnapshotNode;
