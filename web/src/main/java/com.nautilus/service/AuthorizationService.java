@@ -1,6 +1,6 @@
 package com.nautilus.service;
 
-import com.nautilus.services.GlobalService;
+import com.nautilus.postgres.services.GlobalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

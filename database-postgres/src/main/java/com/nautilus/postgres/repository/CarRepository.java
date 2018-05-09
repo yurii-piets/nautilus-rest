@@ -1,8 +1,7 @@
-package com.nautilus.repository;
+package com.nautilus.postgres.repository;
 
-import com.nautilus.domain.Car;
+import com.nautilus.postgres.domain.Car;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository

@@ -1,4 +1,4 @@
-package com.nautilus.domain;
+package com.nautilus.postgres.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nautilus.constants.CarStatus;

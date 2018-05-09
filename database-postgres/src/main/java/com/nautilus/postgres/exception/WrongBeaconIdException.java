@@ -1,4 +1,4 @@
-package com.nautilus.exception;
+package com.nautilus.postgres.exception;
 
 public class WrongBeaconIdException extends RuntimeException {
 

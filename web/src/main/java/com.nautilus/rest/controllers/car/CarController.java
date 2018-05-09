@@ -2,12 +2,12 @@ package com.nautilus.rest.controllers.car;
 
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.nautilus.constants.CarStatus;
-import com.nautilus.domain.Car;
-import com.nautilus.domain.UserConfig;
+import com.nautilus.postgres.domain.Car;
+import com.nautilus.postgres.domain.UserConfig;
 import com.nautilus.dto.car.CarRegisterDTO;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.file.FileUtil;
-import com.nautilus.services.GlobalService;
+import com.nautilus.postgres.services.GlobalService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;

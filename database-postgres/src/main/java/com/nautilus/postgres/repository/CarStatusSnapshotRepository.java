@@ -1,6 +1,6 @@
-package com.nautilus.repository;
+package com.nautilus.postgres.repository;
 
-import com.nautilus.domain.CarStatusSnapshot;
+import com.nautilus.postgres.domain.CarStatusSnapshot;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

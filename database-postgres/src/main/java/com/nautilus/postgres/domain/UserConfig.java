@@ -1,4 +1,4 @@
-package com.nautilus.domain;
+package com.nautilus.postgres.domain;
 
 import com.nautilus.algorithm.MD5;
 import com.nautilus.constants.Authorities;

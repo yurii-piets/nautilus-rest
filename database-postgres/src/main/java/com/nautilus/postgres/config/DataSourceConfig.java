@@ -1,4 +1,4 @@
-package com.nautilus.config;
+package com.nautilus.postgres.config;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -25,8 +25,8 @@ import javax.sql.DataSource;
 @PropertySource("classpath:database.properties")
 public class DataSourceConfig {
 
-    static final String PACKAGE_TO_SCAN_REPOSITORIES = "com.nautilus.repository";
-    private static final String PACKAGE_TO_SCAN_ENTITIES = "com.nautilus.domain";
+    static final String PACKAGE_TO_SCAN_REPOSITORIES = "com.nautilus.postgres.repository";
+    private static final String PACKAGE_TO_SCAN_ENTITIES = "com.nautilus.postgres.domain";
 
     private static final String PROPERTY_DATASOURCE_DRIVER_CLASS_NAME = "datasource.driver-class-name";
     private static final String PROPERTY_DATASOURCE_URL = "datasource.url";

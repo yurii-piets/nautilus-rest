@@ -2,7 +2,7 @@ package com.nautilus.rest.controllers.car;
 
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.file.FileUtil;
-import com.nautilus.services.GlobalService;
+import com.nautilus.postgres.services.GlobalService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

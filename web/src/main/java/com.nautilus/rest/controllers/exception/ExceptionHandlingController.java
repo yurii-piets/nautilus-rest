@@ -3,7 +3,7 @@ package com.nautilus.rest.controllers.exception;
 import com.nautilus.exception.FileNotDeletedException;
 import com.nautilus.exception.IllegalAccessException;
 import com.nautilus.exception.OverLimitNumberOfFilesException;
-import com.nautilus.exception.WrongBeaconIdException;
+import com.nautilus.postgres.exception.WrongBeaconIdException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

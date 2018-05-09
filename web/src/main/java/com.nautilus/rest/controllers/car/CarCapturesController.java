@@ -1,12 +1,12 @@
 package com.nautilus.rest.controllers.car;
 
 import com.nautilus.constants.CarStatus;
-import com.nautilus.domain.Car;
-import com.nautilus.domain.CarLocation;
-import com.nautilus.domain.CarStatusSnapshot;
+import com.nautilus.postgres.domain.Car;
+import com.nautilus.postgres.domain.CarLocation;
+import com.nautilus.postgres.domain.CarStatusSnapshot;
 import com.nautilus.dto.car.CarStatusDTO;
 import com.nautilus.service.AuthorizationService;
-import com.nautilus.services.GlobalService;
+import com.nautilus.postgres.services.GlobalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

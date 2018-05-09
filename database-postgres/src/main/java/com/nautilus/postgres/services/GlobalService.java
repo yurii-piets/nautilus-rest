@@ -1,15 +1,15 @@
-package com.nautilus.services;
+package com.nautilus.postgres.services;
 
 import com.nautilus.constants.CarStatus;
-import com.nautilus.domain.Car;
-import com.nautilus.domain.CarLocation;
-import com.nautilus.domain.CarStatusSnapshot;
-import com.nautilus.domain.UserConfig;
-import com.nautilus.exception.WrongBeaconIdException;
-import com.nautilus.repository.CarLocationRepository;
-import com.nautilus.repository.CarRepository;
-import com.nautilus.repository.CarStatusSnapshotRepository;
-import com.nautilus.repository.UserRepository;
+import com.nautilus.postgres.domain.Car;
+import com.nautilus.postgres.domain.CarLocation;
+import com.nautilus.postgres.domain.CarStatusSnapshot;
+import com.nautilus.postgres.domain.UserConfig;
+import com.nautilus.postgres.exception.WrongBeaconIdException;
+import com.nautilus.postgres.repository.CarLocationRepository;
+import com.nautilus.postgres.repository.CarRepository;
+import com.nautilus.postgres.repository.CarStatusSnapshotRepository;
+import com.nautilus.postgres.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
