@@ -1,4 +1,4 @@
-package com.nautilus.rest.controllers.car;
+package com.nautilus.controller.car;
 
 import com.nautilus.exception.WrongBeaconIdException;
 import com.nautilus.node.CarNode;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.nautilus.rest.controllers.car.CarPhotosController.CAR_PHOTOS_MAPPING;
+import static com.nautilus.controller.car.CarPhotosController.CAR_PHOTOS_MAPPING;
 
 @RestController
 @RequestMapping(path = CAR_PHOTOS_MAPPING)

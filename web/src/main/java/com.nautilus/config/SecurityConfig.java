@@ -19,12 +19,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.nautilus.rest.controllers.IndexController.INDEX_MAPPING;
-import static com.nautilus.rest.controllers.car.CarCapturesController.CAR_FOUND_MAPPING;
-import static com.nautilus.rest.controllers.car.CarController.CAR_MAPPING;
-import static com.nautilus.rest.controllers.car.CarPhotosController.CAR_PHOTOS_MAPPING;
-import static com.nautilus.rest.controllers.user.UserController.USER_CAR_MAPPING;
-import static com.nautilus.rest.controllers.user.UserController.USER_MAPPING;
+import static com.nautilus.controller.IndexController.INDEX_MAPPING;
+import static com.nautilus.controller.car.CarCapturesController.CAR_FOUND_MAPPING;
+import static com.nautilus.controller.car.CarController.CAR_MAPPING;
+import static com.nautilus.controller.car.CarPhotosController.CAR_PHOTOS_MAPPING;
+import static com.nautilus.controller.user.UserController.USER_CAR_MAPPING;
+import static com.nautilus.controller.user.UserController.USER_MAPPING;
 
 @Configuration
 @EnableWebSecurity

@@ -1,4 +1,4 @@
-package com.nautilus.rest.controllers.car;
+package com.nautilus.controller.car;
 
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.nautilus.dto.car.CarRegisterDto;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.io.IOException;
 
-import static com.nautilus.rest.controllers.car.CarController.CAR_MAPPING;
+import static com.nautilus.controller.car.CarController.CAR_MAPPING;
 
 @RestController
 @RequestMapping(path = CAR_MAPPING)

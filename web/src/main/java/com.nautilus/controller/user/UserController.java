@@ -1,7 +1,7 @@
-package com.nautilus.rest.controllers.user;
+package com.nautilus.controller.user;
 
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.nautilus.constants.RegisterStatus;
+import com.nautilus.constants.RegisterError;
 import com.nautilus.dto.user.RegisterUserDto;
 import com.nautilus.node.UserNode;
 import com.nautilus.service.DataService;
@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.nautilus.rest.controllers.user.UserController.USER_MAPPING;
+import static com.nautilus.controller.user.UserController.USER_MAPPING;
 
 @RestController
 @RequestMapping(path = USER_MAPPING)
@@ -53,12 +53,12 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> register(@RequestBody @Valid RegisterUserDto registerDto) {
-        Set<RegisterStatus> statuses = new HashSet<>();
+        Set<RegisterError> statuses = new HashSet<>();
         if (!service.checkEmailIsFree(registerDto.getEmail())) {
-            statuses.add(RegisterStatus.EMAIL_NOT_FREE);
+            statuses.add(RegisterError.EMAIL_NOT_FREE);
         }
         if (!service.checkPhoneNumberIsFree(registerDto.getPhoneNumber())) {
-            statuses.add(RegisterStatus.PHONE_NUMBER_NOT_FREE);
+            statuses.add(RegisterError.PHONE_NUMBER_NOT_FREE);
         }
         if (!statuses.isEmpty()) {
             return new ResponseEntity<>(statuses, HttpStatus.NOT_ACCEPTABLE);

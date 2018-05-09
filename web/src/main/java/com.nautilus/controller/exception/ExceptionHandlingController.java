@@ -1,4 +1,4 @@
-package com.nautilus.rest.controllers.exception;
+package com.nautilus.controller.exception;
 
 import com.nautilus.exception.FileNotDeletedException;
 import com.nautilus.exception.IllegalAccessException;

@@ -1,4 +1,4 @@
-package com.nautilus.rest.controllers.car;
+package com.nautilus.controller.car;
 
 import com.nautilus.constants.CarStatus;
 import com.nautilus.dto.car.CarStatusSnapshotDto;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static com.nautilus.rest.controllers.car.CarCapturesController.CAR_FOUND_MAPPING;
+import static com.nautilus.controller.car.CarCapturesController.CAR_FOUND_MAPPING;
 
 @RestController
 @RequestMapping(value = CAR_FOUND_MAPPING)

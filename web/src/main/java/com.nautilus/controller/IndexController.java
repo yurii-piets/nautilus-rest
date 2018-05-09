@@ -1,4 +1,4 @@
-package com.nautilus.rest.controllers;
+package com.nautilus.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.nautilus.rest.controllers.IndexController.INDEX_MAPPING;
+import static com.nautilus.controller.IndexController.INDEX_MAPPING;
 
 @RestController
 @RequestMapping(value = INDEX_MAPPING)

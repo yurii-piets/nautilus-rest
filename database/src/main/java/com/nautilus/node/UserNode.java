@@ -83,10 +83,10 @@ public class UserNode implements UserDetails {
 
     public UserInfoDto toUserInfoDto(){
         return UserInfoDto.builder()
-                .email(this.email)
-                .phoneNumber(this.phoneNumber)
-                .name(this.name)
-                .surname(this.surname)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .name(name)
+                .surname(surname)
                 .build();
     }
 }
