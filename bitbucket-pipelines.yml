@@ -4,4 +4,5 @@ pipelines:
   default:
     - step:
         script:
-          - gradle clean build
+          - chmod +x ./gradlew
+          - ./gradlew clean build test
