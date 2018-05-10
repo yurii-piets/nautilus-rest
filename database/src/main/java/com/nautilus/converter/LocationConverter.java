@@ -1,6 +1,7 @@
 package com.nautilus.converter;
 
-import javax.xml.stream.Location;
+import com.nautilus.dto.car.Location;
+
 import java.io.IOException;
 
 public class LocationConverter extends AbstractJsonConverter<Location> {

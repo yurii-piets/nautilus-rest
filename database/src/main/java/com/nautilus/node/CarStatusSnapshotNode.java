@@ -1,7 +1,7 @@
 package com.nautilus.node;
 
-import com.nautilus.converter.LocalDateTimeConverter;
 import com.nautilus.converter.LocationConverter;
+import com.nautilus.dto.car.CarStatusSnapshotDto;
 import com.nautilus.dto.car.Location;
 import lombok.Builder;
 import lombok.Data;
@@ -29,13 +29,16 @@ public class CarStatusSnapshotNode {
     @Relationship(type = "CAR")
     private CarNode car;
 
-    @Convert(LocalDateTimeConverter.class)
-    private LocalDateTime time;
+    private LocalDateTime captureTime;
 
     @Builder
-    public CarStatusSnapshotNode(Location carLocation, CarNode car, LocalDateTime time) {
+    public CarStatusSnapshotNode(Location carLocation, CarNode car, LocalDateTime captureTime) {
         this.carLocation = carLocation;
         this.car = car;
-        this.time = time;
+        this.captureTime = captureTime;
+    }
+
+    public CarStatusSnapshotDto toCarStatusSnapshotDto() {
+        return new CarStatusSnapshotDto(carLocation, captureTime);
     }
 }

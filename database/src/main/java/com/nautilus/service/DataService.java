@@ -1,16 +1,20 @@
 package com.nautilus.service;
 
 import com.nautilus.dto.constants.CarStatus;
+import com.nautilus.exception.WrongBeaconIdException;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.CarStatusSnapshotNode;
 import com.nautilus.node.UserNode;
-import com.nautilus.exception.WrongBeaconIdException;
 import com.nautilus.repository.CarRepository;
 import com.nautilus.repository.CarStatusSnapshotRepository;
 import com.nautilus.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -91,6 +95,22 @@ public class DataService {
 
     public CarNode getCarNodeByBeaconId(String beaconId) {
         return carRepository.findCarNodeByBeaconId(beaconId);
+    }
+
+    public Iterable<CarStatusSnapshotNode> getCarStatusSnapshotBeBeaconId(String beaconId) {
+        CarNode carNode = carRepository.findCarNodeByBeaconId(beaconId);
+        if (carNode == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
+        if (carNode.getStatusSnapshots() == null) {
+            return Collections.emptySet();
+        }
+
+        Set<Long> snapshotIds = carNode.getStatusSnapshots()
+                .stream()
+                .map(CarStatusSnapshotNode::getId)
+                .collect(Collectors.toSet());
+        return carStatusSnapshotRepository.findAllById(snapshotIds);
     }
 
     public CarNode getCarNodeByBeaconIdOrRegisterNumber(String beaconId, String registerNumber) {

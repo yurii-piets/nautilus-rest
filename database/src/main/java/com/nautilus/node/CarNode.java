@@ -1,6 +1,7 @@
 package com.nautilus.node;
 
 import com.nautilus.dto.car.CarDto;
+import com.nautilus.dto.car.CarStatusSnapshotDto;
 import com.nautilus.dto.constants.CarStatus;
 import com.nautilus.dto.car.CarRegisterDto;
 import lombok.Data;
@@ -12,7 +13,9 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @NodeEntity
@@ -70,5 +73,14 @@ public class CarNode {
                 .description(description)
                 .status(status)
                 .build();
+    }
+
+    public Set<CarStatusSnapshotDto> mapCarStatusSnapshotsToDto(){
+        if(statusSnapshots == null){
+            return Collections.emptySet();
+        }
+        return statusSnapshots.stream()
+                .map(CarStatusSnapshotNode::toCarStatusSnapshotDto)
+                .collect(Collectors.toSet());
     }
 }

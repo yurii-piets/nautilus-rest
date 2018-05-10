@@ -1,6 +1,5 @@
 package com.nautilus.controller.car;
 
-import com.nautilus.dto.constants.CarStatus;
 import com.nautilus.dto.car.CarStatusSnapshotDto;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.CarStatusSnapshotNode;
@@ -16,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.nautilus.controller.car.CarCapturesController.CAR_FOUND_MAPPING;
 
@@ -33,8 +35,11 @@ public class CarCapturesController {
     @RequestMapping(value = "/captures/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> captures(@PathVariable String beaconId) {
         authorizationService.hasAccessByBeaconId(beaconId);
-        CarNode car = service.getCarNodeByBeaconId(beaconId);
-        return new ResponseEntity<>(car.getStatusSnapshots(), HttpStatus.OK);
+        Iterable<CarStatusSnapshotNode> carStatusSnapshotBeBeaconId = service.getCarStatusSnapshotBeBeaconId(beaconId);
+        Set<CarStatusSnapshotDto> carStatusSnapshotDtos = StreamSupport.stream(carStatusSnapshotBeBeaconId.spliterator(), false)
+                .map(CarStatusSnapshotNode::toCarStatusSnapshotDto)
+                .collect(Collectors.toSet());
+        return new ResponseEntity<>(carStatusSnapshotDtos, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/capture/{beaconId}", method = RequestMethod.POST)
@@ -42,22 +47,24 @@ public class CarCapturesController {
             @PathVariable String beaconId,
             @RequestBody @Valid CarStatusSnapshotDto carStatusSnapshotDto) {
 
-        CarStatus status = service.getCarStatusByCarBeaconId(beaconId);
-        if (status == null) {
-            status = CarStatus.TESTING;
+        CarNode car = service.getCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        if (status.equals(CarStatus.TESTING) || status.equals(CarStatus.STOLEN)) {
-            CarNode car = service.getCarNodeByBeaconId(beaconId);
-            CarStatusSnapshotNode carStatusSnapshot = CarStatusSnapshotNode.builder()
-                    .car(car)
-                    .carLocation(carStatusSnapshotDto.getLocation())
-                    .time(carStatusSnapshotDto.getCaptureTime())
-                    .build();
+        CarStatusSnapshotNode carStatusSnapshot = CarStatusSnapshotNode.builder()
+                .car(car)
+                .carLocation(carStatusSnapshotDto.getLocation())
+                .captureTime(carStatusSnapshotDto.getCaptureTime())
+                .build();
 
-            service.save(carStatusSnapshot);
+        if (car.getStatusSnapshots() == null) {
+            car.setStatusSnapshots(Set.of(carStatusSnapshot));
+        } else {
+            car.getStatusSnapshots().add(carStatusSnapshot);
         }
+        service.save(car);
 
-        return new ResponseEntity<>(status, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
