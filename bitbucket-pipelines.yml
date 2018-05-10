@@ -1,0 +1,8 @@
+image: qlik/gradle
+
+pipelines:
+  default:
+    - step:
+        script:
+          - chmod +x ./gradlew
+          - ./gradlew clean build test
