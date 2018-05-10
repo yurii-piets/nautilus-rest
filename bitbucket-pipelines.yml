@@ -1,8 +1,10 @@
-image: qlik/gradle
+image: java:10
 
 pipelines:
   default:
     - step:
+        caches:
+          - gradle
         script:
           - chmod +x ./gradlew
-          - ./gradlew clean build test
+          - bash ./gradlew clean build test
