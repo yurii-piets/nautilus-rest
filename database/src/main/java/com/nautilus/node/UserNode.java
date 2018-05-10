@@ -5,7 +5,9 @@ import com.nautilus.dto.constants.Authorities;
 import com.nautilus.dto.user.RegisterUserDto;
 import com.nautilus.dto.user.UserInfoDto;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -19,6 +21,8 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @NodeEntity
+@ToString(exclude = "cars")
+@EqualsAndHashCode(exclude = "cars")
 public class UserNode implements UserDetails {
 
     @Id

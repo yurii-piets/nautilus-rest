@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class DataService {
 
+    private final static Integer DEFAULT_DEPTH = 2;
+
     private final CarRepository carRepository;
 
     private final CarStatusSnapshotRepository carStatusSnapshotRepository;
@@ -24,15 +26,15 @@ public class DataService {
     private final UserRepository userRepository;
 
     public void save(UserNode user) {
-        userRepository.save(user);
+        userRepository.save(user, DEFAULT_DEPTH);
     }
 
     public void save(CarNode car) {
-        carRepository.save(car);
+        carRepository.save(car, DEFAULT_DEPTH);
     }
 
     public void save(CarStatusSnapshotNode carStatusSnapshot) {
-        carStatusSnapshotRepository.save(carStatusSnapshot);
+        carStatusSnapshotRepository.save(carStatusSnapshot, DEFAULT_DEPTH);
     }
 
     public void deleteUserById(Long id) {

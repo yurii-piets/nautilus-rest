@@ -1,5 +1,6 @@
 package com.nautilus.node;
 
+import com.nautilus.dto.car.CarDto;
 import com.nautilus.dto.constants.CarStatus;
 import com.nautilus.dto.car.CarRegisterDto;
 import lombok.Data;
@@ -56,5 +57,18 @@ public class CarNode {
         this.description = registerDTO.getDescription();
         this.status = CarStatus.OK;
         this.owner = owner;
+    }
+
+    public CarDto toCarDto() {
+        return CarDto.builder()
+                .beaconId(beaconId)
+                .registerNumber(registerNumber)
+                .mark(mark)
+                .model(model)
+                .color(color)
+                .yearOfProduction(yearOfProduction)
+                .description(description)
+                .status(status)
+                .build();
     }
 }

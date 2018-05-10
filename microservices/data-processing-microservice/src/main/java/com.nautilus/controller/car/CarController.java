@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Set;
 
 import static com.nautilus.controller.car.CarController.CAR_MAPPING;
 
@@ -45,7 +46,10 @@ public class CarController {
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> info(@PathVariable String beaconId) {
         CarNode car = service.getCarNodeByBeaconId(beaconId);
-        return new ResponseEntity<>(car, HttpStatus.OK);
+        if(car == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(car.toCarDto(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/status/{beaconId}", method = RequestMethod.GET)
@@ -66,7 +70,11 @@ public class CarController {
         }
 
         CarNode car = new CarNode(carRegisterDto, user);
-        user.getCars().add(car);
+        if(user.getCars() != null){
+            user.getCars().add(car);
+        } else {
+            user.setCars(Set.of(car));
+        }
         service.save(user);
         return new ResponseEntity(HttpStatus.OK);
     }
