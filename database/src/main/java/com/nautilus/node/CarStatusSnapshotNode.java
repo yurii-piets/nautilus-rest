@@ -26,7 +26,7 @@ public class CarStatusSnapshotNode {
     @Convert(LocationConverter.class)
     private Location carLocation;
 
-    @Relationship(type = "CAR")
+    @Relationship(type = "CAPTURE")
     private CarNode car;
 
     private LocalDateTime captureTime;

@@ -47,7 +47,7 @@ public class CarNode {
     @Relationship(type = "IS_BELONG")
     private UserNode owner;
 
-    @Relationship(type = "SNAPSHOTS")
+    @Relationship(type = "SNAPSHOT")
     private Set<CarStatusSnapshotNode> statusSnapshots;
 
     public CarNode(CarRegisterDto registerDTO, UserNode owner){
