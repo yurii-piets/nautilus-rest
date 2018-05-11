@@ -37,10 +37,6 @@ public class DataService {
         carRepository.save(car, DEFAULT_DEPTH);
     }
 
-    public void save(CarStatusSnapshotNode carStatusSnapshot) {
-        carStatusSnapshotRepository.save(carStatusSnapshot, DEFAULT_DEPTH);
-    }
-
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
@@ -94,7 +90,11 @@ public class DataService {
     }
 
     public CarNode getCarNodeByBeaconId(String beaconId) {
-        return carRepository.findCarNodeByBeaconId(beaconId);
+        CarNode car = carRepository.findCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
+        return car;
     }
 
     public Iterable<CarStatusSnapshotNode> getCarStatusSnapshotBeBeaconId(String beaconId) {
@@ -115,5 +115,12 @@ public class DataService {
 
     public CarNode getCarNodeByBeaconIdOrRegisterNumber(String beaconId, String registerNumber) {
         return carRepository.findCarNodeByBeaconIdOrRegisterNumber(beaconId, registerNumber);
+    }
+
+    public void checkIfCarExistByBeaconId(String beaconId) {
+        CarNode car = carRepository.findCarNodeByBeaconId(beaconId);
+        if (car == null) {
+            throw new WrongBeaconIdException("Car with beacon id [" + beaconId + "] does not exist.");
+        }
     }
 }

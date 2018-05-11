@@ -48,9 +48,6 @@ public class CarCapturesController {
             @RequestBody @Valid CarStatusSnapshotDto carStatusSnapshotDto) {
 
         CarNode car = service.getCarNodeByBeaconId(beaconId);
-        if (car == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
 
         CarStatusSnapshotNode carStatusSnapshot = CarStatusSnapshotNode.builder()
                 .car(car)

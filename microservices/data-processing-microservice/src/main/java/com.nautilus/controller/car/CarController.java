@@ -46,9 +46,6 @@ public class CarController {
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> info(@PathVariable String beaconId) {
         CarNode car = service.getCarNodeByBeaconId(beaconId);
-        if(car == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(car.toCarDto(), HttpStatus.OK);
     }
 
