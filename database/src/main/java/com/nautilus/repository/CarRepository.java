@@ -1,12 +1,11 @@
 package com.nautilus.repository;
 
-import com.nautilus.domain.Car;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
+import com.nautilus.node.CarNode;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 
-@Repository
-public interface CarRepository extends JpaRepository<Car, String> {
-    Car findCarByBeaconId(String beaconId);
-    Car findCarByBeaconIdOrRegisterNumber(String beaconId, String registerNumber);
+public interface CarRepository extends Neo4jRepository<CarNode, Long> {
+
+    CarNode findCarNodeByBeaconId(String beaconId);
+
+    CarNode findCarNodeByBeaconIdOrRegisterNumber(String beaconId, String registerNumber);
 }
