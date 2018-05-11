@@ -1,5 +1,6 @@
 package com.nautilus.node;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nautilus.dto.car.CarDto;
 import com.nautilus.dto.car.CarStatusSnapshotDto;
 import com.nautilus.dto.constants.CarStatus;
@@ -44,6 +45,7 @@ public class CarNode {
 
     private CarStatus status;
 
+    @JsonIgnore
     @Relationship(type = "IS_BELONG")
     private UserNode owner;
 

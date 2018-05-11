@@ -4,6 +4,7 @@ import com.nautilus.controller.user.UserController;
 import com.nautilus.dto.car.CarDto;
 import com.nautilus.dto.constants.RegisterError;
 import com.nautilus.dto.user.RegisterUserDto;
+import com.nautilus.dto.user.UserInfoDto;
 import com.nautilus.node.UserNode;
 import com.nautilus.rest.JsonUtil;
 import com.nautilus.service.DataService;
@@ -73,14 +74,14 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void getWhenUserExist() throws Exception {
-        UserNode user = new UserNode();
+        UserInfoDto user = new UserInfoDto();
         user.setEmail(MOCK_USER_EMAIL);
         user.setPhoneNumber("111000222");
         user.setName("Luke");
         user.setSurname("Skywalker");
         String userJson = jsonUtil.json(user);
         when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
-        buildMockUserWithCar();
+
         mockMvc.perform(get(UserController.USER_MAPPING))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(jsonUtil.getContentType()))

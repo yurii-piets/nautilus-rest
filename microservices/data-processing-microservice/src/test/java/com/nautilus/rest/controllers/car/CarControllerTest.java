@@ -8,6 +8,7 @@ import com.nautilus.node.UserNode;
 import com.nautilus.rest.JsonUtil;
 import com.nautilus.service.DataService;
 import com.nautilus.service.file.FileUtil;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,8 +58,8 @@ public class CarControllerTest {
 
     private static UserNode mockUser;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @Before
+    public void before() {
         mockCar = buildMockCar();
         mockUser = buildMockUserConfig();
         mockCar.setOwner(mockUser);
@@ -78,7 +79,7 @@ public class CarControllerTest {
     public void getCarInfo() throws Exception {
         when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar);
 
-        String carJson = jsonUtil.json(mockCar);
+        String carJson = jsonUtil.json(mockCar.toCarDto());
         mockMvc.perform(get(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(jsonUtil.getContentType()))
@@ -88,12 +89,33 @@ public class CarControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void getCarStatusWhenCarIsOk() throws Exception {
-        when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar);
+        when(service.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar.getStatus());
 
         mockMvc.perform(get(CarController.CAR_MAPPING + "/status/" + MOCK_CAR_BEACON_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(jsonUtil.getContentType()))
                 .andExpect(content().json(jsonUtil.json(CarStatus.OK)));
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void getCarStatusWhenCarIsStolen() throws Exception {
+        mockCar.setStatus(CarStatus.STOLEN);
+        when(service.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar.getStatus());
+
+        mockMvc.perform(get(CarController.CAR_MAPPING + "/status/" + MOCK_CAR_BEACON_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().json(jsonUtil.json(CarStatus.STOLEN)));
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void getCarStatusWhenCarIsTesting() throws Exception {
+        mockCar.setStatus(CarStatus.TESTING);
+        when(service.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar.getStatus());
+
+        mockMvc.perform(get(CarController.CAR_MAPPING + "/status/" + MOCK_CAR_BEACON_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().json(jsonUtil.json(CarStatus.TESTING)));
     }
 
     @Test

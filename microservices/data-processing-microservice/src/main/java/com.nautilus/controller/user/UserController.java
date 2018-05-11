@@ -1,8 +1,10 @@
 package com.nautilus.controller.user;
 
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.nautilus.dto.car.CarDto;
 import com.nautilus.dto.constants.RegisterError;
 import com.nautilus.dto.user.RegisterUserDto;
+import com.nautilus.node.CarNode;
 import com.nautilus.node.UserNode;
 import com.nautilus.service.DataService;
 import com.nautilus.service.file.FileUtil;
@@ -20,8 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.nautilus.controller.user.UserController.USER_MAPPING;
 
@@ -104,6 +108,11 @@ public class UserController {
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(user.getCars(), HttpStatus.OK);
+        Set<CarDto> cars = user.getCars() != null
+                ? user.getCars().stream()
+                    .map(CarNode::toCarDto)
+                    .collect(Collectors.toSet())
+                : Collections.emptySet();
+        return new ResponseEntity<>(cars, HttpStatus.OK);
     }
 }
