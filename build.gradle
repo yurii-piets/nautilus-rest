@@ -1,6 +1,6 @@
 allprojects {
     group = 'com.nautilus'
-    version = '0.0.8-SNAPSHOT'
+    version = '0.2.0-SNAPSHOT'
 
     ext {
         applicationName = 'nautilus-rest'
@@ -11,28 +11,23 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
 
-    sourceCompatibility = 1.8
+    sourceCompatibility = 1.10
 
     repositories {
-        mavenLocal()
+        mavenCentral()
         jcenter()
+        maven { url 'https://repo.spring.io/libs-snapshot' }
     }
 
     dependencies {
-        compile 'com.nautilus:nautilus-common:0.0.1-SNAPSHOT'
-        compile 'org.projectlombok:lombok:1.16.20'
-        compile 'org.hibernate:hibernate-core:5.2.9.Final'
+        compile fileTree(dir: '../dependencies', include: '*.jar')
         compile 'com.github.fge:json-patch:1.9'
         compile 'org.apache.ant:ant:1.8.2'
 
         compile 'org.apache.logging.log4j:log4j-core:2.8.2'
         compile 'org.apache.logging.log4j:log4j-api:2.8.2'
 
-        compile 'org.springframework.boot:spring-boot-starter-web:1.5.4.RELEASE'
-
-        compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-        compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
-        compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0'
-        compile group: 'javax.activation', name: 'activation', version: '1.1.1'
+        compile 'org.springframework.boot:spring-boot-starter-web:2.0.1.RELEASE'
+        compile 'org.springframework.boot:spring-boot-starter-security:2.0.1.RELEASE'
     }
 }

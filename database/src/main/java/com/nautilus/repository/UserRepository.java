@@ -1,11 +1,11 @@
 package com.nautilus.repository;
 
-import com.nautilus.domain.UserConfig;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.nautilus.node.UserNode;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 
-@Repository
-public interface UserRepository extends JpaRepository<UserConfig, Long> {
-    UserConfig findUserConfigByEmail(String email);
-    UserConfig findUserConfigByPhoneNumber(String phoneNumber);
+public interface UserRepository extends Neo4jRepository<UserNode, Long> {
+
+    UserNode findUserNodeByEmail(String email);
+
+    UserNode findUserNodeByPhoneNumber(String phoneNumber);
 }

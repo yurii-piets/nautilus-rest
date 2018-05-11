@@ -1,0 +1,20 @@
+server:
+  protocol: http
+  host: localhost
+  servlet.contextPath: /nautilus
+  port: 8080
+#  ssl:
+#    key-store: ${NAUTILUS_SSL_STORE}
+#    key-store-password: ${NAUTILUS_SSL_PASSWORD}
+#    keyStoreType: PKCS12
+#    keyAlias: tomcat
+
+spring:
+  main:
+    banner-mode: "off"
+
+photos:
+  path: upload/
+  max: 10
+
+servlet.management.contextPath: /actuator

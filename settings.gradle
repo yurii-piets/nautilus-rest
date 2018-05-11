@@ -1,2 +1,4 @@
-include ':web'
 include ':database'
+include ':common'
+include ':microservices'
+include ':microservices:data-processing-microservice'

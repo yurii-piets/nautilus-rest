@@ -1,8 +1,7 @@
 package com.nautilus.repository;
 
-import com.nautilus.domain.CarStatusSnapshot;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.nautilus.node.CarStatusSnapshotNode;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 
-@Repository
-public interface CarStatusSnapshotRepository extends JpaRepository<CarStatusSnapshot, Long> {}
+public interface CarStatusSnapshotRepository extends Neo4jRepository<CarStatusSnapshotNode, Long> {
+}

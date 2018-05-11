@@ -1,0 +1,14 @@
+plugins {
+    id 'org.springframework.boot' version '2.0.1.RELEASE'
+}
+
+dependencies {
+    compile project(':database')
+    compile project(':common')
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.1.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.0.1.RELEASE'
+    compile group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.0.1.RELEASE'
+}

@@ -1,0 +1,10 @@
+image: openjdk:10
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - gradle
+        script:
+          - chmod +x ./gradlew
+          - bash ./gradlew clean build test
