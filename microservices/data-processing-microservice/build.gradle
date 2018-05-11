@@ -11,4 +11,5 @@ dependencies {
     compile group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.0.1.RELEASE'
+    testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.0.4.RELEASE'
 }

@@ -1,12 +1,12 @@
 package com.nautilus.rest.controllers.user;
 
-import com.nautilus.JsonUtil;
-import com.nautilus.constants.RegisterStatus;
-import com.nautilus.domain.Car;
-import com.nautilus.domain.UserConfig;
-import com.nautilus.dto.user.RegisterUserDTO;
-import com.nautilus.dto.user.UserInfo;
-import com.nautilus.services.GlobalService;
+import com.nautilus.controller.user.UserController;
+import com.nautilus.dto.car.CarDto;
+import com.nautilus.dto.constants.RegisterError;
+import com.nautilus.dto.user.RegisterUserDto;
+import com.nautilus.node.UserNode;
+import com.nautilus.rest.JsonUtil;
+import com.nautilus.service.DataService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,8 +19,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -50,9 +48,9 @@ public class UserControllerTest {
     private JsonUtil jsonUtil;
 
     @MockBean
-    private GlobalService service;
+    private DataService service;
 
-    private static UserConfig mockUser;
+    private static UserNode mockUser;
 
     @BeforeClass
     public static void beforeClass() {
@@ -75,14 +73,13 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void getWhenUserExist() throws Exception {
-        UserInfo user = UserInfo.builder()
-                .email(MOCK_USER_EMAIL)
-                .phoneNumber("111000222")
-                .userName("Luke")
-                .userSurname("Skywalker")
-                .build();
+        UserNode user = new UserNode();
+        user.setEmail(MOCK_USER_EMAIL);
+        user.setPhoneNumber("111000222");
+        user.setName("Luke");
+        user.setSurname("Skywalker");
         String userJson = jsonUtil.json(user);
-        when(service.findUserConfigByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
+        when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
         buildMockUserWithCar();
         mockMvc.perform(get(UserController.USER_MAPPING))
                 .andExpect(status().isOk())
@@ -92,14 +89,13 @@ public class UserControllerTest {
 
     @Test
     public void postWhenUserIsOk() throws Exception {
-        RegisterUserDTO userDTO = RegisterUserDTO.builder()
-                .email(MOCK_USER_EMAIL)
-                .phoneNumber("111000222")
-                .userName("Luke")
-                .userSurname("Skywalker")
-                .password(MOCK_USER_PASSWORD)
-                .build();
-        String userJson = jsonUtil.json(userDTO);
+        RegisterUserDto userDto = new RegisterUserDto();
+        userDto.setEmail(MOCK_USER_EMAIL);
+        userDto.setPhoneNumber("111000222");
+        userDto.setName("Luke");
+        userDto.setSurname("Skywalker");
+        userDto.setPassword(MOCK_USER_PASSWORD);
+        String userJson = jsonUtil.json(userDto);
 
         when(service.checkEmailIsFree(MOCK_USER_EMAIL)).thenReturn(true);
         when(service.checkPhoneNumberIsFree("111000222")).thenReturn(true);
@@ -112,21 +108,19 @@ public class UserControllerTest {
 
     @Test
     public void postWhenEmailIsNotFree() throws Exception {
-        RegisterUserDTO userDTO = RegisterUserDTO.builder()
-                .email(MOCK_USER_EMAIL)
-                .phoneNumber("111000222")
-                .userName("Luke")
-                .userSurname("Skywalker")
-                .password(MOCK_USER_PASSWORD)
-                .build();
-        String userJson = jsonUtil.json(userDTO);
+        RegisterUserDto userDto = new RegisterUserDto();
+        userDto.setEmail(MOCK_USER_EMAIL);
+        userDto.setPhoneNumber("111000222");
+        userDto.setName("Luke");
+        userDto.setSurname("Skywalker");
+        userDto.setPassword(MOCK_USER_PASSWORD);
+
+        String userJson = jsonUtil.json(userDto);
 
         when(service.checkEmailIsFree(MOCK_USER_EMAIL)).thenReturn(false);
         when(service.checkPhoneNumberIsFree("111000222")).thenReturn(true);
 
-        List<RegisterStatus> statuses = new ArrayList<RegisterStatus>() {{
-            add(RegisterStatus.EMAIL_NOT_FREE);
-        }};
+        List<RegisterError> statuses =List.of(RegisterError.EMAIL_NOT_FREE);
 
         mockMvc.perform(post(UserController.USER_MAPPING)
                 .contentType(jsonUtil.getContentType())
@@ -137,22 +131,18 @@ public class UserControllerTest {
 
     @Test
     public void postWhenEmailAndPhoneNumberIsNotFree() throws Exception {
-        RegisterUserDTO userDTO = RegisterUserDTO.builder()
-                .email(MOCK_USER_EMAIL)
-                .phoneNumber("111000222")
-                .userName("Luke")
-                .userSurname("Skywalker")
-                .password(MOCK_USER_PASSWORD)
-                .build();
-        String userJson = jsonUtil.json(userDTO);
+        RegisterUserDto userDto = new RegisterUserDto();
+        userDto.setEmail(MOCK_USER_EMAIL);
+        userDto.setPhoneNumber("111000222");
+        userDto.setName("Luke");
+        userDto.setSurname("Skywalker");
+        userDto.setPassword(MOCK_USER_PASSWORD);
+        String userJson = jsonUtil.json(userDto);
 
         when(service.checkEmailIsFree(MOCK_USER_EMAIL)).thenReturn(false);
         when(service.checkPhoneNumberIsFree("111000222")).thenReturn(false);
 
-        List<RegisterStatus> statuses = new ArrayList<RegisterStatus>() {{
-            add(RegisterStatus.EMAIL_NOT_FREE);
-            add(RegisterStatus.PHONE_NUMBER_NOT_FREE);
-        }};
+        List<RegisterError> statuses = List.of(RegisterError.EMAIL_NOT_FREE, RegisterError.PHONE_NUMBER_NOT_FREE);
 
         mockMvc.perform(post(UserController.USER_MAPPING)
                 .contentType(jsonUtil.getContentType())
@@ -170,7 +160,7 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void patchUserEmail() throws Exception {
-        when(service.findUserConfigByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
+        when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
         String patchJson = "[{\"op\": \"replace\", \"path\": \"/phoneNumber\", \"value\": \"123000789\" }]";
 
@@ -183,7 +173,7 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void patchWhenFieldDoesNotExist() throws Exception {
-        when(service.findUserConfigByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
+        when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
         String patchJson = "[{\"op\": \"replace\", \"path\": \"/not_exist\", \"value\": \"asd\" }]";
 
@@ -202,7 +192,7 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void deleteUser() throws Exception {
-        when(service.findUserConfigByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
+        when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
         mockMvc.perform(delete(UserController.USER_MAPPING))
                 .andExpect(status().isOk());
@@ -217,22 +207,19 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void getUserCars() throws Exception {
-        when(service.findUserConfigByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
+        when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
-        Set<Car> set = new HashSet<Car>() {{
-            Car car = new Car();
-            car.setOwner(null);
-            car.setBeaconId("1");
-            car.setRegisterNumber("AA1234AA");
-            car.setMark("Batmobile");
-            car.setColor("Black");
-            car.setYearOfProduction("1939");
-            car.setDescription("The Batmobile's shields are made of ceramic fractal armor panels");
-            add(car);
-        }};
+        CarDto expectedCar = new CarDto();
+        expectedCar.setBeaconId("1");
+        expectedCar.setRegisterNumber("AA1234AA");
+        expectedCar.setMark("Batmobile");
+        expectedCar.setColor("Black");
+        expectedCar.setYearOfProduction("1939");
+        expectedCar.setDescription("The Batmobile's shields are made of ceramic fractal armor panels");
+
 
         mockMvc.perform(get(UserController.USER_MAPPING + UserController.USER_CAR_MAPPING))
-                .andExpect(content().json(jsonUtil.json(set)))
+                .andExpect(content().json(jsonUtil.json(Set.of(expectedCar))))
                 .andExpect(status().isOk());
     }
 }

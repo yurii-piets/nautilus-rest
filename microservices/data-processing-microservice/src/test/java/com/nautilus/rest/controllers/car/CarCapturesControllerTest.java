@@ -1,10 +1,11 @@
 package com.nautilus.rest.controllers.car;
 
-import com.nautilus.JsonUtil;
-import com.nautilus.domain.Car;
-import com.nautilus.dto.car.CarLocationDTO;
-import com.nautilus.dto.car.CarStatusDTO;
-import com.nautilus.services.GlobalService;
+import com.nautilus.controller.car.CarCapturesController;
+import com.nautilus.dto.car.CarStatusSnapshotDto;
+import com.nautilus.dto.car.Location;
+import com.nautilus.node.CarNode;
+import com.nautilus.rest.JsonUtil;
+import com.nautilus.service.DataService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +18,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.sql.Timestamp;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static com.nautilus.MockUtil.MOCK_CAR_BEACON_ID;
 import static com.nautilus.MockUtil.buildMockCarWithCaptures;
@@ -44,9 +46,9 @@ public class CarCapturesControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private GlobalService service;
+    private DataService service;
 
-    private static Car mockCar;
+    private static CarNode mockCar;
 
     @BeforeClass
     public static void beforeClass() {
@@ -62,7 +64,7 @@ public class CarCapturesControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void getCarCapturesWhenNoRightToRead() throws Exception {
-        when(service.findEmailByBeaconId(MOCK_CAR_BEACON_ID))
+        when(service.getEmailByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn("wrong_email@nautilus.com");
 
         mockMvc.perform(get(CarCapturesController.CAR_FOUND_MAPPING + "/captures/" + MOCK_CAR_BEACON_ID))
@@ -72,9 +74,9 @@ public class CarCapturesControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void getCarCaptures() throws Exception {
-        when(service.findEmailByBeaconId(MOCK_CAR_BEACON_ID))
+        when(service.getEmailByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(MOCK_USER_EMAIL);
-        when(service.findCarByBeaconId(MOCK_CAR_BEACON_ID))
+        when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(mockCar);
 
         String carCapturesContent = jsonUtil.json(mockCar.getStatusSnapshots());
@@ -87,7 +89,7 @@ public class CarCapturesControllerTest {
 
     @Test
     public void postCarCaptureWhenNoAuth() throws Exception {
-        String carStatusDTOJson = jsonUtil.json(new CarStatusDTO());
+        String carStatusDTOJson = jsonUtil.json(new CarStatusSnapshotDto());
 
         mockMvc.perform(post(CarCapturesController.CAR_FOUND_MAPPING + "/capture/" + MOCK_CAR_BEACON_ID)
                 .contentType(jsonUtil.getContentType())
@@ -98,14 +100,14 @@ public class CarCapturesControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void postCarCapture() throws Exception {
-        when(service.findCarByBeaconId(MOCK_CAR_BEACON_ID))
+        when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(mockCar);
 
         when(service.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(mockCar.getStatus());
 
         String carStatusDTOJson
-                = jsonUtil.json(new CarStatusDTO(new CarLocationDTO(11.22, 33.44), new Timestamp(1)));
+                = jsonUtil.json(new CarStatusSnapshotDto(new Location(BigDecimal.valueOf(11.22), BigDecimal.valueOf(33.44)), LocalDateTime.now()));
         String okStatusJson = jsonUtil.json(mockCar.getStatus());
 
         mockMvc.perform(post(CarCapturesController.CAR_FOUND_MAPPING + "/capture/" + MOCK_CAR_BEACON_ID)

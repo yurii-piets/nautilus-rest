@@ -1,5 +1,6 @@
 package com.nautilus.rest.controllers;
 
+import com.nautilus.controller.IndexController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

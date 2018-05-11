@@ -1,13 +1,13 @@
 package com.nautilus.rest.controllers.car;
 
-import com.nautilus.JsonUtil;
-import com.nautilus.constants.Authorities;
-import com.nautilus.constants.CarStatus;
-import com.nautilus.domain.Car;
-import com.nautilus.domain.UserConfig;
-import com.nautilus.dto.car.CarRegisterDTO;
+import com.nautilus.controller.car.CarController;
+import com.nautilus.dto.car.CarRegisterDto;
+import com.nautilus.dto.constants.CarStatus;
+import com.nautilus.node.CarNode;
+import com.nautilus.node.UserNode;
+import com.nautilus.rest.JsonUtil;
+import com.nautilus.service.DataService;
 import com.nautilus.service.file.FileUtil;
-import com.nautilus.services.GlobalService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,8 +19,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.LinkedHashSet;
 
 import static com.nautilus.MockUtil.MOCK_CAR_BEACON_ID;
 import static com.nautilus.MockUtil.MOCK_USER_EMAIL;
@@ -50,14 +48,14 @@ public class CarControllerTest {
     private JsonUtil jsonUtil;
 
     @MockBean
-    private GlobalService service;
+    private DataService service;
 
     @MockBean
     private FileUtil fileUtil;
 
-    private static Car mockCar;
+    private static CarNode mockCar;
 
-    private static UserConfig mockUser;
+    private static UserNode mockUser;
 
     @BeforeClass
     public static void beforeClass() {
@@ -69,7 +67,7 @@ public class CarControllerTest {
 
     @Test
     public void getCarInfoWhenNoAuth() throws Exception {
-        when(service.findCarByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar);
+        when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar);
 
         mockMvc.perform(get(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID))
                 .andExpect(status().isUnauthorized());
@@ -78,7 +76,7 @@ public class CarControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void getCarInfo() throws Exception {
-        when(service.findCarByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar);
+        when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar);
 
         String carJson = jsonUtil.json(mockCar);
         mockMvc.perform(get(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID))
@@ -90,7 +88,7 @@ public class CarControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void getCarStatusWhenCarIsOk() throws Exception {
-        when(service.findCarByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar);
+        when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar);
 
         mockMvc.perform(get(CarController.CAR_MAPPING + "/status/" + MOCK_CAR_BEACON_ID))
                 .andExpect(status().isOk())
@@ -100,7 +98,7 @@ public class CarControllerTest {
 
     @Test
     public void postCarWhenNoAuth() throws Exception {
-        CarRegisterDTO carRegisterDTO = buildMockCarRegisterDTO(mockCar);
+        CarRegisterDto carRegisterDTO = buildMockCarRegisterDTO(mockCar);
         String carJson = jsonUtil.json(carRegisterDTO);
 
         mockMvc.perform(post(CarController.CAR_MAPPING)
@@ -112,12 +110,12 @@ public class CarControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void postCarWhenCarFraud() throws Exception {
-        when(service.findUserConfigByEmail(MOCK_USER_EMAIL))
+        when(service.getUserNodeByEmail(MOCK_USER_EMAIL))
                 .thenReturn(mockUser);
-        when(service.findCarByBeaconIdOrRegisterNumber(mockCar.getBeaconId(), mockCar.getRegisterNumber()))
+        when(service.getCarNodeByBeaconIdOrRegisterNumber(mockCar.getBeaconId(), mockCar.getRegisterNumber()))
                 .thenReturn(mockCar);
 
-        CarRegisterDTO carRegisterDTO = buildMockCarRegisterDTO(mockCar);
+        CarRegisterDto carRegisterDTO = buildMockCarRegisterDTO(mockCar);
         String carJson = jsonUtil.json(carRegisterDTO);
 
         mockMvc.perform(post(CarController.CAR_MAPPING)
@@ -129,12 +127,12 @@ public class CarControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void postCar() throws Exception {
-        when(service.findUserConfigByEmail(MOCK_USER_EMAIL))
+        when(service.getUserNodeByEmail(MOCK_USER_EMAIL))
                 .thenReturn(mockUser);
-        when(service.findCarByBeaconIdOrRegisterNumber(mockCar.getBeaconId(), mockCar.getRegisterNumber()))
+        when(service.getCarNodeByBeaconIdOrRegisterNumber(mockCar.getBeaconId(), mockCar.getRegisterNumber()))
                 .thenReturn(null);
 
-        CarRegisterDTO carRegisterDTO = buildMockCarRegisterDTO(mockCar);
+        CarRegisterDto carRegisterDTO = buildMockCarRegisterDTO(mockCar);
         String carJson = jsonUtil.json(carRegisterDTO);
 
         mockMvc.perform(post(CarController.CAR_MAPPING)
@@ -152,7 +150,7 @@ public class CarControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void patchWhenNoRightToModifyCar() throws Exception {
-        when(service.findEmailByBeaconId(MOCK_CAR_BEACON_ID))
+        when(service.getEmailByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn("wrong_email@nautilus.com");
 
         String jsonPatchContent = "[{\"op\": \"replace\", \"path\": \"/color\", \"value\": \"White\" }]";
@@ -165,9 +163,9 @@ public class CarControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void patchCar() throws Exception {
-        when(service.findEmailByBeaconId(MOCK_CAR_BEACON_ID))
+        when(service.getEmailByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(MOCK_USER_EMAIL);
-        when(service.findCarByBeaconId(MOCK_CAR_BEACON_ID))
+        when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(mockCar);
 
         String jsonPatchContent = "[{\"op\": \"replace\", \"path\": \"/color\", \"value\": \"White\" }]";
@@ -186,7 +184,7 @@ public class CarControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void deleteCarWhenNoRightToModifyCar() throws Exception {
-        when(service.findEmailByBeaconId(MOCK_CAR_BEACON_ID))
+        when(service.getEmailByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn("wrong_email@nautilus.com");
 
         mockMvc.perform(delete(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID))
@@ -196,9 +194,9 @@ public class CarControllerTest {
     @Test
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void deleteCar() throws Exception {
-        when(service.findEmailByBeaconId(MOCK_CAR_BEACON_ID))
+        when(service.getEmailByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(MOCK_USER_EMAIL);
-        when(service.findCarByBeaconId(MOCK_CAR_BEACON_ID))
+        when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(mockCar);
         doNothing().when(fileUtil).delete(MOCK_CAR_BEACON_ID);
 
