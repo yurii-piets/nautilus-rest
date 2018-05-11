@@ -1,6 +1,7 @@
 package com.nautilus.controller.user;
 
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.nautilus.dto.PatchDto;
 import com.nautilus.dto.car.CarDto;
 import com.nautilus.dto.constants.RegisterError;
 import com.nautilus.dto.user.RegisterUserDto;
@@ -72,14 +73,14 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.PATCH)
-    public ResponseEntity<?> update(@RequestBody String updateBody) {
+    public ResponseEntity<?> update(@RequestBody Set<PatchDto> patches) {
         UserNode user = service.getUserNodeByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         if (user == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
         try {
-            UserNode mergedUser = (UserNode) patchUtility.patch(updateBody, user).get();
+            UserNode mergedUser = (UserNode) patchUtility.patch(patches, user).get();
             service.save(mergedUser);
             return new ResponseEntity(HttpStatus.OK);
         } catch (IOException e) {

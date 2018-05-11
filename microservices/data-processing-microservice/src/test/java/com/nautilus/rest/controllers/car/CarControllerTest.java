@@ -1,6 +1,7 @@
 package com.nautilus.rest.controllers.car;
 
 import com.nautilus.controller.car.CarController;
+import com.nautilus.dto.PatchDto;
 import com.nautilus.dto.car.CarRegisterDto;
 import com.nautilus.dto.constants.CarStatus;
 import com.nautilus.node.CarNode;
@@ -9,7 +10,6 @@ import com.nautilus.rest.JsonUtil;
 import com.nautilus.service.DataService;
 import com.nautilus.service.file.FileUtil;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Set;
 
 import static com.nautilus.MockUtil.MOCK_CAR_BEACON_ID;
 import static com.nautilus.MockUtil.MOCK_USER_EMAIL;
@@ -190,10 +192,16 @@ public class CarControllerTest {
         when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(mockCar);
 
-        String jsonPatchContent = "[{\"op\": \"replace\", \"path\": \"/color\", \"value\": \"White\" }]";
+        PatchDto patch = new PatchDto();
+        patch.setOp("replace");
+        patch.setPath("/color");
+        patch.setValue("White");
+
+        String jsonPatch = jsonUtil.json(Set.of(patch));
+
         mockMvc.perform(patch(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID)
                 .contentType(jsonUtil.getContentType())
-                .content(jsonPatchContent))
+                .content(jsonPatch))
         .andExpect(status().isOk());
     }
 
