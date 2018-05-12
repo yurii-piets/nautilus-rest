@@ -1,6 +1,7 @@
 package com.nautilus.controller.car;
 
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.nautilus.dto.PatchDto;
 import com.nautilus.dto.car.CarRegisterDto;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.UserNode;
@@ -76,20 +77,15 @@ public class CarController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    /**
-     * @param beaconId
-     * @param updateBody, matches pattern : [{"op": "replace", "path": "/registerNumber", "value": "WW121"}]
-     * @return ResponseEntity with HttpStatus
-     */
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.PATCH)
     public ResponseEntity update(@PathVariable String beaconId,
-                                 @RequestBody String updateBody) {
+                                 @RequestBody Set<PatchDto> patches) {
 
         authorizationService.hasAccessByBeaconId(beaconId);
 
         try {
             CarNode car = service.getCarNodeByBeaconId(beaconId);
-            CarNode mergedCar = (CarNode) patchUtility.patch(updateBody, car).get();
+            CarNode mergedCar = (CarNode) patchUtility.patch(patches, car).get();
             mergedCar.setOwner(car.getOwner());
             mergedCar.setStatusSnapshots(car.getStatusSnapshots());
             mergedCar.setId(car.getId());

@@ -1,5 +1,6 @@
 package com.nautilus.node;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nautilus.algorithm.MD5;
 import com.nautilus.dto.constants.Authorities;
 import com.nautilus.dto.user.RegisterUserDto;
@@ -39,17 +40,23 @@ public class UserNode implements UserDetails {
 
     private String password;
 
+    @JsonIgnore
     private boolean enabled;
 
+    @JsonIgnore
     private boolean locked;
 
+    @JsonIgnore
     private boolean expired;
 
+    @JsonIgnore
     private boolean credentialsExpired;
 
+    @JsonIgnore
     private List<GrantedAuthority> authorities;
 
     @Relationship(type = "OWNS")
+    @JsonIgnore
     private Set<CarNode> cars;
 
     public UserNode(RegisterUserDto registerUserDto){

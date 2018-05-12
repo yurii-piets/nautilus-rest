@@ -1,5 +1,6 @@
 package com.nautilus.dto.car;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Location {
     private static final int MIN_LONGITUDE = -180;
     private static final int MAX_LONGITUDE = 180;
