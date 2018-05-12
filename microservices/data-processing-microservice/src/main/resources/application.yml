@@ -1,6 +1,6 @@
 server:
   protocol: http
-  host: localhost
+  host: 127.0.0.1
   servlet.contextPath: /nautilus
   port: 8080
 #  ssl:
@@ -12,9 +12,12 @@ server:
 spring:
   main:
     banner-mode: "off"
+  application:
+    name: data-processing
 
 photos:
   path: upload/
   max: 10
 
 servlet.management.contextPath: /actuator
+

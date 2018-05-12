@@ -4,14 +4,6 @@ plugins {
 
 apply plugin: 'io.spring.dependency-management'
 
-bootJar {
-    baseName = 'eureka'
-    version = '0.0.1-SNAPSHOT'
-}
-
-sourceCompatibility = 1.10
-targetCompatibility = 1.10
-
 repositories {
     mavenCentral()
     maven {
