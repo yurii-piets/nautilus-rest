@@ -20,4 +20,6 @@ photos:
   max: 10
 
 servlet.management.contextPath: /actuator
+eureka.instance.statusPageUrlPath: /nautilus/index
+eureka.instance.healthCheckUrlPath: /nautilus/index
 
