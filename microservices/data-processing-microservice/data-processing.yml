@@ -1,8 +1,8 @@
 swagger: "2.0"
 info:
-  description: "This is a sample server Nautilus rest api."
-  version: "0.0.1"
-  title: "Nautilus"
+  description: "This is a sample server Nautilus Data Processing Microservice Api."
+  version: "0.2.2"
+  title: "Nautilus Data Processing Microservice"
   termsOfService: ""
   contact:
     email: "piets.yurii@gmail.com"

@@ -1,6 +1,6 @@
 package com.nautilus.rest.controllers;
 
-import com.nautilus.controller.IndexController;
+import com.nautilus.controller.ApiSpecificationController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,21 +18,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class IndexControllerTest {
+public class ApiSpecificationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     public void indexNoAuthTest() throws Exception {
-        mockMvc.perform(get(IndexController.INDEX_MAPPING))
+        mockMvc.perform(get(ApiSpecificationController.INDEX_MAPPING))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(username = "test", password = "test", roles = "USER")
     public void indexAuthTest() throws Exception {
-        mockMvc.perform(get(IndexController.INDEX_MAPPING))
+        mockMvc.perform(get(ApiSpecificationController.INDEX_MAPPING))
                 .andExpect(status().isOk());
     }
 }
