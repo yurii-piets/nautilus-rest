@@ -19,7 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.nautilus.controller.IndexController.INDEX_MAPPING;
+import static com.nautilus.controller.ApiSpecificationController.INDEX_MAPPING;
 import static com.nautilus.controller.car.CarCapturesController.CAR_FOUND_MAPPING;
 import static com.nautilus.controller.car.CarController.CAR_MAPPING;
 import static com.nautilus.controller.car.CarPhotosController.CAR_PHOTOS_MAPPING;
