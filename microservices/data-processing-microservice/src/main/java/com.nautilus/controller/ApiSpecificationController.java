@@ -9,7 +9,7 @@ public class ApiSpecificationController {
 
     public final static String INDEX_MAPPING = "/index";
 
-    private final static String SPECIFICATION_VIEW = "api/index.html";
+    private final static String SPECIFICATION_VIEW = "api/redoc-static.html";
 
     @RequestMapping(value = INDEX_MAPPING, method = RequestMethod.GET)
     public String index() {
