@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.nautilus.dto.PatchDto;
+import com.nautilus.dto.PartialUpdateBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class JsonPatchUtility {
 
     private final ObjectMapper mapper;
 
-    public <T> Optional patch(Set<PatchDto> patches, T target)
+    public <T> Optional patch(Set<PartialUpdateBody> patches, T target)
             throws IOException, JsonPatchException {
 
         String updateBody = mapper.writeValueAsString(patches);

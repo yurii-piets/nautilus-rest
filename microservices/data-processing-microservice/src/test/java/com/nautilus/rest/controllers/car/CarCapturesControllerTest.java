@@ -59,7 +59,7 @@ public class CarCapturesControllerTest {
 
     @Test
     public void getCarCapturesWhenNoAuth() throws Exception {
-        mockMvc.perform(get(CarCapturesController.CAR_FOUND_MAPPING + "/captures/" + MOCK_CAR_BEACON_ID))
+        mockMvc.perform(get(CarCapturesController.CAR_CAPTURES_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID)))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -69,7 +69,7 @@ public class CarCapturesControllerTest {
         when(service.getEmailByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn("wrong_email@nautilus.com");
 
-        mockMvc.perform(get(CarCapturesController.CAR_FOUND_MAPPING + "/captures/" + MOCK_CAR_BEACON_ID))
+        mockMvc.perform(get(CarCapturesController.CAR_CAPTURES_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID)))
                 .andExpect(status().isForbidden());
     }
 
@@ -85,7 +85,7 @@ public class CarCapturesControllerTest {
                 .map(CarStatusSnapshotNode::toCarStatusSnapshotDto)
                 .collect(Collectors.toSet()));
 
-        mockMvc.perform(get(CarCapturesController.CAR_FOUND_MAPPING + "/captures/" + MOCK_CAR_BEACON_ID))
+        mockMvc.perform(get(CarCapturesController.CAR_CAPTURES_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID)))
                 .andExpect(content().contentType(jsonUtil.getContentType()))
                 .andExpect(content().json(carCapturesContent))
                 .andExpect(status().isOk());
@@ -95,7 +95,7 @@ public class CarCapturesControllerTest {
     public void postCarCaptureWhenNoAuth() throws Exception {
         String carStatusDTOJson = jsonUtil.json(new CarStatusSnapshotDto());
 
-        mockMvc.perform(post(CarCapturesController.CAR_FOUND_MAPPING + "/capture/" + MOCK_CAR_BEACON_ID)
+        mockMvc.perform(post(CarCapturesController.CAR_CAPTURES_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID))
                 .contentType(jsonUtil.getContentType())
                 .content(carStatusDTOJson))
                 .andExpect(status().isUnauthorized());
@@ -112,9 +112,9 @@ public class CarCapturesControllerTest {
 
         String carStatusDtoJson = jsonUtil.json(new CarStatusSnapshotDto(new Location(BigDecimal.valueOf(11.22), BigDecimal.valueOf(33.44)), LocalDateTime.now()));
 
-        mockMvc.perform(post(CarCapturesController.CAR_FOUND_MAPPING + "/capture/" + MOCK_CAR_BEACON_ID)
+        mockMvc.perform(post(CarCapturesController.CAR_CAPTURES_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID))
                 .contentType(jsonUtil.getContentType())
                 .content(carStatusDtoJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 }
