@@ -19,20 +19,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.nautilus.controller.car.CarCapturesController.CAR_FOUND_MAPPING;
+import static com.nautilus.controller.car.CarCapturesController.CAR_CAPTURES_MAPPING;
 
 @RestController
-@RequestMapping(value = CAR_FOUND_MAPPING)
+@RequestMapping(value = CAR_CAPTURES_MAPPING)
 @RequiredArgsConstructor
 public class CarCapturesController {
 
-    public final static String CAR_FOUND_MAPPING = "/car";
+    public final static String CAR_CAPTURES_MAPPING = "/car/{beaconId}/captures";
 
     private final DataService service;
 
     private final AuthorizationService authorizationService;
 
-    @RequestMapping(value = "/captures/{beaconId}", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> captures(@PathVariable String beaconId) {
         authorizationService.hasAccessByBeaconId(beaconId);
         Iterable<CarStatusSnapshotNode> carStatusSnapshotBeBeaconId = service.getCarStatusSnapshotBeBeaconId(beaconId);
@@ -42,7 +42,7 @@ public class CarCapturesController {
         return new ResponseEntity<>(carStatusSnapshotDtos, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/capture/{beaconId}", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> capture(
             @PathVariable String beaconId,
             @RequestBody @Valid CarStatusSnapshotDto carStatusSnapshotDto) {
@@ -62,6 +62,6 @@ public class CarCapturesController {
         }
         service.save(car);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

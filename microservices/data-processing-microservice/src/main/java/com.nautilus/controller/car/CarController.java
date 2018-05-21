@@ -1,7 +1,7 @@
 package com.nautilus.controller.car;
 
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.nautilus.dto.PatchDto;
+import com.nautilus.dto.PartialUpdateBody;
 import com.nautilus.dto.car.CarRegisterDto;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.UserNode;
@@ -50,7 +50,7 @@ public class CarController {
         return new ResponseEntity<>(car.toCarDto(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/status/{beaconId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{beaconId}/status", method = RequestMethod.GET)
     public ResponseEntity<?> status(@PathVariable String beaconId) {
         return new ResponseEntity<>(service.getCarStatusByCarBeaconId(beaconId), HttpStatus.OK);
     }
@@ -74,12 +74,12 @@ public class CarController {
             user.setCars(Set.of(car));
         }
         service.save(user);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.PATCH)
     public ResponseEntity update(@PathVariable String beaconId,
-                                 @RequestBody Set<PatchDto> patches) {
+                                 @RequestBody Set<PartialUpdateBody> patches) {
 
         authorizationService.hasAccessByBeaconId(beaconId);
 
@@ -98,7 +98,7 @@ public class CarController {
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.DELETE)

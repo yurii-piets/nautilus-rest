@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.nautilus.controller.ApiSpecificationController.INDEX_MAPPING;
-import static com.nautilus.controller.car.CarCapturesController.CAR_FOUND_MAPPING;
+import static com.nautilus.controller.car.CarCapturesController.CAR_CAPTURES_MAPPING;
 import static com.nautilus.controller.car.CarController.CAR_MAPPING;
 import static com.nautilus.controller.car.CarPhotosController.CAR_PHOTOS_MAPPING;
 import static com.nautilus.controller.user.UserController.USER_CAR_MAPPING;
@@ -45,8 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             CAR_MAPPING + "/**",
             CAR_PHOTOS_MAPPING,
             CAR_PHOTOS_MAPPING + "/**",
-            CAR_FOUND_MAPPING,
-            CAR_FOUND_MAPPING + "/**",
+            CAR_CAPTURES_MAPPING,
+            CAR_CAPTURES_MAPPING + "/**",
             "/actuator/**",
             "/index/**",
             INDEX_MAPPING
