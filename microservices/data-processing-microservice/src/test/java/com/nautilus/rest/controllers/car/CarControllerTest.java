@@ -1,7 +1,7 @@
 package com.nautilus.rest.controllers.car;
 
 import com.nautilus.controller.car.CarController;
-import com.nautilus.dto.PatchDto;
+import com.nautilus.dto.PartialUpdateBody;
 import com.nautilus.dto.car.CarRegisterDto;
 import com.nautilus.dto.constants.CarStatus;
 import com.nautilus.node.CarNode;
@@ -93,7 +93,7 @@ public class CarControllerTest {
     public void getCarStatusWhenCarIsOk() throws Exception {
         when(service.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar.getStatus());
 
-        mockMvc.perform(get(CarController.CAR_MAPPING + "/status/" + MOCK_CAR_BEACON_ID))
+        mockMvc.perform(get(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID + "/status"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonUtil.json(CarStatus.OK)));
     }
@@ -104,7 +104,7 @@ public class CarControllerTest {
         mockCar.setStatus(CarStatus.STOLEN);
         when(service.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar.getStatus());
 
-        mockMvc.perform(get(CarController.CAR_MAPPING + "/status/" + MOCK_CAR_BEACON_ID))
+        mockMvc.perform(get(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID + "/status"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonUtil.json(CarStatus.STOLEN)));
     }
@@ -115,7 +115,7 @@ public class CarControllerTest {
         mockCar.setStatus(CarStatus.TESTING);
         when(service.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(mockCar.getStatus());
 
-        mockMvc.perform(get(CarController.CAR_MAPPING + "/status/" + MOCK_CAR_BEACON_ID))
+        mockMvc.perform(get(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID + "/status"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonUtil.json(CarStatus.TESTING)));
     }
@@ -162,7 +162,7 @@ public class CarControllerTest {
         mockMvc.perform(post(CarController.CAR_MAPPING)
                 .contentType(jsonUtil.getContentType())
                 .content(carJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -192,7 +192,7 @@ public class CarControllerTest {
         when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(mockCar);
 
-        PatchDto patch = new PatchDto();
+        PartialUpdateBody patch = new PartialUpdateBody();
         patch.setOp("replace");
         patch.setPath("/color");
         patch.setValue("White");
@@ -202,7 +202,7 @@ public class CarControllerTest {
         mockMvc.perform(patch(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID)
                 .contentType(jsonUtil.getContentType())
                 .content(jsonPatch))
-        .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     @Test

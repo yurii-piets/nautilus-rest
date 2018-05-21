@@ -1,7 +1,7 @@
 package com.nautilus.rest.controllers.user;
 
 import com.nautilus.controller.user.UserController;
-import com.nautilus.dto.PatchDto;
+import com.nautilus.dto.PartialUpdateBody;
 import com.nautilus.dto.car.CarDto;
 import com.nautilus.dto.constants.RegisterError;
 import com.nautilus.dto.user.RegisterUserDto;
@@ -105,7 +105,7 @@ public class UserControllerTest {
         mockMvc.perform(post(UserController.USER_MAPPING)
                 .contentType(jsonUtil.getContentType())
                 .content(userJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -164,7 +164,7 @@ public class UserControllerTest {
     public void patchUserEmail() throws Exception {
         when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
-        PatchDto op = new PatchDto();
+        PartialUpdateBody op = new PartialUpdateBody();
         op.setOp("replace");
         op.setPath("/phoneNumber");
         op.setValue("123000789");
@@ -173,7 +173,7 @@ public class UserControllerTest {
         mockMvc.perform(patch(UserController.USER_MAPPING)
                 .contentType(jsonUtil.getContentType())
                 .content(patchJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -181,7 +181,7 @@ public class UserControllerTest {
     public void patchWhenFieldDoesNotExist() throws Exception {
         when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
-        PatchDto op = new PatchDto();
+        PartialUpdateBody op = new PartialUpdateBody();
         op.setOp("replace");
         op.setPath("/not_exist");
         op.setValue("asd");
@@ -198,7 +198,7 @@ public class UserControllerTest {
     public void patchWhenFieldEnabledNotAllowed() throws Exception {
         when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
-        PatchDto op = new PatchDto();
+        PartialUpdateBody op = new PartialUpdateBody();
         op.setOp("replace");
         op.setPath("/enabled");
         op.setValue(false);
@@ -215,7 +215,7 @@ public class UserControllerTest {
     public void patchWhenFieldLockedNotAllowed() throws Exception {
         when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
-        PatchDto op = new PatchDto();
+        PartialUpdateBody op = new PartialUpdateBody();
         op.setOp("replace");
         op.setPath("/locked");
         op.setValue(false);
@@ -232,7 +232,7 @@ public class UserControllerTest {
     public void patchWhenFieldExpiredNotAllowed() throws Exception {
         when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
-        PatchDto op = new PatchDto();
+        PartialUpdateBody op = new PartialUpdateBody();
         op.setOp("replace");
         op.setPath("/expired");
         op.setValue(false);
@@ -249,7 +249,7 @@ public class UserControllerTest {
     public void patchWhenFieldCredentialsExpiredNotAllowed() throws Exception {
         when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
-        PatchDto op = new PatchDto();
+        PartialUpdateBody op = new PartialUpdateBody();
         op.setOp("replace");
         op.setPath("/credentialsExpired");
         op.setValue(false);
@@ -266,7 +266,7 @@ public class UserControllerTest {
     public void patchWhenFieldAuthoritiesNotAllowed() throws Exception {
         when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
 
-        PatchDto op = new PatchDto();
+        PartialUpdateBody op = new PartialUpdateBody();
         op.setOp("remove");
         op.setPath("/authorities");
         op.setValue(false);

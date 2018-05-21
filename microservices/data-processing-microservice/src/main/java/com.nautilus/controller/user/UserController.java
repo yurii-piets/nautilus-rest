@@ -1,7 +1,7 @@
 package com.nautilus.controller.user;
 
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.nautilus.dto.PatchDto;
+import com.nautilus.dto.PartialUpdateBody;
 import com.nautilus.dto.car.CarDto;
 import com.nautilus.dto.constants.RegisterError;
 import com.nautilus.dto.user.RegisterUserDto;
@@ -69,11 +69,11 @@ public class UserController {
             return new ResponseEntity<>(statuses, HttpStatus.NOT_ACCEPTABLE);
         }
         service.save(new UserNode(registerDto));
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @RequestMapping(method = RequestMethod.PATCH)
-    public ResponseEntity<?> update(@RequestBody Set<PatchDto> patches) {
+    public ResponseEntity<?> update(@RequestBody Set<PartialUpdateBody> patches) {
         UserNode user = service.getUserNodeByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         if (user == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -82,7 +82,7 @@ public class UserController {
         try {
             UserNode mergedUser = (UserNode) patchUtility.patch(patches, user).get();
             service.save(mergedUser);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity(HttpStatus.ACCEPTED);
         } catch (IOException e) {
             logger.error("Unexpected: ", e);
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
