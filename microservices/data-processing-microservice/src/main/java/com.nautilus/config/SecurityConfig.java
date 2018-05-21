@@ -57,13 +57,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public UserDetailsService userDetailsService() {
         UserDetails actuator = User.builder()
                 .username("actuator")
-                .password("actuator")
+                .password(passwordEncoder().encode("actuator"))
                 .roles(Authorities.ACTUATOR.toString())
                 .build();
 
         UserDetails admin = User.builder()
                 .username("admin")
-                .password("admin")
+                .password(passwordEncoder().encode("admin"))
                 .roles(Authorities.ADMIN.toString())
                 .build();
 
@@ -73,6 +73,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
+                .userDetailsService(userDetailsService())
+                .passwordEncoder(passwordEncoder())
+            .and()
                 .userDetailsService(neo4jUserDetails())
                 .passwordEncoder(passwordEncoder());
     }

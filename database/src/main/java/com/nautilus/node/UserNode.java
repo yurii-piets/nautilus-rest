@@ -16,7 +16,6 @@ import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -53,7 +52,7 @@ public class UserNode implements UserDetails {
     private boolean credentialsExpired;
 
     @JsonIgnore
-    private List<GrantedAuthority> authorities;
+    private Set<GrantedAuthority> authorities = Set.of(Authorities.USER);
 
     @Relationship(type = "OWNS")
     @JsonIgnore
@@ -65,7 +64,6 @@ public class UserNode implements UserDetails {
         this.phoneNumber = registerUserDto.getPhoneNumber();
         this.email = registerUserDto.getEmail();
         this.password = new MD5().encode(registerUserDto.getPassword());
-        this.authorities = List.of(Authorities.USER);
         this.enabled = true;
         this.locked = false;
         this.expired = false;
