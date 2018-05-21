@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 @AllArgsConstructor
 public enum Authorities implements GrantedAuthority {
     ADMIN("ADMIN"),
+    ACTUATOR("ACTUATOR"),
     USER("USER");
 
     private String value;
