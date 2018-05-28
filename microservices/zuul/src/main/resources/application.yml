@@ -6,5 +6,9 @@ eureka:
     leaseRenewalIntervalInSeconds: 1
     leaseExpirationDurationInSeconds: 2
 
-zuul.routes.data-processing.url: http://localhost:8081
+zuul:
+  routes:
+    data-processing.url: http://localhost:8081/
+  sensitive-headers: false
+
 ribbon.eureka.enabled: false
