@@ -1,17 +1,23 @@
 package com.nautilus.config;
 
 import com.nautilus.algorithm.MD5;
+import com.nautilus.dto.constants.Authorities;
 import com.nautilus.security.CustomerUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,6 +35,7 @@ import static com.nautilus.controller.user.UserController.USER_MAPPING;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final static String[] AUTHENTICATED_MAPPINGS = new String[]{
@@ -43,29 +50,43 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             CAR_CAPTURES_MAPPING,
             CAR_CAPTURES_MAPPING + "/**",
             "/actuator/**",
+            "/index/**",
             INDEX_MAPPING
     };
+
+    @Bean
+    @Override
+    public UserDetailsService userDetailsService() {
+        UserDetails actuator = User.builder()
+                .username("actuator")
+                .password(passwordEncoder().encode("actuator"))
+                .roles(Authorities.ACTUATOR.toString())
+                .build();
+
+        UserDetails admin = User.builder()
+                .username("admin")
+                .password(passwordEncoder().encode("admin"))
+                .roles(Authorities.ADMIN.toString())
+                .build();
+
+        return new InMemoryUserDetailsManager(actuator, admin);
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(neo4jUserDetails())
-                .passwordEncoder(new MD5())
+                .userDetailsService(userDetailsService())
+                .passwordEncoder(passwordEncoder())
             .and()
-                .inMemoryAuthentication()
-                .withUser("actuator").password("actuator").roles("ACTUATOR");
-    }
-
-    @Bean
-    public UserDetailsService neo4jUserDetails() {
-        return new CustomerUserDetailsService();
+                .userDetailsService(neo4jUserDetails())
+                .passwordEncoder(passwordEncoder());
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, USER_MAPPING).permitAll()
+                .antMatchers(HttpMethod.POST, USER_MAPPING).not().authenticated()
                 .antMatchers(AUTHENTICATED_MAPPINGS).authenticated()
                 .anyRequest().authenticated()
             .and()
@@ -75,6 +96,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .csrf().disable();
+    }
+
+    @Bean
+    public UserDetailsService neo4jUserDetails() {
+        return new CustomerUserDetailsService();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new MD5();
     }
 
     @Bean

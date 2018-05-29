@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 public class MockUtil {
@@ -30,7 +29,7 @@ public class MockUtil {
         user.setName("Luke");
         user.setSurname("Skywalker");
         user.setPassword(MOCK_USER_PASSWORD);
-        user.setAuthorities(List.of(Authorities.USER));
+        user.setAuthorities(Set.of(Authorities.USER));
         user.setEnabled(true);
         user.setCars(new HashSet<>(){{
             CarNode car = new CarNode();
@@ -80,7 +79,7 @@ public class MockUtil {
         user.setName("Luke");
         user.setSurname("Skywalker");
         user.setPassword(MOCK_USER_PASSWORD);
-        user.setAuthorities(List.of(Authorities.USER));
+        user.setAuthorities(Set.of(Authorities.USER));
         user.setEnabled(true);
         user.setCars(new LinkedHashSet<>());
         return user;

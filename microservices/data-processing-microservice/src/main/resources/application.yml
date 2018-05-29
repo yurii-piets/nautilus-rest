@@ -1,8 +1,8 @@
 server:
   protocol: http
   host: 127.0.0.1
-  servlet.contextPath: /nautilus
-  port: 8080
+  servlet.contextPath: /
+  port: 8081
 #  ssl:
 #    key-store: ${NAUTILUS_SSL_STORE}
 #    key-store-password: ${NAUTILUS_SSL_PASSWORD}
@@ -20,6 +20,9 @@ photos:
   max: 10
 
 servlet.management.contextPath: /actuator
-eureka.instance.statusPageUrlPath: /nautilus/index
-eureka.instance.healthCheckUrlPath: /nautilus/index
+eureka.instance.statusPageUrlPath: /index
+eureka.instance.healthCheckUrlPath: /index
 
+logging:
+  level:
+    com.netflix.eureka: 'OFF'
