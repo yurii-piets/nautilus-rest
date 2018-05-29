@@ -31,7 +31,14 @@ public class ApiSpecificationControllerTest {
 
     @Test
     @WithMockUser(username = "test", password = "test", roles = "USER")
-    public void indexAuthTest() throws Exception {
+    public void indexAuthWhenNoRoleTest() throws Exception {
+        mockMvc.perform(get(ApiSpecificationController.INDEX_MAPPING))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "test", password = "test", roles = "ADMIN")
+    public void indexAuthWhenOkTest() throws Exception {
         mockMvc.perform(get(ApiSpecificationController.INDEX_MAPPING))
                 .andExpect(status().isOk());
     }
