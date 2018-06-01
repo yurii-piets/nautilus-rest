@@ -10,4 +10,5 @@ or
 
 ``
 npx redoc-cli bundle ../../../../data-processing.yml
+npx redoc-cli bundle ../../../../photos-processing.yml
 ``

@@ -1,4 +1,4 @@
-package com.nautilus.controller.car;
+package com.nautilus.controller;
 
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.DataService;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.nautilus.controller.car.CarPhotosController.CAR_PHOTOS_MAPPING;
+import static com.nautilus.controller.CarPhotosController.CAR_PHOTOS_MAPPING;
 
 @RestController
 @RequestMapping(path = CAR_PHOTOS_MAPPING)
@@ -38,7 +38,7 @@ public class CarPhotosController {
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
-    public final static String CAR_PHOTOS_MAPPING = "/car/photos";
+    public final static String CAR_PHOTOS_MAPPING = "/сar/{beaconId}/photos";
 
     private static final String MICRO_MAPPING = "/micro";
 
@@ -65,7 +65,7 @@ public class CarPhotosController {
     @Value("${photos.max}")
     private Integer maxPhotos;
 
-    @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> photos(@PathVariable String beaconId) {
         service.checkIfCarExistByBeaconId(beaconId);
 
@@ -78,7 +78,7 @@ public class CarPhotosController {
         return new ResponseEntity<>(urls, HttpStatus.OK);
     }
 
-    @RequestMapping(value = MICRO_MAPPING + "/{beaconId}", method = RequestMethod.GET)
+    @RequestMapping(value = MICRO_MAPPING, method = RequestMethod.GET)
     public ResponseEntity<?> micro(@PathVariable String beaconId) {
         service.checkIfCarExistByBeaconId(beaconId);
 
@@ -91,7 +91,7 @@ public class CarPhotosController {
         return new ResponseEntity<>(urls, HttpStatus.OK);
     }
 
-    @RequestMapping(value = CAPTURES_MAPPING + "/{beaconId}", method = RequestMethod.GET)
+    @RequestMapping(value = CAPTURES_MAPPING, method = RequestMethod.GET)
     public ResponseEntity<?> captures(@PathVariable String beaconId) {
         service.checkIfCarExistByBeaconId(beaconId);
 
@@ -104,7 +104,7 @@ public class CarPhotosController {
         return new ResponseEntity<>(urls, HttpStatus.OK);
     }
 
-    @RequestMapping(value = CAPTURES_MAPPING + MICRO_MAPPING + "/{beaconId}", method = RequestMethod.GET)
+    @RequestMapping(value = CAPTURES_MAPPING + MICRO_MAPPING, method = RequestMethod.GET)
     public ResponseEntity<?> capturesMicro(@PathVariable String beaconId) {
         service.checkIfCarExistByBeaconId(beaconId);
 
@@ -117,7 +117,7 @@ public class CarPhotosController {
         return new ResponseEntity<>(urls, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{beaconId}/{index}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{index}", method = RequestMethod.GET)
     public ResponseEntity<?> photo(@PathVariable String beaconId,
                                    @PathVariable Integer index
     ) throws IOException {
@@ -134,7 +134,7 @@ public class CarPhotosController {
 
     }
 
-    @RequestMapping(value = MICRO_MAPPING + "/{beaconId}/{index}", method = RequestMethod.GET)
+    @RequestMapping(value = MICRO_MAPPING + "/{index}", method = RequestMethod.GET)
     public ResponseEntity<?> microPhoto(@PathVariable String beaconId,
                                         @PathVariable Integer index
     ) throws IOException {
@@ -150,7 +150,7 @@ public class CarPhotosController {
         return new ResponseEntity<>(b, headers, HttpStatus.OK);
     }
 
-    @RequestMapping(value = CAPTURES_MAPPING + "/{beaconId}/{index}", method = RequestMethod.GET)
+    @RequestMapping(value = CAPTURES_MAPPING + "/{index}", method = RequestMethod.GET)
     public ResponseEntity<?> capturePhoto(@PathVariable String beaconId,
                                           @PathVariable Integer index
     ) throws IOException {
@@ -166,7 +166,7 @@ public class CarPhotosController {
         return new ResponseEntity<>(b, headers, HttpStatus.OK);
     }
 
-    @RequestMapping(value = CAPTURES_MAPPING + MICRO_MAPPING + "/{beaconId}/{index}", method = RequestMethod.GET)
+    @RequestMapping(value = CAPTURES_MAPPING + "/{index}" + MICRO_MAPPING, method = RequestMethod.GET)
     public ResponseEntity<?> microCapture(@PathVariable String beaconId,
                                           @PathVariable Integer index
     ) throws IOException {
@@ -182,7 +182,7 @@ public class CarPhotosController {
         return new ResponseEntity<>(b, headers, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{beaconId}", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> register(@PathVariable String beaconId,
                                       @RequestParam("file") Collection<MultipartFile> files) throws IOException {
 
@@ -202,7 +202,7 @@ public class CarPhotosController {
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
-    @RequestMapping(value = CAPTURES_MAPPING + "/{beaconId}", method = RequestMethod.POST)
+    @RequestMapping(value = CAPTURES_MAPPING, method = RequestMethod.POST)
     public ResponseEntity<?> capture(@PathVariable String beaconId,
                                      @RequestParam("file") List<MultipartFile> files) throws IOException {
         service.checkIfCarExistByBeaconId(beaconId);
@@ -216,7 +216,7 @@ public class CarPhotosController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @RequestMapping(value = "/{beaconId}", method = RequestMethod.DELETE)
+    @RequestMapping(method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String beaconId) {
         authorizationService.hasAccessByBeaconId(beaconId);
         service.checkIfCarExistByBeaconId(beaconId);
@@ -224,7 +224,7 @@ public class CarPhotosController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{beaconId}/{index}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{index}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String beaconId,
                                     @PathVariable Integer index
     ) throws FileNotFoundException {

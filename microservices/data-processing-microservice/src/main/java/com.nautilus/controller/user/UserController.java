@@ -8,7 +8,6 @@ import com.nautilus.dto.user.RegisterUserDto;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.UserNode;
 import com.nautilus.service.DataService;
-import com.nautilus.service.file.FileUtil;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -44,8 +43,6 @@ public class UserController {
     private final DataService service;
 
     private final JsonPatchUtility patchUtility;
-
-    private final FileUtil fileUtil;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> info() {
@@ -99,7 +96,7 @@ public class UserController {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         service.deleteUserById(user.getId());
-        fileUtil.delete(user.getId());
+//        fileUtil.delete(user.getId());
         return new ResponseEntity(HttpStatus.OK);
     }
 

@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  description: "This is a sample server Nautilus Photos Processing Microservice Api."
+  version: "0.3.4-SNAPSHOT"
+  title: "Nautilus Photos Processing Microservice"
+  termsOfService: ""
+  contact:
+    email: "piets.yurii@gmail.com"
+
+tags:
+  - name: "car"
+    description: "Car photos operations."
+
+#change on prod
+servers:
+  - url: http://127.0.0.1:8082/
+
+securityDefinitions:
+  BasicAuth:
+    type: basic
+
+paths:
+  /car/{beaconId}/photos:
+     get:
+        tags:
+          - car
+        description: List of url to car photos.
+        parameters:
+          - in: path
+            name: beaconId
+            schema:
+              type: string
+            required: true
+            description: Id of the beacon that is paired with the car
+        responses:
+          200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: string
+                    example: "https://${host}:${port}/car/${beaconId}/photos/1"
+          401:
+            description: Not authenticated
+          404:
+            description: Car not found
+        security:
+          - BasicAuth: []

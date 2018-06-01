@@ -6,7 +6,6 @@ import com.nautilus.security.CustomerUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,10 +25,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.nautilus.controller.ApiSpecificationController.INDEX_MAPPING;
-import static com.nautilus.controller.car.CarCapturesController.CAR_CAPTURES_MAPPING;
-import static com.nautilus.controller.car.CarController.CAR_MAPPING;
-import static com.nautilus.controller.user.UserController.USER_CAR_MAPPING;
-import static com.nautilus.controller.user.UserController.USER_MAPPING;
 
 @Configuration
 @EnableWebSecurity
@@ -38,14 +33,9 @@ import static com.nautilus.controller.user.UserController.USER_MAPPING;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final static String[] AUTHENTICATED_MAPPINGS = new String[]{
-            USER_MAPPING,
-            USER_MAPPING + "/**",
-            USER_MAPPING + USER_CAR_MAPPING,
-            USER_MAPPING + USER_CAR_MAPPING + "/**",
-            CAR_MAPPING,
-            CAR_MAPPING + "/**",
-            CAR_CAPTURES_MAPPING,
-            CAR_CAPTURES_MAPPING + "/**",
+            "/car",
+            "/car**",
+            "/car/**",
             "/actuator/**",
             "/index/**",
             INDEX_MAPPING
@@ -83,7 +73,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, USER_MAPPING).not().authenticated()
                 .antMatchers(AUTHENTICATED_MAPPINGS).authenticated()
                 .anyRequest().authenticated()
             .and()

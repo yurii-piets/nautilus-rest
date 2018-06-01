@@ -6,9 +6,9 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @EnableDiscoveryClient
 @SpringBootApplication
-public class DPMApplication {
+public class PhotoProcessingApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DPMApplication.class, args);
+        SpringApplication.run(PhotoProcessingApplication.class, args);
     }
 }
