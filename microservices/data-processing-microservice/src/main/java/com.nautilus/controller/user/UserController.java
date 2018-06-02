@@ -5,6 +5,7 @@ import com.nautilus.dto.PartialUpdateBody;
 import com.nautilus.dto.car.CarDto;
 import com.nautilus.dto.constants.RegisterError;
 import com.nautilus.dto.user.RegisterUserDto;
+import com.nautilus.feign.CarPhotosClient;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.UserNode;
 import com.nautilus.service.DataService;
@@ -43,6 +44,8 @@ public class UserController {
     private final DataService service;
 
     private final JsonPatchUtility patchUtility;
+
+    private final CarPhotosClient carPhotosClient;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> info() {
@@ -95,8 +98,13 @@ public class UserController {
         if (user == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
+        Set<CarNode> cars = user.getCars();
+        if(cars != null) {
+            cars.stream()
+                    .map(CarNode::getBeaconId)
+                    .forEach(carPhotosClient::deleteCarPhotos);
+        }
         service.deleteUserById(user.getId());
-//        fileUtil.delete(user.getId());
         return new ResponseEntity(HttpStatus.OK);
     }
 
