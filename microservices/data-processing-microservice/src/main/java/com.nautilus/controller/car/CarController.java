@@ -6,6 +6,7 @@ import com.nautilus.dto.car.CarRegisterDto;
 import com.nautilus.feign.CarPhotosClient;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.UserNode;
+import com.nautilus.security.AuthHeaderConverter;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.DataService;
 import com.nautilus.utilities.JsonPatchUtility;
@@ -43,6 +44,8 @@ public class CarController {
     private final AuthorizationService authorizationService;
 
     private final CarPhotosClient carPhotosClient;
+
+    private final AuthHeaderConverter authHeaderConverter;
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> info(@PathVariable String beaconId) {
@@ -106,7 +109,7 @@ public class CarController {
         authorizationService.hasAccessByBeaconId(beaconId);
 
         CarNode car = service.getCarNodeByBeaconId(beaconId);
-        carPhotosClient.deleteCarPhotos(beaconId);
+        carPhotosClient.deleteCarPhotos(authHeaderConverter.convertCredentialsToHeader(), beaconId);
         service.deleteCarById(car.getId());
         return new ResponseEntity<>(HttpStatus.OK);
     }

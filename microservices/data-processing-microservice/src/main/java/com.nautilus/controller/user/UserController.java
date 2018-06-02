@@ -8,6 +8,7 @@ import com.nautilus.dto.user.RegisterUserDto;
 import com.nautilus.feign.CarPhotosClient;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.UserNode;
+import com.nautilus.security.AuthHeaderConverter;
 import com.nautilus.service.DataService;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,8 @@ public class UserController {
     private final JsonPatchUtility patchUtility;
 
     private final CarPhotosClient carPhotosClient;
+
+    private final AuthHeaderConverter authHeaderConverter;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> info() {
@@ -102,7 +105,7 @@ public class UserController {
         if(cars != null) {
             cars.stream()
                     .map(CarNode::getBeaconId)
-                    .forEach(carPhotosClient::deleteCarPhotos);
+                    .forEach(b -> carPhotosClient.deleteCarPhotos(authHeaderConverter.convertCredentialsToHeader(), b));
         }
         service.deleteUserById(user.getId());
         return new ResponseEntity(HttpStatus.OK);
