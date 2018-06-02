@@ -76,7 +76,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(passwordEncoder())
             .and()
                 .userDetailsService(neo4jUserDetails())
-                .passwordEncoder(passwordEncoder());
+                .passwordEncoder(passwordEncoder())
+            .and()
+                .eraseCredentials(false);
     }
 
     @Override

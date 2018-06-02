@@ -11,7 +11,7 @@ public class AuthHeaderConverter {
 
     public String convertCredentialsToHeader() {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        String pass = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        String pass = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
 
         String plainCreds = name + ":" + pass;
         byte[] plainCredsBytes = plainCreds.getBytes();
