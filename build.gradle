@@ -1,6 +1,5 @@
 allprojects {
     group = 'com.nautilus'
-    version = '0.3.4-SNAPSHOT'
 
     ext {
         applicationName = 'nautilus-rest'
@@ -29,5 +28,8 @@ subprojects {
 
         compile 'org.springframework.boot:spring-boot-starter-web:2.0.1.RELEASE'
         compile 'org.springframework.boot:spring-boot-starter-security:2.0.1.RELEASE'
+
+        testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.0.1.RELEASE'
+        testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.0.4.RELEASE'
     }
 }

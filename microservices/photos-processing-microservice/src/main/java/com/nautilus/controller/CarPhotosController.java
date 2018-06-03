@@ -1,5 +1,7 @@
 package com.nautilus.controller;
 
+import com.nautilus.dto.constants.CarStatus;
+import com.nautilus.exception.IllegalAccessException;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.DataService;
 import com.nautilus.service.file.FileUtil;
@@ -38,7 +40,7 @@ public class CarPhotosController {
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
-    public final static String CAR_PHOTOS_MAPPING = "/сar/{beaconId}/photos";
+    public final static String CAR_PHOTOS_MAPPING = "/car/{beaconId}/photos";
 
     private static final String MICRO_MAPPING = "/micro";
 
@@ -68,6 +70,13 @@ public class CarPhotosController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> photos(@PathVariable String beaconId) {
         service.checkIfCarExistByBeaconId(beaconId);
+        try {
+            authorizationService.hasAccessByBeaconId(beaconId);
+        } catch (IllegalAccessException e) {
+            if(CarStatus.STOLEN != service.getCarStatusByCarBeaconId(beaconId)){
+                throw e;
+            }
+        }
 
         Collection<Integer> indices = fileUtil.getOriginalIndices(beaconId);
 
@@ -81,6 +90,13 @@ public class CarPhotosController {
     @RequestMapping(value = MICRO_MAPPING, method = RequestMethod.GET)
     public ResponseEntity<?> micro(@PathVariable String beaconId) {
         service.checkIfCarExistByBeaconId(beaconId);
+        try {
+            authorizationService.hasAccessByBeaconId(beaconId);
+        } catch (IllegalAccessException e) {
+            if(CarStatus.STOLEN != service.getCarStatusByCarBeaconId(beaconId)){
+                throw e;
+            }
+        }
 
         Collection<Integer> indices = fileUtil.getOriginalIndices(beaconId);
 
@@ -94,6 +110,13 @@ public class CarPhotosController {
     @RequestMapping(value = CAPTURES_MAPPING, method = RequestMethod.GET)
     public ResponseEntity<?> captures(@PathVariable String beaconId) {
         service.checkIfCarExistByBeaconId(beaconId);
+        try {
+            authorizationService.hasAccessByBeaconId(beaconId);
+        } catch (IllegalAccessException e) {
+            if(CarStatus.STOLEN != service.getCarStatusByCarBeaconId(beaconId)){
+                throw e;
+            }
+        }
 
         Collection<Integer> indices = fileUtil.getCaptureIndices(beaconId);
 
@@ -107,6 +130,13 @@ public class CarPhotosController {
     @RequestMapping(value = CAPTURES_MAPPING + MICRO_MAPPING, method = RequestMethod.GET)
     public ResponseEntity<?> capturesMicro(@PathVariable String beaconId) {
         service.checkIfCarExistByBeaconId(beaconId);
+        try {
+            authorizationService.hasAccessByBeaconId(beaconId);
+        } catch (IllegalAccessException e) {
+            if(CarStatus.STOLEN != service.getCarStatusByCarBeaconId(beaconId)){
+                throw e;
+            }
+        }
 
         Collection<Integer> indices = fileUtil.getCaptureIndices(beaconId);
 
@@ -122,6 +152,13 @@ public class CarPhotosController {
                                    @PathVariable Integer index
     ) throws IOException {
         service.checkIfCarExistByBeaconId(beaconId);
+        try {
+            authorizationService.hasAccessByBeaconId(beaconId);
+        } catch (IllegalAccessException e) {
+            if(CarStatus.STOLEN != service.getCarStatusByCarBeaconId(beaconId)){
+                throw e;
+            }
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
@@ -139,6 +176,13 @@ public class CarPhotosController {
                                         @PathVariable Integer index
     ) throws IOException {
         service.checkIfCarExistByBeaconId(beaconId);
+        try {
+            authorizationService.hasAccessByBeaconId(beaconId);
+        } catch (IllegalAccessException e) {
+            if(CarStatus.STOLEN != service.getCarStatusByCarBeaconId(beaconId)){
+                throw e;
+            }
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
@@ -237,16 +281,14 @@ public class CarPhotosController {
 
     private URL buildPhotoUrl(String beaconId, int index, String postfix) {
         StringBuilder pathBuilder = new StringBuilder()
-                .append(contextPath)
-                .append(CAR_PHOTOS_MAPPING);
+                .append(contextPath.equals("/") ? "" : contextPath)
+                .append(CAR_PHOTOS_MAPPING.replace("{beaconId}", beaconId));
 
         if (!(postfix == null || postfix.isEmpty())) {
             pathBuilder.append(postfix);
         }
 
-        pathBuilder
-                .append("/").append(beaconId)
-                .append("/").append(index);
+        pathBuilder.append("/").append(index);
 
         URL url = null;
         try {

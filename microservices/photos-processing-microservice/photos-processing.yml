@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: "This is a sample server Nautilus Photos Processing Microservice Api."
-  version: "0.3.4-SNAPSHOT"
+  version: "0.0.1-SNAPSHOT"
   title: "Nautilus Photos Processing Microservice"
   termsOfService: ""
   contact:
