@@ -4,11 +4,11 @@ import com.nautilus.controller.car.CarController;
 import com.nautilus.dto.PartialUpdateBody;
 import com.nautilus.dto.car.CarRegisterDto;
 import com.nautilus.dto.constants.CarStatus;
+import com.nautilus.feign.CarPhotosClient;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.UserNode;
 import com.nautilus.rest.JsonUtil;
 import com.nautilus.service.DataService;
-import com.nautilus.service.file.FileUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +29,7 @@ import static com.nautilus.MockUtil.MOCK_USER_PASSWORD;
 import static com.nautilus.MockUtil.buildMockCar;
 import static com.nautilus.MockUtil.buildMockCarRegisterDTO;
 import static com.nautilus.MockUtil.buildMockUserConfig;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -54,7 +55,7 @@ public class CarControllerTest {
     private DataService service;
 
     @MockBean
-    private FileUtil fileUtil;
+    private CarPhotosClient carPhotosClient;
 
     private static CarNode mockCar;
 
@@ -228,7 +229,7 @@ public class CarControllerTest {
                 .thenReturn(MOCK_USER_EMAIL);
         when(service.getCarNodeByBeaconId(MOCK_CAR_BEACON_ID))
                 .thenReturn(mockCar);
-        doNothing().when(fileUtil).delete(MOCK_CAR_BEACON_ID);
+        doNothing().when(carPhotosClient).deleteCarPhotos(anyString(), anyString());doNothing().when(carPhotosClient).deleteCarPhotos(anyString(), anyString());
 
         mockMvc.perform(delete(CarController.CAR_MAPPING + "/" + MOCK_CAR_BEACON_ID))
                 .andExpect(status().isOk());

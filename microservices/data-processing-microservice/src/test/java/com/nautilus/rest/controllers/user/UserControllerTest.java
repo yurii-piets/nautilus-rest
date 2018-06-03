@@ -6,6 +6,7 @@ import com.nautilus.dto.car.CarDto;
 import com.nautilus.dto.constants.RegisterError;
 import com.nautilus.dto.user.RegisterUserDto;
 import com.nautilus.dto.user.UserInfoDto;
+import com.nautilus.feign.CarPhotosClient;
 import com.nautilus.node.UserNode;
 import com.nautilus.rest.JsonUtil;
 import com.nautilus.service.DataService;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.Set;
 
 import static com.nautilus.MockUtil.buildMockUserWithCar;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,6 +54,9 @@ public class UserControllerTest {
 
     @MockBean
     private DataService service;
+
+    @MockBean
+    private CarPhotosClient carPhotosClient;
 
     private static UserNode mockUser;
 
@@ -288,6 +294,7 @@ public class UserControllerTest {
     @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
     public void deleteUser() throws Exception {
         when(service.getUserNodeByEmail(MOCK_USER_EMAIL)).thenReturn(mockUser);
+        doNothing().when(carPhotosClient).deleteCarPhotos(anyString(), anyString());
 
         mockMvc.perform(delete(UserController.USER_MAPPING))
                 .andExpect(status().isOk());
