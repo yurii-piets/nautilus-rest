@@ -3,11 +3,8 @@ package com.nautilus.controller;
 import com.google.common.io.Files;
 import com.nautilus.dto.constants.CarStatus;
 import com.nautilus.exception.WrongBeaconIdException;
-import com.nautilus.node.CarNode;
-import com.nautilus.node.UserNode;
 import com.nautilus.service.DataService;
 import com.nautilus.service.file.FileUtil;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +27,6 @@ import java.util.Set;
 import static com.nautilus.controller.CarPhotosController.CAPTURES_MAPPING;
 import static com.nautilus.controller.CarPhotosController.CAR_PHOTOS_MAPPING;
 import static com.nautilus.controller.CarPhotosController.MICRO_MAPPING;
-import static com.nautilus.controller.MockUtil.MOCK_CAR_BEACON_ID;
-import static com.nautilus.controller.MockUtil.MOCK_USER_EMAIL;
-import static com.nautilus.controller.MockUtil.MOCK_USER_PASSWORD;
-import static com.nautilus.controller.MockUtil.buildMockCar;
-import static com.nautilus.controller.MockUtil.buildMockUserConfig;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -51,6 +43,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CarPhotosControllerTest {
+
+    private static final String MOCK_USER_EMAIL = "luke.skywalker@nautilus.com";
+
+    private static final String MOCK_USER_PASSWORD = "star_wars";
+
+    private static final String MOCK_CAR_BEACON_ID = "2412794";
 
     @Autowired
     private MockMvc mockMvc;
@@ -79,19 +77,7 @@ public class CarPhotosControllerTest {
     @Value("${photos.max}")
     private Integer maxPhotos;
 
-    private static CarNode mockCar;
-
-    private static UserNode mockUser;
-
     private final File testImageFile = new File(this.getClass().getClassLoader().getResource("test_image.png").getFile());
-
-    @Before
-    public void before() {
-        mockCar = buildMockCar();
-        mockUser = buildMockUserConfig();
-        mockCar.setOwner(mockUser);
-        mockUser.getCars().add(mockCar);
-    }
 
     @Test
     public void getCarPhotosWhenNoAuth() throws Exception {
