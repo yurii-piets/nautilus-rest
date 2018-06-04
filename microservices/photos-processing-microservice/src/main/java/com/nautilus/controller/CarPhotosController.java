@@ -187,6 +187,7 @@ public class CarPhotosController {
                                           @PathVariable Integer index
     ) throws IOException {
         service.checkIfCarExistByBeaconId(beaconId);
+        authorizationService.hasAccessByBeaconId(beaconId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
@@ -203,6 +204,7 @@ public class CarPhotosController {
                                           @PathVariable Integer index
     ) throws IOException {
         service.checkIfCarExistByBeaconId(beaconId);
+        authorizationService.hasAccessByBeaconId(beaconId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);

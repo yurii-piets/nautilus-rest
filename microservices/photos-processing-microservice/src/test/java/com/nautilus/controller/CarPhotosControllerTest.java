@@ -1,5 +1,6 @@
 package com.nautilus.controller;
 
+import com.google.common.io.Files;
 import com.nautilus.dto.constants.CarStatus;
 import com.nautilus.exception.WrongBeaconIdException;
 import com.nautilus.node.CarNode;
@@ -19,7 +20,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.File;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import static com.nautilus.controller.CarPhotosController.CAPTURES_MAPPING;
@@ -74,6 +77,9 @@ public class CarPhotosControllerTest {
     private static CarNode mockCar;
 
     private static UserNode mockUser;
+
+    private final File testImageFile = new File(this.getClass().getClassLoader().getResource("test_image.png").getFile());
+    ;
 
     @Before
     public void before() {
@@ -237,6 +243,7 @@ public class CarPhotosControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(uris));
     }
+
     @Test
     public void getCarCapturesMicroPhotoWhenNoAuth() throws Exception {
         mockMvc.perform(get((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING + MICRO_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
@@ -287,5 +294,151 @@ public class CarPhotosControllerTest {
         mockMvc.perform(get((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING + MICRO_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(uris));
+    }
+
+    @Test
+    public void getCarPhotoByIndexWhenNoAuth() throws Exception {
+        mockMvc.perform(get(((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING + "/" + 0).replace("{beaconId}", MOCK_CAR_BEACON_ID))))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void getCarPhotoByIndexWhenCarNotExist() throws Exception {
+        doThrow(WrongBeaconIdException.class).when(dataService).checkIfCarExistByBeaconId(anyString());
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + "/" + 0).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "wrong_name", password = "wrong_pass", roles = "USER")
+    public void getCarPhotosByIndexWhenCarIsStolenAndUserNotAllowed() throws Exception {
+        int index = new Random().nextInt();
+        when(dataService.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(CarStatus.STOLEN);
+        when(fileUtil.getOriginal(MOCK_CAR_BEACON_ID, index)).thenReturn(testImageFile);
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + "/" + index).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isOk())
+                .andExpect(content().bytes(Files.toByteArray(testImageFile)));
+    }
+
+    @Test
+    @WithMockUser(username = "wrong_name", password = "wrong_pass", roles = "USER")
+    public void getCarPhotosByIndexWhenCarIsOkAndUserNotAllowed() throws Exception {
+        when(dataService.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(CarStatus.OK);
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + "/" + 0).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void getCarPhotosByIndexWhenIsOk() throws Exception {
+        int index = new Random(0).nextInt();
+        doNothing().when(dataService).checkIfCarExistByBeaconId(anyString());
+        when(fileUtil.getOriginal(MOCK_CAR_BEACON_ID, index)).thenReturn(testImageFile);
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + "/" + index).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isOk())
+                .andExpect(content().bytes(Files.toByteArray(testImageFile)));
+    }
+
+    @Test
+    public void getCarMicroPhotoByIndexWhenNoAuth() throws Exception {
+        mockMvc.perform(get(((CAR_PHOTOS_MAPPING + MICRO_MAPPING + "/" + 9).replace("{beaconId}", MOCK_CAR_BEACON_ID))))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void getCarMicroPhotoByIndexWhenCarNotExist() throws Exception {
+        doThrow(WrongBeaconIdException.class).when(dataService).checkIfCarExistByBeaconId(anyString());
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + MICRO_MAPPING + "/" + 9).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "wrong_name", password = "wrong_pass", roles = "USER")
+    public void getCarMicroPhotosByIndexWhenCarIsStolenAndUserNotAllowed() throws Exception {
+        int index = new Random(0).nextInt();
+        when(dataService.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(CarStatus.STOLEN);
+        when(fileUtil.getMicro(MOCK_CAR_BEACON_ID, index)).thenReturn(testImageFile);
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + MICRO_MAPPING + "/" + index).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isOk())
+                .andExpect(content().bytes(Files.toByteArray(testImageFile)));
+    }
+
+    @Test
+    @WithMockUser(username = "wrong_name", password = "wrong_pass", roles = "USER")
+    public void getCarMicroPhotosByIndexWhenCarIsOkAndUserNotAllowed() throws Exception {
+        when(dataService.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(CarStatus.OK);
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + MICRO_MAPPING + "/" + 9).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void getCarMicroPhotosByIndexWhenIsOk() throws Exception {
+        int index = new Random(0).nextInt();
+        doNothing().when(dataService).checkIfCarExistByBeaconId(anyString());
+        when(fileUtil.getMicro(MOCK_CAR_BEACON_ID, index)).thenReturn(testImageFile);
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + MICRO_MAPPING + "/" + index).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isOk())
+                .andExpect(content().bytes(Files.toByteArray(testImageFile)));
+    }
+
+    @Test
+    public void getCarCapturesMicroPhotoByIndexWhenNoAuth() throws Exception {
+        mockMvc.perform(get(((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING + MICRO_MAPPING + "/" + 9).replace("{beaconId}", MOCK_CAR_BEACON_ID))))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void getCarCapturesMicroPhotoByIndexWhenCarNotExist() throws Exception {
+        doThrow(WrongBeaconIdException.class).when(dataService).checkIfCarExistByBeaconId(anyString());
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING + MICRO_MAPPING + "/" + 9).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "wrong_name", password = "wrong_pass", roles = "USER")
+    public void getCarCapturesMicroPhotosByIndexWhenCarIsStolenAndUserNotAllowed() throws Exception {
+        int index = new Random(0).nextInt();
+        when(dataService.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(CarStatus.STOLEN);
+        when(fileUtil.getCaptureMicro(MOCK_CAR_BEACON_ID, index)).thenReturn(testImageFile);
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING + "/" + index + MICRO_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "wrong_name", password = "wrong_pass", roles = "USER")
+    public void getCarCapturesMicroPhotosByIndexWhenCarIsOkAndUserNotAllowed() throws Exception {
+        when(dataService.getCarStatusByCarBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(CarStatus.OK);
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING + "/" + 9 + MICRO_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void getCarCapturesMicroPhotosByIndexWhenIsOk() throws Exception {
+        int index = new Random(0).nextInt();
+        doNothing().when(dataService).checkIfCarExistByBeaconId(anyString());
+        when(fileUtil.getCaptureMicro(MOCK_CAR_BEACON_ID, index)).thenReturn(testImageFile);
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+
+        mockMvc.perform(get((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING + "/" + index + MICRO_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isOk())
+                .andExpect(content().bytes(Files.toByteArray(testImageFile)));
     }
 }
