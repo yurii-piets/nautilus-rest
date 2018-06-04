@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -37,7 +38,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -79,7 +82,6 @@ public class CarPhotosControllerTest {
     private static UserNode mockUser;
 
     private final File testImageFile = new File(this.getClass().getClassLoader().getResource("test_image.png").getFile());
-    ;
 
     @Before
     public void before() {
@@ -440,5 +442,156 @@ public class CarPhotosControllerTest {
         mockMvc.perform(get((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING + "/" + index + MICRO_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
                 .andExpect(status().isOk())
                 .andExpect(content().bytes(Files.toByteArray(testImageFile)));
+    }
+
+    @Test
+    public void postCarPhotoWhenUnauthorised() throws Exception {
+        mockMvc.perform(post(CAR_PHOTOS_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "wrong_user", password = "wrong_password", roles = "USER")
+    public void postCarPhotosWhenNotAllowed() throws Exception {
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+        doNothing().when(dataService).checkIfCarExistByBeaconId(MOCK_CAR_BEACON_ID);
+
+        mockMvc.perform(post(CAR_PHOTOS_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID))
+                .contentType("multipart/form-data"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void postCarPhotosWhenNoFiles() throws Exception {
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+        doNothing().when(dataService).checkIfCarExistByBeaconId(MOCK_CAR_BEACON_ID);
+
+        mockMvc.perform(post(CAR_PHOTOS_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID))
+                .contentType("multipart/form-data"))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void postCarPhotosWhenFilesOverLimit() throws Exception {
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+        doNothing().when(dataService).checkIfCarExistByBeaconId(MOCK_CAR_BEACON_ID);
+
+        mockMvc.perform(fileUpload(CAR_PHOTOS_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .contentType("multipart/form-data"))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void postCarPhotosWhenCarNotFound() throws Exception {
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+        doThrow(WrongBeaconIdException.class).when(dataService).checkIfCarExistByBeaconId(MOCK_CAR_BEACON_ID);
+
+        mockMvc.perform(fileUpload(CAR_PHOTOS_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID))
+                        .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                        .contentType("multipart/form-data"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void postCarPhotosWhenOk() throws Exception {
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+
+        mockMvc.perform(fileUpload(CAR_PHOTOS_MAPPING.replace("{beaconId}", MOCK_CAR_BEACON_ID))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .contentType("multipart/form-data"))
+                .andExpect(status().isAccepted());
+    }
+
+    @Test
+    public void postCarCapturesPhotoWhenUnauthorised() throws Exception {
+        mockMvc.perform(post((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "wrong_user", password = "wrong_password", roles = "USER")
+    public void postCarCapturesPhotosWhenNotAllowed() throws Exception {
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+        doNothing().when(dataService).checkIfCarExistByBeaconId(MOCK_CAR_BEACON_ID);
+
+        mockMvc.perform(fileUpload((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .contentType("multipart/form-data"))
+                .andExpect(status().isAccepted());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void postCarCapturesPhotosWhenNoFiles() throws Exception {
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+        doNothing().when(dataService).checkIfCarExistByBeaconId(MOCK_CAR_BEACON_ID);
+
+        mockMvc.perform(post((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID))
+                .contentType("multipart/form-data"))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void postCarCapturesPhotosWhenFilesOverLimit() throws Exception {
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+        doNothing().when(dataService).checkIfCarExistByBeaconId(MOCK_CAR_BEACON_ID);
+
+        mockMvc.perform(fileUpload((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .contentType("multipart/form-data"))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void postCarCapturesPhotosWhenCarNotFound() throws Exception {
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+        doThrow(WrongBeaconIdException.class).when(dataService).checkIfCarExistByBeaconId(MOCK_CAR_BEACON_ID);
+
+        mockMvc.perform(fileUpload((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID))
+                        .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                        .contentType("multipart/form-data"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = MOCK_USER_EMAIL, password = MOCK_USER_PASSWORD, roles = "USER")
+    public void postCarCapturesPhotosWhenOk() throws Exception {
+        when(dataService.getEmailByBeaconId(MOCK_CAR_BEACON_ID)).thenReturn(MOCK_USER_EMAIL);
+
+        mockMvc.perform(fileUpload((CAR_PHOTOS_MAPPING + CAPTURES_MAPPING).replace("{beaconId}", MOCK_CAR_BEACON_ID))
+                .file(new MockMultipartFile("file", Files.toByteArray(testImageFile)))
+                .contentType("multipart/form-data"))
+                .andExpect(status().isAccepted());
     }
 }

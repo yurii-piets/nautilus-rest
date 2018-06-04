@@ -221,17 +221,13 @@ public class CarPhotosController {
                                       @RequestParam("file") Collection<MultipartFile> files) throws IOException {
 
         authorizationService.hasAccessByBeaconId(beaconId);
-
         if (files == null || files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
-
         if (files.size() > maxPhotos) {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
-
         service.checkIfCarExistByBeaconId(beaconId);
-
         fileUtil.saveOriginal(beaconId, files);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
@@ -239,14 +235,15 @@ public class CarPhotosController {
     @RequestMapping(value = CAPTURES_MAPPING, method = RequestMethod.POST)
     public ResponseEntity<?> capture(@PathVariable String beaconId,
                                      @RequestParam("file") List<MultipartFile> files) throws IOException {
-        service.checkIfCarExistByBeaconId(beaconId);
 
+        service.checkIfCarExistByBeaconId(beaconId);
         if (files == null || files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
-
+        if (files.size() > maxPhotos) {
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+        }
         fileUtil.saveCapture(beaconId, files);
-
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
