@@ -42,9 +42,9 @@ public class CarPhotosController {
 
     public final static String CAR_PHOTOS_MAPPING = "/car/{beaconId}/photos";
 
-    private static final String MICRO_MAPPING = "/micro";
+    public static final String MICRO_MAPPING = "/micro";
 
-    private static final String CAPTURES_MAPPING = "/captures";
+    public static final String CAPTURES_MAPPING = "/captures";
 
     private final DataService service;
 
@@ -110,13 +110,7 @@ public class CarPhotosController {
     @RequestMapping(value = CAPTURES_MAPPING, method = RequestMethod.GET)
     public ResponseEntity<?> captures(@PathVariable String beaconId) {
         service.checkIfCarExistByBeaconId(beaconId);
-        try {
-            authorizationService.hasAccessByBeaconId(beaconId);
-        } catch (IllegalAccessException e) {
-            if(CarStatus.STOLEN != service.getCarStatusByCarBeaconId(beaconId)){
-                throw e;
-            }
-        }
+        authorizationService.hasAccessByBeaconId(beaconId);
 
         Collection<Integer> indices = fileUtil.getCaptureIndices(beaconId);
 
@@ -130,13 +124,7 @@ public class CarPhotosController {
     @RequestMapping(value = CAPTURES_MAPPING + MICRO_MAPPING, method = RequestMethod.GET)
     public ResponseEntity<?> capturesMicro(@PathVariable String beaconId) {
         service.checkIfCarExistByBeaconId(beaconId);
-        try {
-            authorizationService.hasAccessByBeaconId(beaconId);
-        } catch (IllegalAccessException e) {
-            if(CarStatus.STOLEN != service.getCarStatusByCarBeaconId(beaconId)){
-                throw e;
-            }
-        }
+        authorizationService.hasAccessByBeaconId(beaconId);
 
         Collection<Integer> indices = fileUtil.getCaptureIndices(beaconId);
 
@@ -284,11 +272,11 @@ public class CarPhotosController {
                 .append(contextPath.equals("/") ? "" : contextPath)
                 .append(CAR_PHOTOS_MAPPING.replace("{beaconId}", beaconId));
 
+        pathBuilder.append("/").append(index);
+
         if (!(postfix == null || postfix.isEmpty())) {
             pathBuilder.append(postfix);
         }
-
-        pathBuilder.append("/").append(index);
 
         URL url = null;
         try {
