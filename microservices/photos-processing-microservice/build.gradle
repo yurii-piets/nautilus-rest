@@ -4,7 +4,7 @@ plugins {
 
 apply plugin: 'io.spring.dependency-management'
 
-version = '0.2.5-SNAPSHOT'
+version = '0.0.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -20,12 +20,12 @@ dependencyManagement {
 }
 
 dependencies {
-    compile project(':database')
     compile project(':common')
+    compile project(':database')
 
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.1.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.0.1.RELEASE'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '1.4.4.RELEASE'
-    compile group: 'org.springframework', name: 'spring-web', version: '5.0.6.RELEASE'
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-feign', version: '2.0.0.M2'
+
+    compile group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
 }

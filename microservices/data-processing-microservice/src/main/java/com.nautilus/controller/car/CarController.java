@@ -3,11 +3,12 @@ package com.nautilus.controller.car;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.nautilus.dto.PartialUpdateBody;
 import com.nautilus.dto.car.CarRegisterDto;
+import com.nautilus.feign.CarPhotosClient;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.UserNode;
+import com.nautilus.security.AuthHeaderConverter;
 import com.nautilus.service.AuthorizationService;
 import com.nautilus.service.DataService;
-import com.nautilus.service.file.FileUtil;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +43,9 @@ public class CarController {
 
     private final AuthorizationService authorizationService;
 
-    private final FileUtil fileUtil;
+    private final CarPhotosClient carPhotosClient;
+
+    private final AuthHeaderConverter authHeaderConverter;
 
     @RequestMapping(value = "/{beaconId}", method = RequestMethod.GET)
     public ResponseEntity<?> info(@PathVariable String beaconId) {
@@ -68,7 +71,7 @@ public class CarController {
         }
 
         CarNode car = new CarNode(carRegisterDto, user);
-        if(user.getCars() != null){
+        if (user.getCars() != null) {
             user.getCars().add(car);
         } else {
             user.setCars(Set.of(car));
@@ -106,9 +109,8 @@ public class CarController {
         authorizationService.hasAccessByBeaconId(beaconId);
 
         CarNode car = service.getCarNodeByBeaconId(beaconId);
+        carPhotosClient.deleteCarPhotos(authHeaderConverter.convertCredentialsToHeader(), beaconId);
         service.deleteCarById(car.getId());
-        fileUtil.delete(car.getBeaconId());
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

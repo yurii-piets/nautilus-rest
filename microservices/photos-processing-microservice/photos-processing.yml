@@ -1,0 +1,416 @@
+openapi: 3.0.0
+info:
+  description: "This is a sample server Nautilus Photos Processing Microservice Api."
+  version: "0.0.1-SNAPSHOT"
+  title: "Nautilus Photos Processing Microservice"
+  termsOfService: ""
+  contact:
+    email: "piets.yurii@gmail.com"
+
+tags:
+  - name: "car"
+    description: "Car photos operations."
+
+#change on prod
+servers:
+  - url: http://127.0.0.1:8082/
+
+securityDefinitions:
+  BasicAuth:
+    type: basic
+
+paths:
+  /car/{beaconId}/photos:
+    get:
+      tags:
+        - car
+      description: List of url to car photos.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "https://${host}:${port}/car/${beaconId}/photos/1"
+        401:
+          description: Not authenticated
+        403:
+          description: Current user is not allowed to access the car.
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []
+
+    post:
+      tags:
+        - car
+      description: Save car photos.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                type: string
+                format: binary
+            encoding:
+              profileImage:
+                contentType: image/png, image/jpeg
+      responses:
+        202:
+          description: Accepted
+        401:
+          description: Not authenticated
+        403:
+          description: Current user is not allowed to access the car.
+        404:
+          description: Car with beacon id does not exist.
+        406:
+          description: Amount of photos is over limit or is empty.
+      security:
+        - BasicAuth: []
+
+    delete:
+      tags:
+        - car
+      description: Delete all car photos.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+      responses:
+        202:
+          description: Accepted
+        401:
+          description: Not authenticated
+        403:
+          description: Current user is not allowed to access the car.
+        404:
+          description: Car with beacon id does not exist.
+        406:
+          description: Amount of photos is over limit or is empty.
+      security:
+        - BasicAuth: []
+
+  /car/{beaconId}/photos/{index}:
+    get:
+      tags:
+        - car
+      description: Photo by index.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+        - in: path
+          name: index
+          schema:
+            type: number
+          required: true
+          description: Index of the photos.
+      responses:
+        200:
+          description: OK
+          content:
+            multipart/form-data:
+              schema:
+                type: string
+                format: binary
+              encoding:
+                profileImage:
+                  contentType: image/png, image/jpeg
+        401:
+          description: Not authenticated
+        403:
+          description: Current user is not allowed to access the car.
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []
+
+    delete:
+      tags:
+        - car
+      description: Delte photo by index.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+        - in: path
+          name: index
+          schema:
+            type: number
+          required: true
+          description: Index of the photos.
+      responses:
+        200:
+          description: OK
+        401:
+          description: Not authenticated
+        403:
+          description: Current user is not allowed to access the car.
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []
+
+  /car/{beaconId}/photos/micro:
+    get:
+      tags:
+        - car
+      description: List of  url to car photos.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "https://${host}:${port}/car/${beaconId}/photos/micro/1"
+        401:
+          description: Not authenticated
+        403:
+          description: Current user is not allowed to access the car.
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []
+
+  /car/{beaconId}/photos/{index}/micro:
+    get:
+      tags:
+        - car
+      description: Photo's micro copy by index.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+        - in: path
+          name: index
+          schema:
+            type: number
+          required: true
+          description: Index of the photos.
+      responses:
+        200:
+          description: OK
+          content:
+            multipart/form-data:
+              schema:
+                type: string
+                format: binary
+              encoding:
+                profileImage:
+                  contentType: image/png, image/jpeg
+        401:
+          description: Not authenticated
+        403:
+          description: Current user is not allowed to access the car.
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []
+
+  /car/{beaconId}/photos/captures:
+    get:
+      tags:
+        - car
+      description: List of urls to car photos that were captures by another users.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "https://${host}:${port}/car/${beaconId}/photos/captures/1"
+        401:
+          description: Not authenticated
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []
+    post:
+      tags:
+        - car
+      description: Save capture photo.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                type: string
+                format: binary
+            encoding:
+              profileImage:
+                contentType: image/png, image/jpeg
+      responses:
+        202:
+          description: Accepted
+        401:
+          description: Not authenticated
+        404:
+          description: Car with beacon id does not exist.
+        406:
+          description: Amount of photos is over limit or is empty.
+      security:
+        - BasicAuth: []
+
+
+  /car/{beaconId}/photos/captures/{index}:
+    get:
+      tags:
+        - car
+      description: Capture photos made by another users.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+        - in: path
+          name: index
+          schema:
+            type: number
+          required: true
+          description: Index of the photos.
+      responses:
+        200:
+          description: OK
+          content:
+            multipart/form-data:
+              schema:
+                type: string
+                format: binary
+              encoding:
+                profileImage:
+                  contentType: image/png, image/jpeg
+        401:
+          description: Not authenticated
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []
+
+
+  /car/{beaconId}/photos/captures/micro:
+    get:
+      tags:
+        - car
+      description: List of urls to car photo's small copies that were captures by another users.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "https://${host}:${port}/car/${beaconId}/photos/captures/micro/1"
+        401:
+          description: Not authenticated
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []
+
+  /car/{beaconId}/photos/captures/{index}/micro:
+    get:
+      tags:
+        - car
+      description: Capture photo's micro copies made by another users.
+      parameters:
+        - in: path
+          name: beaconId
+          schema:
+            type: string
+          required: true
+          description: Id of the beacon that is paired with the car
+        - in: path
+          name: index
+          schema:
+            type: number
+          required: true
+          description: Index of the photos.
+      responses:
+        200:
+          description: OK
+          content:
+            multipart/form-data:
+              schema:
+                type: string
+                format: binary
+              encoding:
+                profileImage:
+                  contentType: image/png, image/jpeg
+        401:
+          description: Not authenticated
+        404:
+          description: Car not found
+      security:
+        - BasicAuth: []

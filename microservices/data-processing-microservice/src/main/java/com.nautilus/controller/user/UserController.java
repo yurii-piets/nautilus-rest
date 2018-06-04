@@ -5,10 +5,11 @@ import com.nautilus.dto.PartialUpdateBody;
 import com.nautilus.dto.car.CarDto;
 import com.nautilus.dto.constants.RegisterError;
 import com.nautilus.dto.user.RegisterUserDto;
+import com.nautilus.feign.CarPhotosClient;
 import com.nautilus.node.CarNode;
 import com.nautilus.node.UserNode;
+import com.nautilus.security.AuthHeaderConverter;
 import com.nautilus.service.DataService;
-import com.nautilus.service.file.FileUtil;
 import com.nautilus.utilities.JsonPatchUtility;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -45,7 +46,9 @@ public class UserController {
 
     private final JsonPatchUtility patchUtility;
 
-    private final FileUtil fileUtil;
+    private final CarPhotosClient carPhotosClient;
+
+    private final AuthHeaderConverter authHeaderConverter;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> info() {
@@ -98,8 +101,13 @@ public class UserController {
         if (user == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
+        Set<CarNode> cars = user.getCars();
+        if(cars != null) {
+            cars.stream()
+                    .map(CarNode::getBeaconId)
+                    .forEach(b -> carPhotosClient.deleteCarPhotos(authHeaderConverter.convertCredentialsToHeader(), b));
+        }
         service.deleteUserById(user.getId());
-        fileUtil.delete(user.getId());
         return new ResponseEntity(HttpStatus.OK);
     }
 

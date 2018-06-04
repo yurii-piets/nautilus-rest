@@ -1,6 +1,8 @@
-package com.nautilus.controller.exception;
+package com.nautilus.controller;
 
+import com.nautilus.exception.FileNotDeletedException;
 import com.nautilus.exception.IllegalAccessException;
+import com.nautilus.exception.OverLimitNumberOfFilesException;
 import com.nautilus.exception.WrongBeaconIdException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,18 @@ public class ExceptionHandlingController extends ResponseEntityExceptionHandler 
     public ResponseEntity<?> handle(FileNotFoundException e) {
         logger.error("Unexpected: ", e);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = OverLimitNumberOfFilesException.class)
+    public ResponseEntity<?> handle(OverLimitNumberOfFilesException e) {
+        logger.error("Unexpected: ", e);
+        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(value = {FileNotDeletedException.class})
+    public ResponseEntity<?> handle(FileNotDeletedException e) {
+        logger.error("Unexpected: ", e);
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = {AccessDeniedException.class})

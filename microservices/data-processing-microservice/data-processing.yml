@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: "This is a sample server Nautilus Data Processing Microservice Api."
-  version: "0.2.4-SNAPSHOT"
+  version: "0.2.5-SNAPSHOT"
   title: "Nautilus Data Processing Microservice"
   termsOfService: ""
   contact:
